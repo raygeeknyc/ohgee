@@ -3,6 +3,7 @@ import Queue
 from array import array
 import threading
 import time
+import io
 import sys
 import pyaudio
 from streamrw import StreamRW
@@ -33,15 +34,14 @@ class SpeechProcessor():
     def stop(self):
         self._stop = True
     
-    def processSoundBites(audio_stream, transcript):
-        shutdown = False
+    def processSoundBites(self, audio_stream, transcript):
         audio_sample = self._speech_client.sample(
             stream=audio_stream,
             source_uri=None,
             encoding=speech.encoding.Encoding.LINEAR16,
             sample_rate_hertz=RATE)
 
-        while not shutdown:
+        while not self._stop:
             logging.info("Processing sound")
             # Find transcriptions of the audio content
             try:
@@ -65,7 +65,7 @@ class SpeechProcessor():
         logging.info("capturing")
         transcript = Queue.Queue()
         audio_pipe = StreamRW(io.BytesIO())
-        soundprocessor = threading.Thread(target=processSoundBites, args=(audio_pipe, transcript,))
+        soundprocessor = threading.Thread(target=self.processSoundBites, args=(audio_pipe, transcript,))
         soundprocessor.start()
         while not self._stop:
             soundbite = Queue.Queue()
