@@ -1,7 +1,7 @@
 import io
 class StreamRW(io.BufferedRandom):
-    def __init__(self, raw):
-        super(StreamRW, self).__init__(raw)
+    def __init__(self, raw, buffer_size):
+        super(StreamRW, self).__init__(raw, buffer_size)
         self.seek(0)
 
     def read(self, size=1):
