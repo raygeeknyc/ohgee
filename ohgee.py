@@ -23,6 +23,8 @@ RATE = 44100
 FRAMES_PER_BUFFER = 4096
 SILENCE_THRESHOLD = 700
 PAUSE_LENGTH_SECS = 1
+SPEECH_WAIT_SECS = 2
+MAX_BUFFERED_SAMPLES = 3
 PAUSE_LENGTH_IN_SAMPLES = int((PAUSE_LENGTH_SECS * RATE / FRAMES_PER_BUFFER) + 0.5)
  
 class SpeechProcessor():
@@ -33,8 +35,10 @@ class SpeechProcessor():
         self._audio = pyaudio.PyAudio()
         self._transcript = transcript
         self._audio_stream = StreamRW(io.BytesIO(), RATE*FRAMES_PER_BUFFER)
-        self.speech_recognizer = threading.Thread(target=self.processSoundBites )
-        self.speech_recognizer.start()
+        self._speech_recognizer = threading.Thread(target=self.processSoundBites )
+        self._speech_recognizer.start()
+        self._sound_ingester = threading.Thread(target=self.getSound)
+        self._sound_ingester.start()
 
     def stop_recognizing(self):
         self._stop_recognizing = True
@@ -56,16 +60,16 @@ class SpeechProcessor():
                 alternatives = audio_sample.streaming_recognize('en-US',
                     interim_results=True)
                 for alternative in alternatives:
-                    logging.info('Transcript: {}'.format(alternative.transcript))
+                    logging.debug('Transcript: {}'.format(alternative.transcript))
                     logging.debug('Finished: {}'.format(alternative.is_final))
                     logging.debug('Stability: {}'.format(alternative.stability))
                     logging.debug('Confidence: {}'.format(alternative.confidence))
                     if alternative.is_final:
                         self._transcript.put(alternative.transcript)
                 if self._stop_recognizing: break
-        except:
+        except Exception, e:
             alternatives = None
-            logging.error("could not set up recognizer")
+            logging.error("error recognizing: {}".format(e))
         logging.debug("stopped recognizing")
 
     def getSound(self):
@@ -75,7 +79,7 @@ class SpeechProcessor():
             frames_per_buffer=FRAMES_PER_BUFFER)
 
         consecutive_silent_samples = 0
-        logging.info("capturing")
+        logging.info("capturing from the mic")
         samples = 0
         while True:
             samples += 1
@@ -89,24 +93,25 @@ class SpeechProcessor():
                 else:
                     consecutive_silent_samples = 0
                 self._audio_stream.write(data)
-                if not samples % 10:
+                if not samples % MAX_BUFFERED_SAMPLES or consecutive_silent_samples >= PAUSE_LENGTH_IN_SAMPLES or self._stop_recording:
                     self._audio_stream.flush()
-                if consecutive_silent_samples >= PAUSE_LENGTH_IN_SAMPLES:
-                    logging.debug("pause detected")
             except IOError:
-                logging.debug("-")
+                logging.warning("-")
             if self._stop_recording:
-                self.stop_recognizing()
                 break
-        logging.info("ending")
+        logging.info("ending sound capture")
         # stop Recording
         mic_stream.stop_stream()
         mic_stream.close()
         self._audio.terminate()
 
+    def waitForLastSample(self):
+        logging.debug("Waiting for processor to exit")
+        self._sound_ingester.join()
+
     def waitForFinalTranscript(self):
         logging.debug("Waiting for processor to exit")
-        self.speech_recognizer.join()
+        self._speech_recognizer.join()
 
 if __name__ == '__main__':
     logging.getLogger().setLevel(_DEBUG)
@@ -114,15 +119,17 @@ if __name__ == '__main__':
     transcript = Queue.Queue()
     speech_processor = SpeechProcessor(transcript)
     try:
-        speech_processor.getSound()
-    #    sound_ingester = threading.Thread(target=speech_processor.getSound)
-    #    sound_ingester.start()
-    #    while True:
-    #        time.sleep(10)
+        while True:
+            try:
+                speech = transcript.get_nowait()
+                logging.info("speech: {}".format(speech))
+            except Queue.Empty:
+                time.sleep(SPEECH_WAIT_SECS)
     except KeyboardInterrupt:
-        logging.info("Stopping speech analysis")
+        logging.info("Stopping speech processing")
         speech_processor.stop_recording()
+        speech_processor.waitForLastSample()
         speech_processor.stop_recognizing()
         speech_processor.waitForFinalTranscript()
-        logging.info("Final transcript: '%s'" % ";".join(transcript.queue))
+        logging.info("Final speech: '%s'" % ";".join(transcript.queue))
         sys.exit()
