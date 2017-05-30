@@ -1,6 +1,7 @@
 import logging
 _DEBUG = logging.INFO
 
+import multiprocessing
 import Queue
 from array import array
 import threading
@@ -113,10 +114,7 @@ class SpeechProcessor():
         logging.debug("Waiting for processor to exit")
         self._speech_recognizer.join()
 
-if __name__ == '__main__':
-    logging.getLogger().setLevel(_DEBUG)
-    logging.info("Starting speech analysis")
-    transcript = Queue.Queue()
+def runSpeechProcessor(transcript):
     speech_processor = SpeechProcessor(transcript)
     try:
         while True:
@@ -125,11 +123,26 @@ if __name__ == '__main__':
                 logging.info("speech: {}".format(speech))
             except Queue.Empty:
                 time.sleep(SPEECH_WAIT_SECS)
-    except KeyboardInterrupt:
+    except Exception, e:
+        logging.debug("Speech processor received exception: {}".format(e))
         logging.info("Stopping speech processing")
         speech_processor.stop_recording()
         speech_processor.waitForLastSample()
         speech_processor.stop_recognizing()
         speech_processor.waitForFinalTranscript()
-        logging.info("Final speech: '%s'" % ";".join(transcript.queue))
-        sys.exit()
+
+if __name__ == '__main__':
+    logging.getLogger().setLevel(_DEBUG)
+    logging.info("Starting speech analysis")
+    transcript = multiprocessing.Queue()
+    speech_worker = multiprocessing.Process(target = runSpeechProcessor, args=(transcript,))
+    try:
+        speech_worker.start()
+        logging.info("waiting for speech processor to complete")
+        speech_worker.join()
+    except KeyboardInterrupt:
+        speech_worker.terminate()
+    speech_worker.join()
+    
+    logging.info("Final speech: '%s'" % ";".join(transcript.queue))
+    sys.exit()
