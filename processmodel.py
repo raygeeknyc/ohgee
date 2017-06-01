@@ -96,7 +96,7 @@ if __name__=='__main__':
         c = 0
         while not STOP:
             message = o.recv()
-            logging.info("received message: {}".format(message))
+            logging.info("main received message: {}".format(message))
             c += 1
             if c > 5:
                 break;
