@@ -47,7 +47,6 @@ class Background(multiprocessing.Process):
         except Exception, e:
             print("***background exception: {}".format(e))
         print("***background terminating")
-        self.stop()
         self._stopProducing()
         self._stopProcessing()
         self._ingester.join()
@@ -77,10 +76,6 @@ class Background(multiprocessing.Process):
             except Queue.Empty:
                 time.sleep(0.1)
         print("stopped performing")
-
-def runWorker(background):
-    logging.debug("starting background process")
-    background.run()
 
 if __name__=='__main__':
     logging.getLogger().setLevel(_DEBUG)
