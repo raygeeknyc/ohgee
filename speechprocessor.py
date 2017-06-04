@@ -16,10 +16,10 @@ from google.cloud import speech
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 44100
-FRAMES_PER_BUFFER = 4096
+FRAMES_PER_BUFFER = 8192
 SILENCE_THRESHOLD = 700
 PAUSE_LENGTH_SECS = 1
-MAX_BUFFERED_SAMPLES = 3
+MAX_BUFFERED_SAMPLES = 1
 PAUSE_LENGTH_IN_SAMPLES = int((PAUSE_LENGTH_SECS * RATE / FRAMES_PER_BUFFER) + 0.5)
 
 def log(message):
@@ -85,7 +85,7 @@ class SpeechProcessor(multiprocessing.Process):
                 else:
                     consecutive_silent_samples = 0
                 l=self._audio_stream.write(data)
-                print("wrote {} bytes".format(l))
+                log("wrote {} bytes".format(l))
                 log("Vol: {}".format(volume))
                 if not samples % MAX_BUFFERED_SAMPLES or consecutive_silent_samples >= PAUSE_LENGTH_IN_SAMPLES or self._stop_capturing:
                     self._audio_stream.flush()
