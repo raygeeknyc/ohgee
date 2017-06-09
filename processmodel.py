@@ -1,6 +1,8 @@
 import logging
 _DEBUG = logging.DEBUG
 
+import multiprocessingloghandler
+import StringIO
 import multiprocessing
 import threading
 import Queue
@@ -21,35 +23,48 @@ def signal_handler(sig, frame):
 signal.signal(signal.SIGINT, signal_handler)
 
 class Background(multiprocessing.Process):
-    def __init__(self, transcript):
-        multiprocessing.Process.__init__(self)
+    def __init__(self, transcript, log_queue, log_level):
+        super(Background,self).__init__()
         i, o = transcript
         self._exit = multiprocessing.Event()
-        print("Event initially {}".format(self._exit.is_set()))
+        logging.debug("Event initially {}".format(self._exit.is_set()))
+        self._log_queue = log_queue
+        self._log_level = log_level
         self._transcript = i
         self._stop_producing = False
         self._stop_processing = False
         self._work_queue = Queue.Queue()
-        self._ingester = threading.Thread(target=self.getWork)
-        self._processor = threading.Thread(target=self.performWork)
+
+    def _initLogging(self):
+        handler = multiprocessingloghandler.ChildMultiProcessingLogHandler(self._log_queue)
+        logging.getLogger(str(os.getpid())).addHandler(handler)
+        logging.getLogger(str(os.getpid())).setLevel(self._log_level)
 
     def stop(self):
-        print("***background received shutdown")
+        logging.debug("***background received shutdown")
         self._exit.set()
 
     def run(self):
         try:
-            print("***background active")
+            logging.debug("***background active")
+            logging.debug("process %s (%d)" % (self.name, os.getpid()))
+            logging.debug("creating producer")
+            self._producer = threading.Thread(target=self.produceWork)
+            logging.debug("creating processor")
+            self._processor = threading.Thread(target=self.performWork)
+            self._initLogging()
+            logging.debug("starting processor")
             self._processor.start()
-            self._ingester.start()
+            logging.debug("starting producer")
+            self._producer.start()
             self._exit.wait()
  
         except Exception, e:
-            print("***background exception: {}".format(e))
-        print("***background terminating")
+            logging.error("***background exception: {}".format(e))
+        logging.debug("***background terminating")
         self._stopProducing()
         self._stopProcessing()
-        self._ingester.join()
+        self._producer.join()
         self._processor.join()
 
     def _stopProducing(self):
@@ -58,35 +73,38 @@ class Background(multiprocessing.Process):
     def _stopProcessing(self):
         self._stop_processing = True
 
-    def getWork(self):
-        print("producing")
+    def produceWork(self):
+        logging.debug("producing")
         i = 0
         while not self._stop_producing:
             self._work_queue.put(i)
             time.sleep(1)
             i+=1
-        print("stopped producing")
+        logging.debug("stopped producing")
 
     def performWork(self):
-        print("performing")
+        logging.debug("performing")
         while not self._stop_processing:
             try:
                 message = self._work_queue.get(False) 
                 self._transcript.send("i={}".format(message))
             except Queue.Empty:
                 time.sleep(0.1)
-        print("stopped performing")
+        logging.debug("stopped performing")
 
-if __name__=='__main__':
-    logging.getLogger().setLevel(_DEBUG)
+if __name__ == '__main__':
+    log_stream = sys.stderr
+    log_queue = multiprocessing.Queue(100)
+    handler = multiprocessingloghandler.ParentMultiProcessingLogHandler(logging.StreamHandler(log_stream), log_queue)
+    logging.getLogger('').addHandler(handler)
+    logging.getLogger('').setLevel(_DEBUG)
 
     logging.debug("starting main")
     transcript = multiprocessing.Pipe()
-    
-    worker = Background(transcript)
+    background_process = Background(transcript, log_queue, logging.getLogger('').getEffectiveLevel())
     try:
         i, o = transcript
-        worker.start()
+        background_process.start()
         logging.debug("waiting for messages")
         c = 0
         while not STOP:
@@ -95,11 +113,16 @@ if __name__=='__main__':
             c += 1
             if c > 5:
                 break;
+            time.sleep(2)
     except Exception, e:
         logging.error("Error in main: {}".format(e))
     logging.info("ending main")
-    worker.stop()
+    background_process.stop()
     logging.info("waiting for background process to exit")
-    worker.join()
-    logging.info("done")
+    time.sleep(2)
+    background_process.join()
+    time.sleep(2)
+    logging.info("logged: main done")
+    logging.shutdown()
+    logging.error("main post-logging")
     sys.exit() 

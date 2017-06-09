@@ -121,7 +121,3 @@ class SpeechProcessor(multiprocessing.Process):
                 log("error processing speech: {}".format(e))
         o.close()
         log("stopped processing")
-
-def runSpeechProcessor(speech_processor):
-    logging.debug("starting background Speech Processor")
-    speech_processor.run()
