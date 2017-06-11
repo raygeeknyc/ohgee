@@ -35,9 +35,13 @@ def receiveSpeech(transcript):
         logging.debug("done listening")
 
 if __name__ == '__main__':
-    logging.getLogger().setLevel(_DEBUG)
+    log_stream = sys.stderr
+    log_queue = multiprocessing.Queue(100)
+    handler = multiprocessingloghandler.ParentMultiProcessingLogHandler(logging.StreamHandler(log_stream), log_queue)
+    logging.getLogger('').addHandler(handler)
+    logging.getLogger('').setLevel(_DEBUG)
     transcript = multiprocessing.Pipe()
-    speech_worker = speechprocessor.SpeechProcessor(transcript)
+    speech_worker = speechprocessor.SpeechProcessor(transcript, log_queue, logging.getLogger('').getEffectiveLevel())
     logging.info("Starting speech analysis")
     speech_worker.start()
     logging.info("Receiving speech")

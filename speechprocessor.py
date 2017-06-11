@@ -2,6 +2,7 @@ import logging
 _DEBUG = logging.DEBUG
 
 import multiprocessing
+from multiprocessingloghandler import ChildMultiProcessingLogHandler
 import threading
 from streamrw import StreamRW
 import pyaudio
@@ -22,9 +23,6 @@ PAUSE_LENGTH_SECS = 1
 MAX_BUFFERED_SAMPLES = 1
 PAUSE_LENGTH_IN_SAMPLES = int((PAUSE_LENGTH_SECS * RATE / FRAMES_PER_BUFFER) + 0.5)
 
-def log(message):
-    pass
-
 class SpeechProcessor(multiprocessing.Process):
     def __init__(self, transcript):
         multiprocessing.Process.__init__(self)
@@ -41,19 +39,19 @@ class SpeechProcessor(multiprocessing.Process):
         self._audio_stream = StreamRW(io.BytesIO(), MAX_BUFFERED_SAMPLES*FRAMES_PER_BUFFER*2)
 
     def stop(self):
-        log("***background received shutdown")
+        logging.debug("***background received shutdown")
         self._exit.set()
 
     def run(self):
         try:
-            log("***background active")
+            lging.debug("***background active")
             self._processor.start()
             self._ingester.start()
             self._exit.wait()
  
         except Exception, e:
-            log("***background exception: {}".format(e))
-        log("***background terminating")
+            logging.exception("***background exception: {}".format(str(e)))
+        logging.debug("***background terminating")
         self._stopCapturing()
         self._stopProcessing()
         self._ingester.join()
@@ -66,7 +64,7 @@ class SpeechProcessor(multiprocessing.Process):
         self._stop_recognizing = True
 
     def getSound(self):
-        log("capturing")
+        logging.debug("capturing")
         mic_stream = self._audio.open(format=FORMAT, channels=CHANNELS,
             rate=RATE, input=True,
             frames_per_buffer=FRAMES_PER_BUFFER)
@@ -85,23 +83,23 @@ class SpeechProcessor(multiprocessing.Process):
                 else:
                     consecutive_silent_samples = 0
                 l=self._audio_stream.write(data)
-                log("wrote {} bytes".format(l))
-                log("Vol: {}".format(volume))
+                logging.debug("wrote {} bytes".format(l))
+                logging.debug("Vol: {}".format(volume))
                 if not samples % MAX_BUFFERED_SAMPLES or consecutive_silent_samples >= PAUSE_LENGTH_IN_SAMPLES or self._stop_capturing:
                     self._audio_stream.flush()
-                    log("flush")
-            except IOError:
-                log("-")
+                    logging.debug("flush")
+            except IOError, e:
+                logging.exception(e)
  
-        log("ending sound capture")
+        logging.debug("ending sound capture")
         # stop Recording
         mic_stream.stop_stream()
         mic_stream.close()
         self._audio.terminate()
-        log("stopped producing")
+        logging.debug("stopped producing")
 
     def processSound(self):
-        log("processing sound")
+        logging.debug("processing sound")
         audio_sample = self._speech_client.sample(
             stream=self._audio_stream,
             source_uri=None,
@@ -113,11 +111,11 @@ class SpeechProcessor(multiprocessing.Process):
                 alternatives = audio_sample.streaming_recognize('en-US',
                     interim_results=True)
                 for alternative in alternatives:
-                    log("speech: {}".format(alternative.transcript))
+                    logging.info("speech: {}".format(alternative.transcript))
                     if alternative.is_final:
                         o.send(alternative.transcript)
             except Exception, e:
                 alternatives = None
-                log("error processing speech: {}".format(e))
+                logging.exception("error processing speech: {}".format(str(e)))
         o.close()
-        log("stopped processing")
+        logging.debug("stopped processing")
