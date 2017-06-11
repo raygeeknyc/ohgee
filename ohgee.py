@@ -1,7 +1,8 @@
 import logging
-_DEBUG = logging.DEBUG
+_DEBUG = logging.WARNING
 
 import multiprocessing
+from multiprocessingloghandler import ParentMultiProcessingLogHandler
 import Queue
 from array import array
 import threading
@@ -20,7 +21,6 @@ def signal_handler(sig, frame):
     if STOP:
         signal.signal(signal.SIGINT, signal.SIG_IGN)
         os.kill(os.getpid(), signal.SIGTERM)
-    print("STOP")
     STOP = True
 signal.signal(signal.SIGINT, signal_handler)
  
@@ -30,14 +30,14 @@ def receiveSpeech(transcript):
     try:
         while True:
             utterance = o.recv()
-            logging.info("Utterance: {}".format(utterance))
+            print("Utterance: {}".format(utterance))
     except EOFError:
         logging.debug("done listening")
 
 if __name__ == '__main__':
     log_stream = sys.stderr
     log_queue = multiprocessing.Queue(100)
-    handler = multiprocessingloghandler.ParentMultiProcessingLogHandler(logging.StreamHandler(log_stream), log_queue)
+    handler = ParentMultiProcessingLogHandler(logging.StreamHandler(log_stream), log_queue)
     logging.getLogger('').addHandler(handler)
     logging.getLogger('').setLevel(_DEBUG)
     transcript = multiprocessing.Pipe()

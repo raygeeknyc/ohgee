@@ -10,6 +10,7 @@ import array
 import Queue
 import time
 import io
+import os
 import sys
 from google.cloud import speech
 
@@ -24,9 +25,11 @@ MAX_BUFFERED_SAMPLES = 1
 PAUSE_LENGTH_IN_SAMPLES = int((PAUSE_LENGTH_SECS * RATE / FRAMES_PER_BUFFER) + 0.5)
 
 class SpeechProcessor(multiprocessing.Process):
-    def __init__(self, transcript):
+    def __init__(self, transcript, log_queue, logging_level):
         multiprocessing.Process.__init__(self)
         i, o = transcript
+        self._log_queue = log_queue
+        self._logging_level = logging_level
         self._exit = multiprocessing.Event()
         self._transcript = i
         self._speech_client = speech.Client()
@@ -42,9 +45,16 @@ class SpeechProcessor(multiprocessing.Process):
         logging.debug("***background received shutdown")
         self._exit.set()
 
+    def _initLogging(self):
+        handler = ChildMultiProcessingLogHandler(self._log_queue)
+        logging.getLogger(str(os.getpid())).addHandler(handler)
+        logging.getLogger(str(os.getpid())).setLevel(self._logging_level)
+
+
     def run(self):
         try:
-            lging.debug("***background active")
+            self._initLogging()
+            logging.debug("***background active")
             self._processor.start()
             self._ingester.start()
             self._exit.wait()
