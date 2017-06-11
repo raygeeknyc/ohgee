@@ -17,8 +17,8 @@ from google.cloud import speech
 # Setup audio and cloud speech
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
-RATE = 44100
-FRAMES_PER_BUFFER = 8192
+RATE = 16000
+FRAMES_PER_BUFFER = 2048
 SILENCE_THRESHOLD = 700
 PAUSE_LENGTH_SECS = 1
 MAX_BUFFERED_SAMPLES = 1
