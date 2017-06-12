@@ -19,6 +19,7 @@ def signal_handler(sig, frame):
     if STOP:
         signal.signal(signal.SIGINT, signal.SIG_IGN)
         os.kill(os.getpid(), signal.SIGTERM)
+    logging.debug("SIGINT")
     STOP = True
 signal.signal(signal.SIGINT, signal_handler)
 
@@ -91,7 +92,7 @@ class Background(multiprocessing.Process):
                 message = self._work_queue.pop() 
                 self._transcript.send("i={}".format(message))
             except IndexError:
-                time.sleep(0.1)
+                pass
         logging.debug("stopped performing")
 
 if __name__ == '__main__':
