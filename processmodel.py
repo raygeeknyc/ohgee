@@ -5,7 +5,7 @@ import multiprocessingloghandler
 import StringIO
 import multiprocessing
 import threading
-import Queue
+from collections import deque
 import time
 import io
 import sys
@@ -19,6 +19,7 @@ def signal_handler(sig, frame):
     if STOP:
         signal.signal(signal.SIGINT, signal.SIG_IGN)
         os.kill(os.getpid(), signal.SIGTERM)
+    logging.debug("SIGINT")
     STOP = True
 signal.signal(signal.SIGINT, signal_handler)
 
@@ -33,7 +34,7 @@ class Background(multiprocessing.Process):
         self._transcript = i
         self._stop_producing = False
         self._stop_processing = False
-        self._work_queue = Queue.Queue()
+        self._work_queue = deque()
 
     def _initLogging(self):
         handler = multiprocessingloghandler.ChildMultiProcessingLogHandler(self._log_queue)
@@ -77,7 +78,7 @@ class Background(multiprocessing.Process):
         logging.debug("producing")
         i = 0
         while not self._stop_producing:
-            self._work_queue.put(i)
+            self._work_queue.append(i)
             time.sleep(1)
             i+=1
         logging.debug("stopped producing")
@@ -86,10 +87,10 @@ class Background(multiprocessing.Process):
         logging.debug("performing")
         while not self._stop_processing:
             try:
-                message = self._work_queue.get(False) 
+                message = self._work_queue.pop() 
                 self._transcript.send("i={}".format(message))
-            except Queue.Empty:
-                time.sleep(0.1)
+            except IndexError:
+                pass
         logging.debug("stopped performing")
 
 if __name__ == '__main__':
