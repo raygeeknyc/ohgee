@@ -1,5 +1,5 @@
 import logging
-_DEBUG = logging.WARNING
+_DEBUG = logging.INFO
 
 import multiprocessing
 from multiprocessingloghandler import ParentMultiProcessingLogHandler
@@ -17,8 +17,9 @@ STOP = False
 
 def signal_handler(sig, frame):
     global STOP
-    print("signal trapped")
+    logging.debug("INT signal trapped")
     if STOP:
+        logging.debug("second INT signal trapped, killing")
         signal.signal(signal.SIGINT, signal.SIG_IGN)
         os.kill(os.getpid(), signal.SIGTERM)
     STOP = True
@@ -50,7 +51,7 @@ if __name__ == '__main__':
         listener.start()
         logging.info("polling")
         while not STOP:
-            pass
+            time.sleep(0.1)
         logging.info("stopping")
         o, i = transcript
         o.close()
