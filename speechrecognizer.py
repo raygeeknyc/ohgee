@@ -49,14 +49,14 @@ class SpeechRecognizer(multiprocessing.Process):
         try:
             self._audio_stream = FedStream(self._audio_buffer, self._log_queue, self._logging_level)
             self._audio = pyaudio.PyAudio()
-            logging.debug("***background active")
+            logging.debug("recognizer process active")
             self._processor.start()
             self._ingester.start()
             self._exit.wait()
  
         except Exception, e:
-            logging.exception("***background exception: {}".format(str(e)))
-        logging.debug("***background terminating")
+            logging.exception("recognizer process exception: {}".format(str(e)))
+        logging.debug("recognizer process terminating")
         self._stopCapturing()
         self._stopRecognizing()
         self._ingester.join()
@@ -121,6 +121,7 @@ class SpeechRecognizer(multiprocessing.Process):
                     logging.debug("final: {}".format(alternative.is_final))
                     logging.debug("confidence: {}".format(alternative.confidence))
                     if alternative.is_final or self._stop_recognizing:
+                        logging.debug("putting phrase {}".format(alternative.transcript))
                         self._transcript.send(alternative.transcript)
                     if self._stop_recognizing:
                         break

@@ -1,3 +1,4 @@
+import os
 import logging
 import multiprocessing
 from multiprocessingloghandler import ChildMultiProcessingLogHandler
@@ -7,9 +8,10 @@ from google.cloud import language
 class SpeechAnalyzer(multiprocessing.Process):
     def __init__(self, transcript, log_queue, logging_level):
         multiprocessing.Process.__init__(self)
-        self._transcript, _ = transcript
+        _, self._transcript = transcript
         self._exit = multiprocessing.Event()
-
+        self._log_queue = log_queue
+        self._logging_level = logging_level
 
     def _initLogging(self):
         handler = ChildMultiProcessingLogHandler(self._log_queue)
@@ -17,29 +19,32 @@ class SpeechAnalyzer(multiprocessing.Process):
         logging.getLogger(str(os.getpid())).setLevel(self._logging_level)
 
     def stop(self):
-        logging.debug("***background received shutdown")
+        logging.debug("speech analyzer received shutdown")
         self._exit.set()
 
     def run(self):
         self._initLogging()
+        logging.debug("***speech analyzer starting")
         try:
-            language_client = language.Client()
+            self._language_client = language.Client()
             self._analyzeSpeech()
+            logging.debug("speech analyzer done analyzing")
         except Exception, e:
-            logging.exception("***background exception: {}".format(str(e)))
+            logging.exception("speech analyzer exception: {}".format(str(e)))
         finally:
-            logging.debug("***speech analyzer terminating")
+            logging.debug("speech analyzer terminating")
   
     def _analyzeSpeech(self):
-        while not self._exit.is_set:
-            text = self._transcript.get()
-            document = language_client.document_from_text(text)
+        logging.debug("***speech analyzer analyzing")
+        while not self._exit.is_set():
+            text = self._transcript.recv()
+            document = self._language_client.document_from_text(text)
+            print("analyzer received text: {}".format(text))
 
             sentiment = document.analyze_sentiment().sentiment
             entities = document.analyze_entities().entities
             tokens = document.analyze_syntax().tokens
 
-            print("Text: {}".format(text))
             if sentiment.score < 0:
                 mood = "sad"
             elif sentiment.score > 0:
@@ -47,10 +52,10 @@ class SpeechAnalyzer(multiprocessing.Process):
             else:
                 mood = "meh"
 
-            print("Sentiment: {}: {}, {}".format(mood, sentiment.score, sentiment.magnitude))
+            logging.info("Sentiment: {}: {}, {}".format(mood, sentiment.score, sentiment.magnitude))
             for entity in entities:
-                print("Entity: {}: {}".format(entity.entity_type, entity.name))
-                print("source: {}: {}".format(entity.metadata, entity.salience))
+                logging.info("Entity: {}: {}".format(entity.entity_type, entity.name))
+                logging.info("source: {}: {}".format(entity.metadata, entity.salience))
 
             for token in tokens:
-                print("Token: {}: {}".format(token.part_of_speech, token.text_content))
+                logging.info("Token: {}: {}".format(token.part_of_speech, token.text_content))

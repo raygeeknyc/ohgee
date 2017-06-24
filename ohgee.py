@@ -51,7 +51,6 @@ if __name__ == '__main__':
     analysis_worker = speechanalyzer.SpeechAnalyzer(transcript, log_queue, logging.getLogger('').getEffectiveLevel())
     logging.info("Starting speech analysis")
     analysis_worker.start()
-    logging.info("analyzing speech")
     try:
         #listener = threading.Thread(target = receiveSpeech, args=(transcript,))
         #listener.start()
