@@ -1,7 +1,6 @@
 from multiprocessingloghandler import ChildMultiProcessingLogHandler
 import logging
 import Queue
-import sys
 import os
 
 class FedStream(object):
