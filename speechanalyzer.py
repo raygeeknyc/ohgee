@@ -8,11 +8,17 @@ class SpeechAnalyzer(multiprocessing.Process):
     def __init__(self, transcript, log_queue, logging_level):
         multiprocessing.Process.__init__(self)
         self._transcript, _ = transcript
+        self._exit = multiprocessing.Event()
+
 
     def _initLogging(self):
         handler = ChildMultiProcessingLogHandler(self._log_queue)
         logging.getLogger(str(os.getpid())).addHandler(handler)
         logging.getLogger(str(os.getpid())).setLevel(self._logging_level)
+
+    def stop(self):
+        logging.debug("***background received shutdown")
+        self._exit.set()
 
     def run(self):
         self._initLogging()
@@ -25,7 +31,7 @@ class SpeechAnalyzer(multiprocessing.Process):
             logging.debug("***speech analyzer terminating")
   
     def _analyzeSpeech(self):
-        while True:
+        while not self._exit.is_set:
             text = self._transcript.get()
             document = language_client.document_from_text(text)
 

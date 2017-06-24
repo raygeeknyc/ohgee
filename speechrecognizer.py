@@ -22,7 +22,7 @@ PAUSE_LENGTH_SECS = 1
 MAX_BUFFERED_SAMPLES = 1
 PAUSE_LENGTH_IN_SAMPLES = int((PAUSE_LENGTH_SECS * RATE / FRAMES_PER_BUFFER) + 0.5)
 
-class SpeechProcessor(multiprocessing.Process):
+class SpeechRecognizer(multiprocessing.Process):
     def __init__(self, transcript, log_queue, logging_level):
         multiprocessing.Process.__init__(self)
         self._log_queue = log_queue

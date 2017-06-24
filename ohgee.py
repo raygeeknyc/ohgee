@@ -9,7 +9,8 @@ import threading
 import time
 import io
 import sys
-import speechprocessor
+import speechrecognizer
+import speechanalyzer
 import os, signal
 
 global STOP
@@ -42,25 +43,32 @@ if __name__ == '__main__':
     logging.getLogger('').addHandler(handler)
     logging.getLogger('').setLevel(_DEBUG)
     transcript = multiprocessing.Pipe()
-    speech_worker = speechprocessor.SpeechProcessor(transcript, log_queue, logging.getLogger('').getEffectiveLevel())
+
+    recognition_worker = speechrecognizer.SpeechRecognizer(transcript, log_queue, logging.getLogger('').getEffectiveLevel())
     logging.info("Starting speech recognition")
-    speech_worker.start()
-    logging.info("Receiving speech")
+    recognition_worker.start()
+
+    analysis_worker = speechanalyzer.SpeechAnalyzer(transcript, log_queue, logging.getLogger('').getEffectiveLevel())
+    logging.info("Starting speech analysis")
+    analysis_worker.start()
+    logging.info("analyzing speech")
     try:
-        listener = threading.Thread(target = receiveSpeech, args=(transcript,))
-        listener.start()
-        logging.info("polling")
+        #listener = threading.Thread(target = receiveSpeech, args=(transcript,))
+        #listener.start()
+        logging.info("waiting")
         while not STOP:
             time.sleep(0.1)
         logging.info("stopping")
         i, _ = transcript
         i.close()
-        speech_worker.stop()
     except Exception, e:
         logging.error("Error in main: {}".format(e))
-    logging.info("ending main")
-    speech_worker.stop()
-    logging.info("waiting for background process to exit")
-    speech_worker.join()
-    logging.info("done")
+    finally:
+        logging.info("ending main")
+        recognition_worker.stop()
+        analysis_worker.stop()
+        logging.info("waiting for background processes to exit")
+        recognition_worker.join()
+        analysis_worker.join()
+        logging.info("done")
     sys.exit()
