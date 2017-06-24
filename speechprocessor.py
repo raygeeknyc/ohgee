@@ -1,5 +1,4 @@
 import logging
-_DEBUG = logging.DEBUG
 
 import multiprocessing
 from multiprocessingloghandler import ChildMultiProcessingLogHandler
@@ -8,7 +7,6 @@ from fedstream import FedStream
 import pyaudio
 import array
 import Queue
-import time
 import io
 import os
 import sys
@@ -27,16 +25,14 @@ PAUSE_LENGTH_IN_SAMPLES = int((PAUSE_LENGTH_SECS * RATE / FRAMES_PER_BUFFER) + 0
 class SpeechProcessor(multiprocessing.Process):
     def __init__(self, transcript, log_queue, logging_level):
         multiprocessing.Process.__init__(self)
-        i, o = transcript
         self._log_queue = log_queue
         self._logging_level = logging_level
         self._exit = multiprocessing.Event()
-        self._transcript = i
+        self._transcript, _ = transcript
         self._ingester = threading.Thread(target=self.getSound)
         self._processor = threading.Thread(target=self.processSound)
         self._stop_capturing = False
         self._stop_recognizing = False
-        self._transcript = transcript
         self._audio_buffer = Queue.Queue()
 
     def stop(self):
@@ -110,7 +106,6 @@ class SpeechProcessor(multiprocessing.Process):
         logging.debug("started recognizing")
         self._speech_client = speech.Client()
         logging.debug("Starting sampling")
-        o, i = self._transcript
         audio_sample = self._speech_client.sample(
             stream=self._audio_stream,
             source_uri=None,
@@ -122,16 +117,15 @@ class SpeechProcessor(multiprocessing.Process):
                 alternatives = audio_sample.streaming_recognize('en-US',
                     interim_results=True)
                 for alternative in alternatives:
-                    logging.info("stop_recognizing: {}".format(self._stop_recognizing))
                     logging.debug("speech: {}".format(alternative.transcript))
                     logging.debug("final: {}".format(alternative.is_final))
                     logging.debug("confidence: {}".format(alternative.confidence))
                     if alternative.is_final or self._stop_recognizing:
-                        o.send(alternative.transcript)
+                        self._transcript.send(alternative.transcript)
                     if self._stop_recognizing:
                         break
             except Exception, e:
                 alternatives = None
                 logging.exception("error recognizing speech: {}".format(str(e)))
-        o.close()
+        self._transcript.close()
         logging.debug("stopped recognizing")

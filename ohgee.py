@@ -27,10 +27,10 @@ signal.signal(signal.SIGINT, signal_handler)
  
 def receiveSpeech(transcript):
     logging.info("listening")
-    i, o = transcript
+    _, transcript = transcript
     try:
         while True:
-            utterance = o.recv()
+            utterance = transcript.recv()
             print("Utterance: {}".format(utterance))
     except EOFError:
         logging.debug("done listening")
@@ -43,7 +43,7 @@ if __name__ == '__main__':
     logging.getLogger('').setLevel(_DEBUG)
     transcript = multiprocessing.Pipe()
     speech_worker = speechprocessor.SpeechProcessor(transcript, log_queue, logging.getLogger('').getEffectiveLevel())
-    logging.info("Starting speech analysis")
+    logging.info("Starting speech recognition")
     speech_worker.start()
     logging.info("Receiving speech")
     try:
@@ -53,8 +53,8 @@ if __name__ == '__main__':
         while not STOP:
             time.sleep(0.1)
         logging.info("stopping")
-        o, i = transcript
-        o.close()
+        i, _ = transcript
+        i.close()
         speech_worker.stop()
     except Exception, e:
         logging.error("Error in main: {}".format(e))
