@@ -26,13 +26,13 @@ def signal_handler(sig, frame):
     STOP = True
 signal.signal(signal.SIGINT, signal_handler)
  
-def receiveSpeech(transcript):
+def receiveLanguageResults(nl_results):
     logging.info("listening")
-    _, transcript = transcript
+    _, nl_results = nl_results
     try:
         while True:
-            utterance = transcript.recv()
-            print("Utterance: {}".format(utterance))
+            phrase = nl_results.recv()
+            print("Language Results: {}".format(phrase))
     except EOFError:
         logging.debug("done listening")
 
@@ -43,22 +43,23 @@ if __name__ == '__main__':
     logging.getLogger('').addHandler(handler)
     logging.getLogger('').setLevel(_DEBUG)
     transcript = multiprocessing.Pipe()
+    nl_results = multiprocessing.Pipe()
 
     recognition_worker = speechrecognizer.SpeechRecognizer(transcript, log_queue, logging.getLogger('').getEffectiveLevel())
     logging.info("Starting speech recognition")
     recognition_worker.start()
 
-    analysis_worker = speechanalyzer.SpeechAnalyzer(transcript, log_queue, logging.getLogger('').getEffectiveLevel())
+    analysis_worker = speechanalyzer.SpeechAnalyzer(transcript, nl_results, log_queue, logging.getLogger('').getEffectiveLevel())
     logging.info("Starting speech analysis")
     analysis_worker.start()
     try:
-        #listener = threading.Thread(target = receiveSpeech, args=(transcript,))
-        #listener.start()
+        listener = threading.Thread(target = receiveLanguageResults, args=(nl_results,))
+        listener.start()
         logging.info("waiting")
         while not STOP:
             time.sleep(0.1)
         logging.info("stopping")
-        i, _ = transcript
+        _, i = nl_results
         i.close()
     except Exception, e:
         logging.error("Error in main: {}".format(e))
