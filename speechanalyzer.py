@@ -6,7 +6,7 @@ from multiprocessingloghandler import ChildMultiProcessingLogHandler
 from google.cloud import language
 
 MOOD_THRESHOLD = 0.1
-LOWER_MOOD_TRESHOLD = -1 * MOOD_TRESHOLD
+LOWER_MOOD_THRESHOLD = -1 * MOOD_THRESHOLD
 
 class SpeechAnalyzer(multiprocessing.Process):
     def __init__(self, text_transcript, nl_results, log_queue, logging_level):
@@ -44,6 +44,8 @@ class SpeechAnalyzer(multiprocessing.Process):
         while not self._exit.is_set():
             text = self._text_transcript.recv()
             document = self._language_client.document_from_text(text)
+            entities = document.analyze_entities().entities
+            tokens = document.analyze_syntax().tokens
             print("analyzer received text: {}".format(text))
 
             sentiment = document.analyze_sentiment().sentiment

@@ -1,10 +1,11 @@
 import logging
+
+# reorder as appropriate
+_DEBUG = logging.DEBUG
 _DEBUG = logging.INFO
 
 import multiprocessing
 from multiprocessingloghandler import ParentMultiProcessingLogHandler
-import Queue
-from array import array
 import threading
 import time
 import io
@@ -27,7 +28,7 @@ def signal_handler(sig, frame):
 signal.signal(signal.SIGINT, signal_handler)
  
 def receiveLanguageResults(nl_results):
-    logging.info("listening")
+    logging.debug("listening")
     _, nl_results = nl_results
     try:
         while True:
@@ -46,29 +47,29 @@ if __name__ == '__main__':
     nl_results = multiprocessing.Pipe()
 
     recognition_worker = speechrecognizer.SpeechRecognizer(transcript, log_queue, logging.getLogger('').getEffectiveLevel())
-    logging.info("Starting speech recognition")
+    logging.debug("Starting speech recognition")
     recognition_worker.start()
 
     analysis_worker = speechanalyzer.SpeechAnalyzer(transcript, nl_results, log_queue, logging.getLogger('').getEffectiveLevel())
-    logging.info("Starting speech analysis")
+    logging.debug("Starting speech analysis")
     analysis_worker.start()
     try:
         listener = threading.Thread(target = receiveLanguageResults, args=(nl_results,))
         listener.start()
-        logging.info("waiting")
+        logging.debug("waiting")
         while not STOP:
             time.sleep(0.1)
-        logging.info("stopping")
+        logging.debug("stopping")
         _, i = nl_results
         i.close()
     except Exception, e:
         logging.error("Error in main: {}".format(e))
     finally:
-        logging.info("ending main")
+        logging.debug("ending main")
         recognition_worker.stop()
         analysis_worker.stop()
-        logging.info("waiting for background processes to exit")
+        logging.debug("waiting for background processes to exit")
         recognition_worker.join()
         analysis_worker.join()
-        logging.info("done")
+        logging.debug("done")
     sys.exit()
