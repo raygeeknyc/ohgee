@@ -21,6 +21,10 @@ class FedStream(object):
         logging.debug("fedstream close()")
         self.closed = True
 
+    # This is not the number of bytes and should only be used as an empty/non-empty indicator
+    def available(self):
+        return self._buff.qsize()
+
     def read(self, chunk_size):
         data = None
         while not data and not self.closed:

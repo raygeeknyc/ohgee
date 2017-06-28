@@ -10,6 +10,7 @@ import Queue
 import io
 import os
 import sys
+import grpc  # for error types returned by the client
 from google.cloud import speech
 
 # Setup audio and cloud speech
@@ -17,7 +18,7 @@ FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 16000
 FRAMES_PER_BUFFER = 2048
-SILENCE_THRESHOLD = 700
+SILENCE_THRESHOLD = 900
 PAUSE_LENGTH_SECS = 1
 MAX_BUFFERED_SAMPLES = 1
 PAUSE_LENGTH_IN_SAMPLES = int((PAUSE_LENGTH_SECS * RATE / FRAMES_PER_BUFFER) + 0.5)
@@ -85,13 +86,18 @@ class SpeechRecognizer(multiprocessing.Process):
             try:
                 data = mic_stream.read(FRAMES_PER_BUFFER)
                 volume = max(array.array('h', data))
+                logging.debug("mic read {} bytes".format(len(data)))
+                logging.debug("Vol: {}".format(volume))
                 if volume <= SILENCE_THRESHOLD:
                     consecutive_silent_samples += 1
                 else:
+                    if consecutive_silent_samples >= PAUSE_LENGTH_IN_SAMPLES:
+                        logging.debug("pause ended")
                     consecutive_silent_samples = 0
-                logging.debug("mic read {} bytes".format(len(data)))
-                self._audio_buffer.put(data)
-                logging.debug("Vol: {}".format(volume))
+                if consecutive_silent_samples == PAUSE_LENGTH_IN_SAMPLES:
+                    logging.debug("pause started")
+                if consecutive_silent_samples < PAUSE_LENGTH_IN_SAMPLES:
+                    self._audio_buffer.put(data)
             except IOError, e:
                 logging.exception(e)
         logging.debug("ending sound capture")
@@ -113,6 +119,9 @@ class SpeechRecognizer(multiprocessing.Process):
         logging.debug("Starting recognizing")
         while not self._stop_recognizing:
             try:
+                if not self._audio_stream.available():
+                    logging.debug("waiting for sound")
+                    continue
                 alternatives = audio_sample.streaming_recognize('en-US',
                     interim_results=True)
                 for alternative in alternatives:
@@ -124,7 +133,10 @@ class SpeechRecognizer(multiprocessing.Process):
                         self._transcript.send(alternative.transcript)
                     if self._stop_recognizing:
                         break
+            except grpc._channel._Rendezvous, e:
+                logging.debug("empty stream recognition attempted")
+                continue
             except Exception, e:
-                logging.exception("error recognizing speech: {}".format(str(e)))
+                logging.exception("error recognizing speech: {}".format(e))
                 continue
         logging.debug("stopped recognizing")
