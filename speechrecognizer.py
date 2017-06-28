@@ -77,7 +77,8 @@ class SpeechRecognizer(multiprocessing.Process):
             rate=RATE, input=True,
             frames_per_buffer=FRAMES_PER_BUFFER)
 
-        consecutive_silent_samples = 0
+        consecutive_silent_samples = 999
+        self._audio_stream.close()
         samples = 0
  
         while not self._stop_capturing:
@@ -119,7 +120,7 @@ class SpeechRecognizer(multiprocessing.Process):
         logging.debug("Starting recognizing")
         while not self._stop_recognizing:
             try:
-                if not self._audio_stream.available():
+                if self._audio_stream.closed:
                     logging.debug("waiting for sound")
                     continue
                 alternatives = audio_sample.streaming_recognize('en-US',
