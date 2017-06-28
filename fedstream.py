@@ -17,6 +17,10 @@ class FedStream(object):
         logging.getLogger(str(os.getpid())).addHandler(handler)
         logging.getLogger(str(os.getpid())).setLevel(self._log_level)
 
+    def open(self):
+        logging.debug("fedstream open()")
+        self.closed = False
+
     def close(self):
         logging.debug("fedstream close()")
         self.closed = True

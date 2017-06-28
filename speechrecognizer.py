@@ -18,7 +18,7 @@ FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 16000
 FRAMES_PER_BUFFER = 2048
-SILENCE_THRESHOLD = 900
+SILENCE_THRESHOLD = 700
 PAUSE_LENGTH_SECS = 1
 MAX_BUFFERED_SAMPLES = 1
 PAUSE_LENGTH_IN_SAMPLES = int((PAUSE_LENGTH_SECS * RATE / FRAMES_PER_BUFFER) + 0.5)
@@ -86,16 +86,16 @@ class SpeechRecognizer(multiprocessing.Process):
             try:
                 data = mic_stream.read(FRAMES_PER_BUFFER)
                 volume = max(array.array('h', data))
-                logging.debug("mic read {} bytes".format(len(data)))
-                logging.debug("Vol: {}".format(volume))
                 if volume <= SILENCE_THRESHOLD:
                     consecutive_silent_samples += 1
                 else:
                     if consecutive_silent_samples >= PAUSE_LENGTH_IN_SAMPLES:
                         logging.debug("pause ended")
+                        self._audio_stream.open()
                     consecutive_silent_samples = 0
                 if consecutive_silent_samples == PAUSE_LENGTH_IN_SAMPLES:
                     logging.debug("pause started")
+                    self._audio_stream.close()
                 if consecutive_silent_samples < PAUSE_LENGTH_IN_SAMPLES:
                     self._audio_buffer.put(data)
             except IOError, e:
@@ -128,8 +128,8 @@ class SpeechRecognizer(multiprocessing.Process):
                     logging.debug("speech: {}".format(alternative.transcript))
                     logging.debug("final: {}".format(alternative.is_final))
                     logging.debug("confidence: {}".format(alternative.confidence))
+                    logging.debug("putting phrase {}".format(alternative.transcript))
                     if alternative.is_final or self._stop_recognizing:
-                        logging.debug("putting phrase {}".format(alternative.transcript))
                         self._transcript.send(alternative.transcript)
                     if self._stop_recognizing:
                         break

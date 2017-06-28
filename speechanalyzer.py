@@ -8,6 +8,15 @@ from google.cloud import language
 MOOD_THRESHOLD = 0.1
 LOWER_MOOD_THRESHOLD = -1 * MOOD_THRESHOLD
 
+def isGood(sentiment):
+    return sentiment.score >= MOOD_THRESHOLD
+
+def isBad(sentiment):
+    return sentiment.score <= LOWER_MOOD_THRESHOLD
+
+def isMeh(sentiment):
+    return MOOD_THRESHOLD >= sentiment.score >= LOWER_MOOD_THRESHOLD
+
 class SpeechAnalyzer(multiprocessing.Process):
     def __init__(self, text_transcript, nl_results, log_queue, logging_level):
         multiprocessing.Process.__init__(self)
@@ -46,17 +55,11 @@ class SpeechAnalyzer(multiprocessing.Process):
             document = self._language_client.document_from_text(text)
             entities = document.analyze_entities().entities
             tokens = document.analyze_syntax().tokens
-            print("analyzer received text: {}".format(text))
+            logging.debug("analyzer received text: {}".format(text))
 
             sentiment = document.analyze_sentiment().sentiment
-            if sentiment.score < LOWER_MOOD_THRESHOLD:
-                mood = "sad"
-            elif sentiment.score > MOOD_THRESHOLD:
-                mood = "glad"
-            else:
-                mood = "meh"
 
-            logging.debug("Sentiment: {}: {}, {}".format(mood, sentiment.score, sentiment.magnitude))
+            logging.debug("Sentiment: {}, {}".format(sentiment.score, sentiment.magnitude))
             for entity in entities:
                 logging.debug("Entity: {}: {}".format(entity.entity_type, entity.name))
                 logging.debug("source: {}: {}".format(entity.metadata, entity.salience))

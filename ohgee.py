@@ -17,6 +17,15 @@ import os, signal
 global STOP
 STOP = False
 
+def showGoodMood(score):
+    print "Good mood {}".format(score)
+
+def showBadMood(score):
+    print "Bad mood {}".format(score)
+
+def showMehMood():
+    print "meh mood"
+
 def signal_handler(sig, frame):
     global STOP
     logging.debug("INT signal trapped")
@@ -33,7 +42,13 @@ def receiveLanguageResults(nl_results):
     try:
         while True:
             phrase = nl_results.recv()
-            print("Language Results: {}".format(phrase))
+            tokens, entities, sentiment = phrase
+            if speechanalyzer.isGood(sentiment):
+                showGoodMood(sentiment.score)
+            elif speechanalyzer.isBad(sentiment):
+                showBadMood(sentiment.score)
+            else:
+                showMehMood()
     except EOFError:
         logging.debug("done listening")
 
