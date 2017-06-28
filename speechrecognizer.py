@@ -29,8 +29,6 @@ class SpeechRecognizer(multiprocessing.Process):
         self._logging_level = logging_level
         self._exit = multiprocessing.Event()
         self._transcript, _ = transcript
-        self._ingester = threading.Thread(target=self.getSound)
-        self._processor = threading.Thread(target=self.processSound)
         self._stop_capturing = False
         self._stop_recognizing = False
         self._audio_buffer = Queue.Queue()
@@ -47,20 +45,22 @@ class SpeechRecognizer(multiprocessing.Process):
     def run(self):
         self._initLogging()
         try:
+            self._capturer = threading.Thread(target=self.captureSound)
+            self._recognizer = threading.Thread(target=self.recognizeSpeech)
             self._audio_stream = FedStream(self._audio_buffer, self._log_queue, self._logging_level)
             self._audio = pyaudio.PyAudio()
             logging.debug("recognizer process active")
-            self._processor.start()
-            self._ingester.start()
+            self._recognizer.start()
+            self._capturer.start()
             self._exit.wait()
- 
         except Exception, e:
             logging.exception("recognizer process exception: {}".format(str(e)))
         logging.debug("recognizer process terminating")
         self._stopCapturing()
         self._stopRecognizing()
-        self._ingester.join()
-        self._processor.join()
+        self._capturer.join()
+        self._recognizer.join()
+        self._transcript.close()
 
     def _stopCapturing(self):
         logging.debug("setting stop_capturing")
@@ -70,7 +70,7 @@ class SpeechRecognizer(multiprocessing.Process):
         logging.debug("setting stop_recognizing")
         self._stop_recognizing = True
 
-    def getSound(self):
+    def captureSound(self):
         logging.debug("starting capturing")
         mic_stream = self._audio.open(format=FORMAT, channels=CHANNELS,
             rate=RATE, input=True,
@@ -94,7 +94,6 @@ class SpeechRecognizer(multiprocessing.Process):
                 logging.debug("Vol: {}".format(volume))
             except IOError, e:
                 logging.exception(e)
-
         logging.debug("ending sound capture")
         # stop Recording
         mic_stream.stop_stream()
@@ -102,7 +101,7 @@ class SpeechRecognizer(multiprocessing.Process):
         self._audio.terminate()
         logging.debug("stopped capturing")
 
-    def processSound(self):
+    def recognizeSpeech(self):
         logging.debug("started recognizing")
         self._speech_client = speech.Client()
         logging.debug("Starting sampling")
@@ -126,7 +125,6 @@ class SpeechRecognizer(multiprocessing.Process):
                     if self._stop_recognizing:
                         break
             except Exception, e:
-                alternatives = None
                 logging.exception("error recognizing speech: {}".format(str(e)))
-        self._transcript.close()
+                continue
         logging.debug("stopped recognizing")
