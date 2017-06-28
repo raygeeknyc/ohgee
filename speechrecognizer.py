@@ -1,6 +1,7 @@
 import logging
 
 import multiprocessing
+import time
 from multiprocessingloghandler import ChildMultiProcessingLogHandler
 import threading
 from fedstream import FedStream
@@ -17,11 +18,12 @@ from google.cloud import speech
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 16000
-FRAMES_PER_BUFFER = 2048
+FRAMES_PER_BUFFER = 4096
 SILENCE_THRESHOLD = 700
 PAUSE_LENGTH_SECS = 1
 MAX_BUFFERED_SAMPLES = 1
 PAUSE_LENGTH_IN_SAMPLES = int((PAUSE_LENGTH_SECS * RATE / FRAMES_PER_BUFFER) + 0.5)
+SAMPLE_RETRY_DELAY_SECS = 0.1
 
 class SpeechRecognizer(multiprocessing.Process):
     def __init__(self, transcript, log_queue, logging_level):
@@ -118,11 +120,16 @@ class SpeechRecognizer(multiprocessing.Process):
             encoding=speech.encoding.Encoding.LINEAR16,
             sample_rate_hertz=RATE)
         logging.debug("Starting recognizing")
+        waiting = False
         while not self._stop_recognizing:
             try:
                 if self._audio_stream.closed:
-                    logging.debug("waiting for sound")
+                    if not waiting:
+                        logging.debug("waiting for sound")
+                        waiting = True
+                    time.sleep(SAMPLE_RETRY_DELAY_SECS)
                     continue
+                waiting = False
                 alternatives = audio_sample.streaming_recognize('en-US',
                     interim_results=True)
                 for alternative in alternatives:
