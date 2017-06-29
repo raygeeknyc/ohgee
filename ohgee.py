@@ -1,8 +1,8 @@
 import logging
 
 # reorder as appropriate
-_DEBUG = logging.INFO
 _DEBUG = logging.DEBUG
+_DEBUG = logging.INFO
 
 import multiprocessing
 from multiprocessingloghandler import ParentMultiProcessingLogHandler
@@ -21,6 +21,7 @@ STOP = False
 global mood_set_until
 mood_set_until = 0
 MOOD_SET_DURATION_SECS = 4
+POLL_DELAY_SECS = 0.2
 
 def expireMood():
     global mood_set_until
@@ -97,7 +98,7 @@ if __name__ == '__main__':
         listener.start()
         logging.debug("waiting")
         while not STOP:
-            time.sleep(0.1)
+            time.sleep(POLL_DELAY_SECS)
             expireMood()
         logging.debug("stopping")
         _, i = nl_results
