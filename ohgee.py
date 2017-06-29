@@ -23,6 +23,11 @@ mood_set_until = 0
 MOOD_SET_DURATION_SECS = 4
 POLL_DELAY_SECS = 0.2
 
+servoPin = 18
+ARM_RELAXED_POSITION = 50
+ARM_UP_POSITION = 160
+ARM_DOWN_POSITION = 10
+
 def expireMood():
     global mood_set_until
     if mood_set_until and mood_set_until < time.time():
@@ -75,9 +80,22 @@ def receiveLanguageResults(nl_results):
     except EOFError:
         logging.debug("done listening")
 
+def lowerArm():
+    arm.start(ARM_DOWN_POSITION)
+
+def raiseArm():
+    arm.start(ARM_UP_POSITION)
+
+def relaxArm():
+    arm.start(ARM_RELAXED_POSITION)
+
 if __name__ == '__main__':
     led = rgbled.RgbLed(rgbled.redPin, rgbled.greenPin, rgbled.bluePin)
     led.setColor(rgbled.OFF)
+
+    GPIO.setup(servoPin, GPIO.OUT)
+    arm = GPIO.PWM(servoPin, 50)
+
     log_stream = sys.stderr
     log_queue = multiprocessing.Queue(100)
     handler = ParentMultiProcessingLogHandler(logging.StreamHandler(log_stream), log_queue)
