@@ -113,4 +113,5 @@ if __name__ == '__main__':
         recognition_worker.join()
         analysis_worker.join()
         logging.debug("done")
+        led.setColor(rgbled.OFF)
     sys.exit()
