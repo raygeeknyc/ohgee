@@ -132,4 +132,5 @@ if __name__ == '__main__':
         analysis_worker.join()
         logging.debug("done")
         led.setColor(rgbled.OFF)
+    GPIO.cleanup()
     sys.exit()
