@@ -1,8 +1,8 @@
 import logging
 
 # reorder as appropriate
-_DEBUG = logging.DEBUG
 _DEBUG = logging.INFO
+_DEBUG = logging.DEBUG
 
 import multiprocessing
 from multiprocessingloghandler import ParentMultiProcessingLogHandler
@@ -13,18 +13,40 @@ import sys
 import speechrecognizer
 import speechanalyzer
 import os, signal
+import rgbled
 
 global STOP
 STOP = False
 
+global mood_set_until
+mood_set_until = 0
+MOOD_SET_DURATION_SECS = 4
+
+def expireMood():
+    global mood_set_until
+    if mood_set_until and mood_set_until < time.time():
+        mood_set_until = 0
+        led.setColor(rgbled.OFF)
+
+def setMoodTime():
+    global mood_set_until
+    global MOOD_SET_DURATION_SECS
+    mood_set_until = time.time() + MOOD_SET_DURATION_SECS
+
 def showGoodMood(score):
     print "Good mood {}".format(score)
+    led.setColor(rgbled.GREEN)
+    setMoodTime()
 
 def showBadMood(score):
     print "Bad mood {}".format(score)
+    led.setColor(rgbled.RED)
+    setMoodTime()
 
 def showMehMood():
     print "meh mood"
+    led.setColor(rgbled.CYAN)
+    setMoodTime()
 
 def signal_handler(sig, frame):
     global STOP
@@ -53,6 +75,8 @@ def receiveLanguageResults(nl_results):
         logging.debug("done listening")
 
 if __name__ == '__main__':
+    led = rgbled.RgbLed(rgbled.redPin, rgbled.greenPin, rgbled.bluePin)
+    led.setColor(rgbled.OFF)
     log_stream = sys.stderr
     log_queue = multiprocessing.Queue(100)
     handler = ParentMultiProcessingLogHandler(logging.StreamHandler(log_stream), log_queue)
@@ -74,6 +98,7 @@ if __name__ == '__main__':
         logging.debug("waiting")
         while not STOP:
             time.sleep(0.1)
+            expireMood()
         logging.debug("stopping")
         _, i = nl_results
         i.close()

@@ -5,7 +5,7 @@ from multiprocessingloghandler import ChildMultiProcessingLogHandler
 
 from google.cloud import language
 
-MOOD_THRESHOLD = 0.1
+MOOD_THRESHOLD = 0.2
 LOWER_MOOD_THRESHOLD = -1 * MOOD_THRESHOLD
 
 def isGood(sentiment):
