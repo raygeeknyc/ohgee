@@ -27,6 +27,19 @@ servoPin = 18
 ARM_RELAXED_POSITION = 50
 ARM_UP_POSITION = 160
 ARM_DOWN_POSITION = 10
+ARM_WAVE_DOWN_SECS = 0.5
+ARM_WAVE_UP_SECS = 2
+
+GREETINGS = [["hello"],["hi"],["good", "morning"], ["hey", "there"]]
+FAREWELLS = [["goodbye"], ["farewell"], ["good", "night"], ["see","you"]]
+def phraseMatch(tokens, phrases):
+    return []
+
+def greeted(tokens):
+    return phraseMatch(tokens, GREETINGS)
+
+def departed(tokens):
+    return phraseMatch(tokens, FAREWELLS)
 
 def expireMood():
     global mood_set_until
@@ -77,6 +90,8 @@ def receiveLanguageResults(nl_results):
                 showBadMood(sentiment.score)
             else:
                 showMehMood()
+            if  greeted(tokens):
+                waveArm()
     except EOFError:
         logging.debug("done listening")
 
@@ -89,6 +104,13 @@ def raiseArm():
 def relaxArm():
     arm.start(ARM_RELAXED_POSITION)
 
+def waveArm():
+    lowerArm()
+    time.sleep(ARM_WAVE_DOWN_SECS)
+    raiseArm()
+    time.sleep(ARM_WAVE_UP_SECS)
+    relaxArm()
+    
 if __name__ == '__main__':
     led = rgbled.RgbLed(rgbled.redPin, rgbled.greenPin, rgbled.bluePin)
     led.setColor(rgbled.OFF)
