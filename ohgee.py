@@ -17,6 +17,8 @@ import rgbled
 
 global STOP
 STOP = False
+global waving
+waving = False
 
 global mood_set_until
 mood_set_until = 0
@@ -29,17 +31,6 @@ ARM_UP_POSITION = 160
 ARM_DOWN_POSITION = 10
 ARM_WAVE_DOWN_SECS = 0.5
 ARM_WAVE_UP_SECS = 2
-
-GREETINGS = [["hello"],["hi"],["good", "morning"], ["hey", "there"]]
-FAREWELLS = [["goodbye"], ["farewell"], ["good", "night"], ["see","you"]]
-def phraseMatch(tokens, phrases):
-    return []
-
-def greeted(tokens):
-    return phraseMatch(tokens, GREETINGS)
-
-def departed(tokens):
-    return phraseMatch(tokens, FAREWELLS)
 
 def expireMood():
     global mood_set_until
@@ -77,6 +68,18 @@ def signal_handler(sig, frame):
     STOP = True
 signal.signal(signal.SIGINT, signal_handler)
  
+def wave():
+    global waving
+    while True:
+        while not waving:
+            time.sleep(WAVE_DELAY_SECS)
+        raiseArm()
+        time.sleep(WAVE_RAISE_SECS)
+        lowerArm()
+        time.sleep(WAVE_LOWER_SECS)
+        relaxArm()
+        waving = False
+
 def receiveLanguageResults(nl_results):
     logging.debug("listening")
     _, nl_results = nl_results
@@ -90,7 +93,7 @@ def receiveLanguageResults(nl_results):
                 showBadMood(sentiment.score)
             else:
                 showMehMood()
-            if  greeted(tokens):
+            if  speechanalyzer.greeted(tokens):
                 waveArm()
     except EOFError:
         logging.debug("done listening")
@@ -110,6 +113,11 @@ def waveArm():
     raiseArm()
     time.sleep(ARM_WAVE_UP_SECS)
     relaxArm()
+
+def startWaving():
+    global waving
+    if not waving:
+        waving = True
     
 if __name__ == '__main__':
     led = rgbled.RgbLed(rgbled.redPin, rgbled.greenPin, rgbled.bluePin)
@@ -134,6 +142,8 @@ if __name__ == '__main__':
     logging.debug("Starting speech analysis")
     analysis_worker.start()
     try:
+        waver = threading.Thread(target = wave, args=())
+        waver.start()
         listener = threading.Thread(target = receiveLanguageResults, args=(nl_results,))
         listener.start()
         logging.debug("waiting")

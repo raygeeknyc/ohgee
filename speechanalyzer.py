@@ -3,10 +3,39 @@ import logging
 import multiprocessing
 from multiprocessingloghandler import ChildMultiProcessingLogHandler
 
-from google.cloud import language
+#from google.cloud import language
 
 MOOD_THRESHOLD = 0.2
 LOWER_MOOD_THRESHOLD = -1 * MOOD_THRESHOLD
+
+GREETINGS = [["hello"],["hi"],["good", "morning"], ["hey", "there"]]
+FAREWELLS = [["goodbye"], ["farewell"], ["good", "night"], ["see","you"]]
+def phraseMatch(tokens, phrases):
+    for phrase in phrases:
+        matchedTokens = phraseInTokens(tokens, phrase)
+        if matchedTokens:
+            return matchedTokens
+    return []
+
+def phraseInTokens(tokens, phrase):
+    if not phrase or not tokens:
+        return []
+    w = phrase[0]
+    matched = True
+    for i in range(len(tokens)-len(phrase)+1):
+        if tokens[i].upper() == w.upper():
+            for j in range(1,len(phrase)):
+                if tokens[i+j].upper() != phrase[j].upper():
+                    matched = False
+            if matched:
+                return tokens[i:i+len(phrase)]
+    return []
+
+def greeted(tokens):
+    return phraseMatch(tokens, GREETINGS)
+
+def departed(tokens):
+    return phraseMatch(tokens, FAREWELLS)
 
 def isGood(sentiment):
     return sentiment.score >= MOOD_THRESHOLD
