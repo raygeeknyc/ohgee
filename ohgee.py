@@ -95,6 +95,14 @@ def receiveLanguageResults(nl_results):
                 showMehMood()
             if  speechanalyzer.greeted(tokens):
                 waveArm()
+            greeting = speechanalyzer.phraseMatch(tokens, speechanalyzer.GREETINGS)
+            farewells = speechanalyzer.phraseMatch(tokens, speechanalyzer.FAREWELLS)
+            if greeting:
+                showGoodMood(sentiment.score)
+                startWaving()
+            if farewells:
+                showMehMood(sentiment.score)
+                startWaving()
     except EOFError:
         logging.debug("done listening")
 
