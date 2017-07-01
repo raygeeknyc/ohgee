@@ -7,13 +7,15 @@ _DEBUG = logging.INFO
 import multiprocessing
 from multiprocessingloghandler import ParentMultiProcessingLogHandler
 import threading
+import RPi.GPIO as GPIO
 import time
 import io
 import sys
+import os, signal
+
+import rgbled
 import speechrecognizer
 import speechanalyzer
-import os, signal
-import rgbled
 
 global STOP
 STOP = False
@@ -26,11 +28,12 @@ MOOD_SET_DURATION_SECS = 4
 POLL_DELAY_SECS = 0.2
 
 servoPin = 18
-ARM_RELAXED_POSITION = 50
-ARM_UP_POSITION = 160
-ARM_DOWN_POSITION = 10
-ARM_WAVE_DOWN_SECS = 0.5
-ARM_WAVE_UP_SECS = 2
+ARM_RELAXED_POSITION = 7.5
+ARM_UP_POSITION = 12.5
+ARM_DOWN_POSITION = 2.5
+ARM_WAVE_LOWER_SECS = 0.5
+ARM_WAVE_RAISE_SECS = 2
+ARM_WAVE_DELAY_SECS = 5
 
 def expireMood():
     global mood_set_until
@@ -53,8 +56,8 @@ def showBadMood(score):
     led.setColor(rgbled.RED)
     setMoodTime()
 
-def showMehMood():
-    print "meh mood"
+def showMehMood(score):
+    print "Meh mood {}".format(score)
     led.setColor(rgbled.CYAN)
     setMoodTime()
 
@@ -72,11 +75,12 @@ def wave():
     global waving
     while True:
         while not waving:
-            time.sleep(WAVE_DELAY_SECS)
+            time.sleep(ARM_WAVE_DELAY_SECS)
+        logging.debug("wave")
         raiseArm()
-        time.sleep(WAVE_RAISE_SECS)
+        time.sleep(ARM_WAVE_RAISE_SECS)
         lowerArm()
-        time.sleep(WAVE_LOWER_SECS)
+        time.sleep(ARM_WAVE_LOWER_SECS)
         relaxArm()
         waving = False
 
@@ -92,35 +96,24 @@ def receiveLanguageResults(nl_results):
             elif speechanalyzer.isBad(sentiment):
                 showBadMood(sentiment.score)
             else:
-                showMehMood()
-            if  speechanalyzer.greeted(tokens):
-                waveArm()
+                showMehMood(sentiment.score)
             greeting = speechanalyzer.phraseMatch(tokens, speechanalyzer.GREETINGS)
             farewells = speechanalyzer.phraseMatch(tokens, speechanalyzer.FAREWELLS)
             if greeting:
-                showGoodMood(sentiment.score)
                 startWaving()
             if farewells:
-                showMehMood(sentiment.score)
                 startWaving()
     except EOFError:
         logging.debug("done listening")
 
 def lowerArm():
-    arm.start(ARM_DOWN_POSITION)
+    arm.ChangeDutyCycle(ARM_DOWN_POSITION)
 
 def raiseArm():
-    arm.start(ARM_UP_POSITION)
+    arm.ChangeDutyCycle(ARM_UP_POSITION)
 
 def relaxArm():
-    arm.start(ARM_RELAXED_POSITION)
-
-def waveArm():
-    lowerArm()
-    time.sleep(ARM_WAVE_DOWN_SECS)
-    raiseArm()
-    time.sleep(ARM_WAVE_UP_SECS)
-    relaxArm()
+    arm.ChangeDutyCycle(ARM_RELAXED_POSITION)
 
 def startWaving():
     global waving
@@ -133,6 +126,7 @@ if __name__ == '__main__':
 
     GPIO.setup(servoPin, GPIO.OUT)
     arm = GPIO.PWM(servoPin, 50)
+    arm.start(ARM_RELAXED_POSITION)
 
     log_stream = sys.stderr
     log_queue = multiprocessing.Queue(100)

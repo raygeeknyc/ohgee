@@ -3,13 +3,13 @@ import logging
 import multiprocessing
 from multiprocessingloghandler import ChildMultiProcessingLogHandler
 
-#from google.cloud import language
+from google.cloud import language
 
 MOOD_THRESHOLD = 0.2
 LOWER_MOOD_THRESHOLD = -1 * MOOD_THRESHOLD
 
 GREETINGS = [["hello"],["hi"],["good", "morning"], ["hey", "there"]]
-FAREWELLS = [["goodbye"], ["farewell"], ["good", "night"], ["see","you"]]
+FAREWELLS = [["goodbye"], ["bye"], ["farewell"], ["good", "night"], ["see","you"]]
 def phraseMatch(tokens, phrases):
     for phrase in phrases:
         matchedTokens = phraseInTokens(tokens, phrase)
@@ -23,9 +23,9 @@ def phraseInTokens(tokens, phrase):
     w = phrase[0]
     matched = True
     for i in range(len(tokens)-len(phrase)+1):
-        if tokens[i].upper() == w.upper():
+        if tokens[i].text_content.upper() == w.upper():
             for j in range(1,len(phrase)):
-                if tokens[i+j].upper() != phrase[j].upper():
+                if tokens[i+j].text_content.upper() != phrase[j].upper():
                     matched = False
             if matched:
                 return tokens[i:i+len(phrase)]
