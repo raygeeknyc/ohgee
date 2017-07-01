@@ -30,7 +30,7 @@ POLL_DELAY_SECS = 0.2
 servoPin = 18
 ARM_RELAXED_POSITION = 7.5
 ARM_UP_POSITION = 12.5
-ARM_DOWN_POSITION = 2.5
+ARM_DOWN_POSITION = 4.5
 ARM_WAVE_LOWER_SECS = 0.5
 ARM_WAVE_RAISE_SECS = 2
 ARM_WAVE_DELAY_SECS = 5
@@ -82,6 +82,8 @@ def wave():
         lowerArm()
         time.sleep(ARM_WAVE_LOWER_SECS)
         relaxArm()
+        time.sleep(0.5)
+        arm.ChangeDutyCycle(0)
         waving = False
 
 def receiveLanguageResults(nl_results):
@@ -125,8 +127,6 @@ if __name__ == '__main__':
     led.setColor(rgbled.OFF)
 
     GPIO.setup(servoPin, GPIO.OUT)
-    arm = GPIO.PWM(servoPin, 50)
-    arm.start(ARM_RELAXED_POSITION)
 
     log_stream = sys.stderr
     log_queue = multiprocessing.Queue(100)
@@ -144,6 +144,8 @@ if __name__ == '__main__':
     logging.debug("Starting speech analysis")
     analysis_worker.start()
     try:
+        arm = GPIO.PWM(servoPin, 50)
+        arm.start(0)
         waver = threading.Thread(target = wave, args=())
         waver.start()
         listener = threading.Thread(target = receiveLanguageResults, args=(nl_results,))
@@ -166,5 +168,6 @@ if __name__ == '__main__':
         analysis_worker.join()
         logging.debug("done")
         led.setColor(rgbled.OFF)
+        arm.stop()
     GPIO.cleanup()
     sys.exit()
