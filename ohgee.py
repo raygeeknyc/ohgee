@@ -12,6 +12,8 @@ import time
 import io
 import sys
 import os, signal
+from collections import deque
+from random import randint
 
 import rgbled
 import speechrecognizer
@@ -35,11 +37,17 @@ ARM_WAVE_LOWER_SECS = 0.5
 ARM_WAVE_RAISE_SECS = 2
 ARM_WAVE_DELAY_SECS = 5
 
+SPEECH_TMP_FILE="/tmp/speech.wav"
+PICO_CMD="pico2wave -l en-US --wave '%s' '%s';aplay %s"
+
 def expireMood():
     global mood_set_until
     if mood_set_until and mood_set_until < time.time():
         mood_set_until = 0
         led.setColor(rgbled.OFF)
+
+def randomPhraseFrom(phrases):
+    return phrases[randint(0,len(phrases)-1)]
 
 def setMoodTime():
     global mood_set_until
@@ -71,9 +79,16 @@ def signal_handler(sig, frame):
     STOP = True
 signal.signal(signal.SIGINT, signal_handler)
  
+def speak(speech_queue):
+    global STOP
+    while not STOP:
+        utterance = " ".join(speech_queue.get())
+        os.system(PICO_CMD % (SPEECH_TMP_FILE, utterance, SPEECH_TMP_FILE))
+
 def wave():
     global waving
-    while True:
+    global STOP
+    while not STOP:
         while not waving:
             time.sleep(ARM_WAVE_DELAY_SECS)
         logging.debug("wave")
@@ -102,8 +117,10 @@ def receiveLanguageResults(nl_results):
             greeting = speechanalyzer.phraseMatch(tokens, speechanalyzer.GREETINGS)
             farewells = speechanalyzer.phraseMatch(tokens, speechanalyzer.FAREWELLS)
             if greeting:
+                speech_queue.append(randomPhraseFrom(GREETINGS))
                 startWaving()
             if farewells:
+                speech_queue.append(randomPhraseFrom(FAREWELLS))
                 startWaving()
     except EOFError:
         logging.debug("done listening")
@@ -148,6 +165,9 @@ if __name__ == '__main__':
         arm.start(0)
         waver = threading.Thread(target = wave, args=())
         waver.start()
+        speech_queue = deque()
+        speaker = threading.Thread(target = speak, args=(speech_queue))
+        speaker.start()
         listener = threading.Thread(target = receiveLanguageResults, args=(nl_results,))
         listener.start()
         logging.debug("waiting")
