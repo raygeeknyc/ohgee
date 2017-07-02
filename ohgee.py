@@ -39,6 +39,7 @@ ARM_WAVE_DELAY_SECS = 5
 
 SPEECH_TMP_FILE="/tmp/speech.wav"
 PICO_CMD="pico2wave -l en-US --wave '%s' '%s';aplay %s"
+PHRASE_SUFFIXES=[["to","you"], ["as","well"], ["too"], ["also"], ["to","you","as","well"], []]
 
 def expireMood():
     global mood_set_until
@@ -117,10 +118,10 @@ def receiveLanguageResults(nl_results):
             greeting = speechanalyzer.phraseMatch(tokens, speechanalyzer.GREETINGS)
             farewells = speechanalyzer.phraseMatch(tokens, speechanalyzer.FAREWELLS)
             if greeting:
-                speech_queue.append(randomPhraseFrom(GREETINGS))
+                speech_queue.append(randomPhraseFrom(speechanalyzer.GREETINGS)+randomPhraseFrom(PHRASE_SUFFIXES))
                 startWaving()
             if farewells:
-                speech_queue.append(randomPhraseFrom(FAREWELLS))
+                speech_queue.append(randomPhraseFrom(speechanalyzer.FAREWELLS)+randomPhraseFrom(PHRASE_SUFFIXES))
                 startWaving()
     except EOFError:
         logging.debug("done listening")
