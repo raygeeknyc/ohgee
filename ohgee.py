@@ -12,7 +12,7 @@ import time
 import io
 import sys
 import os, signal
-from collections import deque
+import Queue
 from random import randint
 
 import rgbled
@@ -39,7 +39,7 @@ ARM_WAVE_DELAY_SECS = 5
 
 SPEECH_TMP_FILE="/tmp/speech.wav"
 PICO_CMD="pico2wave -l en-US --wave '%s' '%s';aplay %s"
-PHRASE_SUFFIXES=[["to","you"], ["as","well"], ["too"], ["also"], ["to","you","as","well"], []]
+PHRASE_SUFFIXES=[["to","you"], ["as","well"], ["too"], ["also"], ["to","you","as","well"], [], [], []]
 
 def expireMood():
     global mood_set_until
@@ -82,9 +82,15 @@ signal.signal(signal.SIGINT, signal_handler)
  
 def speak(speech_queue):
     global STOP
+    logging.debug("speaker started")
     while not STOP:
+        logging.debug("waiting to talk")
         utterance = " ".join(speech_queue.get())
+        recognition_worker.suspendListening()
+        logging.debug("saying '{}'".format(utterance))
         os.system(PICO_CMD % (SPEECH_TMP_FILE, utterance, SPEECH_TMP_FILE))
+        recognition_worker.resumeListening()
+    logging.debug("speaker stopping")
 
 def wave():
     global waving
@@ -109,6 +115,8 @@ def receiveLanguageResults(nl_results):
         while True:
             phrase = nl_results.recv()
             tokens, entities, sentiment = phrase
+            text = " ".join([x.text_content for x in tokens])
+            logging.debug("got spoken phrase {}".format(text))
             if speechanalyzer.isGood(sentiment):
                 showGoodMood(sentiment.score)
             elif speechanalyzer.isBad(sentiment):
@@ -116,12 +124,14 @@ def receiveLanguageResults(nl_results):
             else:
                 showMehMood(sentiment.score)
             greeting = speechanalyzer.phraseMatch(tokens, speechanalyzer.GREETINGS)
-            farewells = speechanalyzer.phraseMatch(tokens, speechanalyzer.FAREWELLS)
+            farewell = speechanalyzer.phraseMatch(tokens, speechanalyzer.FAREWELLS)
             if greeting:
-                speech_queue.append(randomPhraseFrom(speechanalyzer.GREETINGS)+randomPhraseFrom(PHRASE_SUFFIXES))
+                logging.debug("greeting matched")
+                speech_queue.put(randomPhraseFrom(speechanalyzer.GREETINGS)+randomPhraseFrom(PHRASE_SUFFIXES))
                 startWaving()
-            if farewells:
-                speech_queue.append(randomPhraseFrom(speechanalyzer.FAREWELLS)+randomPhraseFrom(PHRASE_SUFFIXES))
+            if farewell:
+                logging.debug("farewell matched")
+                speech_queue.put(randomPhraseFrom(speechanalyzer.FAREWELLS)+randomPhraseFrom(PHRASE_SUFFIXES))
                 startWaving()
     except EOFError:
         logging.debug("done listening")
@@ -166,8 +176,8 @@ if __name__ == '__main__':
         arm.start(0)
         waver = threading.Thread(target = wave, args=())
         waver.start()
-        speech_queue = deque()
-        speaker = threading.Thread(target = speak, args=(speech_queue))
+        speech_queue = Queue.Queue()
+        speaker = threading.Thread(target = speak, args=(speech_queue,))
         speaker.start()
         listener = threading.Thread(target = receiveLanguageResults, args=(nl_results,))
         listener.start()

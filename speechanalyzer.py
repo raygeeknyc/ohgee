@@ -9,7 +9,7 @@ MOOD_THRESHOLD = 0.2
 LOWER_MOOD_THRESHOLD = -1 * MOOD_THRESHOLD
 
 GREETINGS = [["hello"],["hi"],["good", "morning"], ["hey", "there"]]
-FAREWELLS = [["goodbye"], ["bye"], ["farewell"], ["good", "night"], ["see","you"]]
+FAREWELLS = [["goodnight"], ["goodbye"], ["bye"], ["farewell"], ["good", "night"], ["see","you"]]
 def phraseMatch(tokens, phrases):
     for phrase in phrases:
         matchedTokens = phraseInTokens(tokens, phrase)

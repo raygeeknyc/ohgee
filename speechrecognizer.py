@@ -31,10 +31,19 @@ class SpeechRecognizer(multiprocessing.Process):
         self._log_queue = log_queue
         self._logging_level = logging_level
         self._exit = multiprocessing.Event()
+        self._suspend_listening = multiprocessing.Event()
         self._transcript, _ = transcript
         self._stop_capturing = False
         self._stop_recognizing = False
         self._audio_buffer = Queue.Queue()
+
+    def resumeListening(self):
+        logging.debug("***background received resume")
+        self._suspend_listening.clear()
+
+    def suspendListening(self):
+        logging.debug("***background received suspend")
+        self._suspend_listening.set()
 
     def stop(self):
         logging.debug("***background received shutdown")
@@ -54,6 +63,7 @@ class SpeechRecognizer(multiprocessing.Process):
             self._audio = pyaudio.PyAudio()
             logging.debug("recognizer process active")
             self._recognizer.start()
+            self._suspend_listening.clear()
             self._capturer.start()
             self._exit.wait()
         except Exception, e:
@@ -88,6 +98,8 @@ class SpeechRecognizer(multiprocessing.Process):
             volume = 0
             try:
                 data = mic_stream.read(FRAMES_PER_BUFFER)
+                if self._suspend_listening.is_set():
+                    continue
                 volume = max(array.array('h', data))
                 if volume <= SILENCE_THRESHOLD:
                     consecutive_silent_samples += 1
