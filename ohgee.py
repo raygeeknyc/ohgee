@@ -13,7 +13,6 @@ import io
 import sys
 import os, signal
 import Queue
-from random import randint
 
 import rgbled
 import speechrecognizer
@@ -39,16 +38,12 @@ ARM_WAVE_DELAY_SECS = 1
 
 SPEECH_TMP_FILE="/tmp/speech.wav"
 PICO_CMD="pico2wave -l en-US --wave '%s' '%s';aplay %s"
-PHRASE_SUFFIXES=[["to","you"], ["as","well"], ["too"], ["also"], ["to","you","as","well"], [], [], []]
 
 def expireMood():
     global mood_set_until
     if mood_set_until and mood_set_until < time.time():
         mood_set_until = 0
         led.setColor(rgbled.OFF)
-
-def randomPhraseFrom(phrases):
-    return phrases[randint(0,len(phrases)-1)]
 
 def setMoodTime():
     global mood_set_until
@@ -123,16 +118,13 @@ def receiveLanguageResults(nl_results):
                 showBadMood(sentiment.score)
             else:
                 showMehMood(sentiment.score)
-            greeting = speechanalyzer.phraseMatch(tokens, speechanalyzer.GREETINGS)
-            farewell = speechanalyzer.phraseMatch(tokens, speechanalyzer.FAREWELLS)
-            if greeting:
-                logging.debug("greeting matched")
-                speech_queue.put(randomPhraseFrom(speechanalyzer.GREETINGS)+randomPhraseFrom(PHRASE_SUFFIXES))
-                startWaving()
-            if farewell:
-                logging.debug("farewell matched")
-                speech_queue.put(randomPhraseFrom(speechanalyzer.FAREWELLS)+randomPhraseFrom(PHRASE_SUFFIXES))
-                startWaving()
+            response = speechanalyzer.getResponse(tokens, speechanalyzer.GREETINGS)
+            if response:
+                logging.debug("phrase matched")
+                comeback, wave_flag = response
+                speech_queue.put(comeback)
+                if wave_flag:
+                    startWaving()
     except EOFError:
         logging.debug("done listening")
 
