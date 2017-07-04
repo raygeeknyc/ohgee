@@ -37,7 +37,7 @@ ARM_WAVE_RAISE_SECS = 2
 ARM_WAVE_DELAY_SECS = 1
 
 SPEECH_TMP_FILE="/tmp/speech.wav"
-PICO_CMD="pico2wave -l en-US --wave '%s' '%s';aplay %s"
+PICO_CMD='pico2wave -l en-US --wave "%s" "%s";aplay "%s"'
 
 def expireMood():
     global mood_set_until
@@ -82,7 +82,7 @@ def speak(speech_queue):
         logging.debug("waiting to talk")
         utterance = " ".join(speech_queue.get())
         recognition_worker.suspendListening()
-        logging.debug("saying '{}'".format(utterance))
+        logging.debug("saying {}".format(utterance))
         os.system(PICO_CMD % (SPEECH_TMP_FILE, utterance, SPEECH_TMP_FILE))
         recognition_worker.resumeListening()
     logging.debug("speaker stopping")
@@ -118,7 +118,7 @@ def receiveLanguageResults(nl_results):
                 showBadMood(sentiment.score)
             else:
                 showMehMood(sentiment.score)
-            response = speechanalyzer.getResponse(tokens, speechanalyzer.GREETINGS)
+            response = speechanalyzer.getResponse(tokens)
             if response:
                 logging.debug("phrase matched")
                 comeback, wave_flag = response
