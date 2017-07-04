@@ -51,17 +51,17 @@ def setMoodTime():
     mood_set_until = time.time() + MOOD_SET_DURATION_SECS
 
 def showGoodMood(score):
-    print "Good mood {}".format(score)
+    logging.info("Good mood {}".format(score))
     led.setColor(rgbled.GREEN)
     setMoodTime()
 
 def showBadMood(score):
-    print "Bad mood {}".format(score)
+    logging.info("Bad mood {}".format(score))
     led.setColor(rgbled.RED)
     setMoodTime()
 
 def showMehMood(score):
-    print "Meh mood {}".format(score)
+    logging.info("Meh mood {}".format(score))
     led.setColor(rgbled.CYAN)
     setMoodTime()
 
