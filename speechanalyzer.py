@@ -11,12 +11,12 @@ LOWER_MOOD_THRESHOLD = -1 * MOOD_THRESHOLD
 
 GREETINGS = (["hello"],["hi"],["good", "morning"], ["hey", "there"])
 FAREWELLS = (["goodnight"], ["goodbye"], ["bye"], ["farewell"], ["good", "night"], ["see","you"])
-AFFECTIONS = (["I", "love", "you"], ["I", "like", "you"], ["you're", "the", "best"])
+AFFECTIONS = (["youre", "adorable"], ["I", "adore", "you"], ["I", "love", "you"], ["I", "like", "you"], ["youre", "the", "best"])
 ME_TOO = (["I", "feel", "the", "same"], ["that", "makes", "two", "of", "us"], ["I", "feel", "the", "same", "way"], ["same", "here"])
 THANKS = (["thank", "you"], ["thanks"])
-WELCOMES = (["you're", "welcome"], ["don't", "mention", "it"], ["de", "nada"], ["my", "pleasure"])
-HATES = (["I", "hate", "you"], ["I", "don't", "like", "you"], ["you", "suck"])
-SADNESSES = (["sniff"], ["you", "break", "my", "heart"], ["that", "makes", "me", "sad"], ["I'm", "sorry"])
+WELCOMES = (["youre", "welcome"], ["dont", "mention", "it"], ["de", "nada"], ["my", "pleasure"])
+HATES = (["I", "hate", "you"], ["I", "dont", "like", "you"], ["you", "suck"])
+SADNESSES = (["sniff"], ["you", "break", "my", "heart"], ["that", "makes", "me", "sad"], ["Im", "sorry"])
 IN_KIND_SUFFIXES=(["to","you"], ["as","well"], ["too"], ["also"], ["to","you","as","well"], [], [], [])
 
 PROMPTS_RESPONSES = [(GREETINGS, GREETINGS, IN_KIND_SUFFIXES, True), 
@@ -105,7 +105,7 @@ class SpeechAnalyzer(multiprocessing.Process):
     def _analyzeSpeech(self):
         logging.debug("***speech analyzer analyzing")
         while not self._exit.is_set():
-            text = self._text_transcript.recv()
+            text = self._text_transcript.recv().replace("'","")
             document = self._language_client.document_from_text(text)
             entities = document.analyze_entities().entities
             tokens = document.analyze_syntax().tokens
