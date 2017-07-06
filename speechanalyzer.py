@@ -9,13 +9,13 @@ from google.cloud import language
 MOOD_THRESHOLD = 0.2
 LOWER_MOOD_THRESHOLD = -1 * MOOD_THRESHOLD
 
-GREETINGS = (["hello"],["hi"],["good", "morning"], ["hey", "there"])
-FAREWELLS = (["goodnight"], ["goodbye"], ["bye"], ["farewell"], ["good", "night"], ["see","you"])
-AFFECTIONS = (["youre", "adorable"], ["I", "adore", "you"], ["I", "love", "you"], ["I", "like", "you"], ["youre", "the", "best"])
+GREETINGS = (["hello"],["hi"],["good", "morning"], ["hey", "there"], ["good", "day"])
+FAREWELLS = (["goodnight"], ["goodbye"], ["bye"], ["farewell"], ["good", "night"], ["see","you"], ["talk", "to", "you", "later"])
+AFFECTIONS = (["youre", "adorable"], ["I", "adore", "you"], ["I", "love", "you"], ["I", "like", "you"], ["youre", "the", "best"], ["youre", "cute"], ["youre", "so", "cute"], ["youre", "sweet"], ["youre", "so", "sweet"], ["youre", "cool"], ["youre", "great"], ["cute", "robot"])
 ME_TOO = (["I", "feel", "the", "same"], ["that", "makes", "two", "of", "us"], ["I", "feel", "the", "same", "way"], ["same", "here"])
 THANKS = (["thank", "you"], ["thanks"])
 WELCOMES = (["youre", "welcome"], ["dont", "mention", "it"], ["de", "nada"], ["my", "pleasure"])
-HATES = (["I", "hate", "you"], ["I", "dont", "like", "you"], ["you", "suck"])
+HATES = (["I", "hate", "you"], ["I", "dont", "like", "you"], ["you", "suck"], ["youre", "stupid"], ["youre", "awful"], ["stupid", "robot"], ["dumb", "robot"])
 SADNESSES = (["sniff"], ["you", "break", "my", "heart"], ["that", "makes", "me", "sad"], ["Im", "sorry"])
 IN_KIND_SUFFIXES=(["to","you"], ["as","well"], ["too"], ["also"], ["to","you","as","well"], [], [], [])
 
