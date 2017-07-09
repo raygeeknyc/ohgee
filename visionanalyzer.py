@@ -33,7 +33,7 @@ PIXEL_SHIFT_SENSITIVITY = 30
 POLL_SECS = 0.5
 
 # This is the rate at which to send frame to the vision service
-ANALYSIS_RATE_FPS = 1.0/3
+ANALYSIS_RATE_FPS = 1.0/2
 _ANALYSIS_DELAY_SECS = 1.0/ANALYSIS_RATE_FPS
 
 def signal_handler(sig, frame):

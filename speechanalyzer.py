@@ -11,13 +11,14 @@ LOWER_MOOD_THRESHOLD = -1 * MOOD_THRESHOLD
 
 GREETINGS = (["hello"],["hi"],["good", "morning"], ["hey", "there"], ["good", "day"])
 FAREWELLS = (["goodnight"], ["goodbye"], ["bye"], ["farewell"], ["good", "night"], ["see","you"], ["talk", "to", "you", "later"])
-AFFECTIONS = (["youre", "adorable"], ["I", "adore", "you"], ["I", "love", "you"], ["I", "like", "you"], ["youre", "the", "best"], ["youre", "cute"], ["youre", "so", "cute"], ["youre", "sweet"], ["youre", "so", "sweet"], ["youre", "cool"], ["youre", "great"], ["cute", "robot"])
+AFFECTIONS = (["you're", "adorable"], ["I", "adore", "you"], ["I", "love", "you"], ["I", "like", "you"], ["you're", "the", "best"], ["you're", "cute"], ["you're", "so", "cute"], ["you're", "sweet"], ["you're", "so", "sweet"], ["you're", "cool"], ["you're", "great"], ["cute", "robot"])
 ME_TOO = (["I", "feel", "the", "same"], ["that", "makes", "two", "of", "us"], ["I", "feel", "the", "same", "way"], ["same", "here"])
 THANKS = (["thank", "you"], ["thanks"])
-WELCOMES = (["youre", "welcome"], ["dont", "mention", "it"], ["de", "nada"], ["my", "pleasure"])
-HATES = (["I", "hate", "you"], ["I", "dont", "like", "you"], ["you", "suck"], ["youre", "stupid"], ["youre", "awful"], ["stupid", "robot"], ["dumb", "robot"])
+WELCOMES = (["you're", "welcome"], ["don't", "mention", "it"], ["de", "nada"], ["my", "pleasure"])
+HATES = (["I", "hate", "you"], ["I", "don't", "like", "you"], ["you", "suck"], ["you're", "stupid"], ["you're", "awful"], ["stupid", "robot"], ["dumb", "robot"])
 SADNESSES = (["sniff"], ["you", "break", "my", "heart"], ["that", "makes", "me", "sad"], ["Im", "sorry"])
-IN_KIND_SUFFIXES=(["to","you"], ["as","well"], ["too"], ["also"], ["to","you","as","well"], [], [], [])
+# Add in empty lists to weigh the random selection from the tuple towards null responses
+IN_KIND_SUFFIXES=(["to","you"], ["as","well"], ["too"], ["also"], ["to","you","as","well"], [], [], [], [], [], [], [])
 
 PROMPTS_RESPONSES = [(GREETINGS, GREETINGS, IN_KIND_SUFFIXES, True), 
   (FAREWELLS, FAREWELLS, IN_KIND_SUFFIXES, True),
@@ -50,7 +51,7 @@ def phraseInTokens(phrase, candidate_phrase):
     words = phrase.split(" ")
     for i in range(len(words)-len(candidate_phrase)+1):
         if words[i].upper() == w.upper():
-            for j in range(1,len(phrase)):
+            for j in range(1,len(candidate_phrase)):
                 if words[i+j].upper() != candidate_phrase[j].upper():
                     matched = False
             if matched:
@@ -101,27 +102,30 @@ class SpeechAnalyzer(multiprocessing.Process):
             logging.exception("speech analyzer exception: {}".format(str(e)))
         finally:
             logging.debug("speech analyzer terminating")
-            self._nl_results.close()
   
     def _analyzeSpeech(self):
         logging.debug("***speech analyzer analyzing")
-        while not self._exit.is_set():
-            text = self._text_transcript.recv()
-            document = self._language_client.document_from_text(text)
-            entities = document.analyze_entities().entities
-            tokens = document.analyze_syntax().tokens
-            content = document.content
-            logging.debug("text contained {} sentences".format(len(sentences)))
-            logging.debug("analyzer received text: {}".format(text))
+        try:
+            while not self._exit.is_set():
+                text = self._text_transcript.recv()
+                document = self._language_client.document_from_text(text)
+                content = document.content
+                logging.debug("analyzer received text: {}".format(content))
+                entities = document.analyze_entities().entities
+                tokens = document.analyze_syntax().tokens
+                sentiment = document.analyze_sentiment().sentiment
 
-            sentiment = document.analyze_sentiment().sentiment
+                logging.debug("Sentiment: {}, {}".format(sentiment.score, sentiment.magnitude))
+                for entity in entities:
+                    logging.debug("Entity: {}: {}".format(entity.entity_type, entity.name))
+                    logging.debug("source: {}: {}".format(entity.metadata, entity.salience))
 
-            logging.debug("Sentiment: {}, {}".format(sentiment.score, sentiment.magnitude))
-            for entity in entities:
-                logging.debug("Entity: {}: {}".format(entity.entity_type, entity.name))
-                logging.debug("source: {}: {}".format(entity.metadata, entity.salience))
-
-            for token in tokens:
-                logging.debug("Token: {}: {}".format(token.part_of_speech, token.text_content))
-            results = (content, tokens, entities, sentiment)
-            self._nl_results.send(results)
+                for token in tokens:
+                    logging.debug("Token: {}: {}".format(token.part_of_speech, token.text_content))
+                results = (content, tokens, entities, sentiment)
+                self._nl_results.send(results)
+        except EOFError, e:
+            logging.debug("end of speech analyzer")
+        finally:
+            self._text_transcript.close()
+            self._nl_results.close()

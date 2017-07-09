@@ -70,12 +70,14 @@ class SpeechRecognizer(multiprocessing.Process):
             self._exit.wait()
         except Exception, e:
             logging.exception("recognizer process exception: {}".format(str(e)))
-        logging.debug("recognizer process terminating")
-        self._stopCapturing()
-        self._stopRecognizing()
-        self._capturer.join()
-        self._recognizer.join()
-        self._transcript.close()
+        finally:
+            self._stopCapturing()
+            self._stopRecognizing()
+            self._capturer.join()
+            self._recognizer.join()
+            self._transcript.close()
+            logging.debug("recognizer process terminating")
+            sys.exit(0)
 
     def _stopCapturing(self):
         logging.debug("setting stop_capturing")

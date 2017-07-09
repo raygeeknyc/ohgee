@@ -1,8 +1,8 @@
 import logging
 
 # reorder as appropriate
-_DEBUG = logging.DEBUG
 _DEBUG = logging.INFO
+_DEBUG = logging.DEBUG
 
 import multiprocessing
 from multiprocessingloghandler import ParentMultiProcessingLogHandler
@@ -17,9 +17,11 @@ import Queue
 import rgbled
 import speechrecognizer
 import speechanalyzer
+import visionanalyzer
 
 global STOP
 STOP = False
+
 global waving
 waving = False
 
@@ -69,7 +71,7 @@ def signal_handler(sig, frame):
     global STOP
     logging.debug("INT signal trapped")
     if STOP:
-        logging.debug("second INT signal trapped, killing")
+        logging.debug("Second INT signal trapped, killing")
         signal.signal(signal.SIGINT, signal.SIG_IGN)
         os.kill(os.getpid(), signal.SIGTERM)
     STOP = True
@@ -77,15 +79,15 @@ signal.signal(signal.SIGINT, signal_handler)
  
 def speak(speech_queue):
     global STOP
-    logging.debug("speaker started")
+    logging.debug("Speaker started")
     while not STOP:
-        logging.debug("waiting to talk")
+        logging.debug("Waiting to talk")
         utterance = " ".join(speech_queue.get())
         recognition_worker.suspendListening()
-        logging.debug("saying {}".format(utterance))
+        logging.debug("Saying {}".format(utterance))
         os.system(PICO_CMD % (SPEECH_TMP_FILE, utterance, SPEECH_TMP_FILE))
         recognition_worker.resumeListening()
-    logging.debug("speaker stopping")
+    logging.debug("Speaker stopping")
 
 def wave():
     global waving
@@ -93,7 +95,7 @@ def wave():
     while not STOP:
         while not waving:
             time.sleep(ARM_WAVE_DELAY_SECS)
-        logging.debug("wave")
+        logging.debug("Wave")
         raiseArm()
         time.sleep(ARM_WAVE_RAISE_SECS)
         lowerArm()
@@ -104,13 +106,13 @@ def wave():
         waving = False
 
 def receiveLanguageResults(nl_results):
-    logging.debug("listening")
+    logging.debug("Listening")
     _, nl_results = nl_results
     try:
         while True:
             phrase = nl_results.recv()
             text, tokens, entities, sentiment = phrase
-            logging.debug("got spoken phrase {}".format(text))
+            logging.debug("Got spoken phrase {}".format(text))
             if speechanalyzer.isGood(sentiment):
                 showGoodMood(sentiment.score)
             elif speechanalyzer.isBad(sentiment):
@@ -119,13 +121,26 @@ def receiveLanguageResults(nl_results):
                 showMehMood(sentiment.score)
             response = speechanalyzer.getResponse(text)
             if response:
-                logging.debug("phrase matched")
+                logging.debug("Phrase matched")
                 comeback, wave_flag = response
                 speech_queue.put(comeback)
                 if wave_flag:
                     startWaving()
     except EOFError:
-        logging.debug("done listening")
+        logging.debug("Done listening")
+
+def watchForResults(vision_results_queue):
+    logging.debug("Watching")
+    _, incoming_results = vision_results_queue
+    try:
+        while True:
+            processed_image_results = incoming_results.recv()
+            image, labels, faces = processed_image_results
+            logging.debug("{} faces detected".format(len(faces)))
+            for label in labels:
+                logging.debug("Label: {}".format(label.description))
+    except EOFError:
+        logging.debug("Done watching")
 
 def lowerArm():
     arm.ChangeDutyCycle(ARM_DOWN_POSITION)
@@ -152,46 +167,63 @@ if __name__ == '__main__':
     handler = ParentMultiProcessingLogHandler(logging.StreamHandler(log_stream), log_queue)
     logging.getLogger('').addHandler(handler)
     logging.getLogger('').setLevel(_DEBUG)
-    transcript = multiprocessing.Pipe()
-    nl_results = multiprocessing.Pipe()
 
+    transcript = multiprocessing.Pipe()
     recognition_worker = speechrecognizer.SpeechRecognizer(transcript, log_queue, logging.getLogger('').getEffectiveLevel())
     logging.debug("Starting speech recognition")
     recognition_worker.start()
+    unused, _ = transcript
+    unused.close()
 
+    nl_results = multiprocessing.Pipe()
     analysis_worker = speechanalyzer.SpeechAnalyzer(transcript, nl_results, log_queue, logging.getLogger('').getEffectiveLevel())
     logging.debug("Starting speech analysis")
     analysis_worker.start()
     unused, _ = nl_results
     unused.close()
+
+    vision_results_queue = multiprocessing.Pipe()
+    vision_worker = visionanalyzer.ImageAnalyzer(vision_results_queue, log_queue, logging.getLogger('').getEffectiveLevel())
+    logging.debug("Starting image analysis")
+    vision_worker.start()
+    unused, _ = vision_results_queue
+    unused.close()
+
     try:
         arm = GPIO.PWM(servoPin, 50)
         arm.start(0)
         waver = threading.Thread(target = wave, args=())
         waver.start()
+
+        watcher = threading.Thread(target = watchForResults, args=(vision_results_queue,))
+        watcher.start()
+
         speech_queue = Queue.Queue()
         speaker = threading.Thread(target = speak, args=(speech_queue,))
         speaker.start()
         listener = threading.Thread(target = receiveLanguageResults, args=(nl_results,))
         listener.start()
-        logging.debug("waiting")
+        logging.info("Waiting")
         while not STOP:
             time.sleep(POLL_DELAY_SECS)
             expireMood()
-        logging.debug("stopping")
-        _, i = nl_results
-        i.close()
+        logging.info("Stopping")
     except Exception, e:
         logging.error("Error in main: {}".format(e))
     finally:
-        logging.debug("ending main")
+        logging.debug("Ending main")
+        vision_worker.stop()
         recognition_worker.stop()
         analysis_worker.stop()
-        logging.debug("waiting for background processes to exit")
+        logging.debug("Waiting for background processes to exit")
+        logging.debug("wait for vision")
+        vision_worker.join()
+        logging.debug("wait for recognition")
         recognition_worker.join()
+        logging.debug("wait for analysis")
         analysis_worker.join()
-        logging.debug("done")
         led.setColor(rgbled.OFF)
         arm.stop()
-    GPIO.cleanup()
-    sys.exit()
+        GPIO.cleanup()
+        logging.debug("Done")
+        sys.exit(0)
