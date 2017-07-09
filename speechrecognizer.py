@@ -88,13 +88,13 @@ class SpeechRecognizer(multiprocessing.Process):
         self._stop_recognizing = True
 
     def trainSilence(self, mic_stream):
-        logging.debug("Training silence")
+        logging.info("Training silence")
         self._silence_threshold = 999
         for sample in xrange(SILENCE_TRAINING_SAMPLES):
             data = mic_stream.read(FRAMES_PER_BUFFER)
             volume = max(array.array('h', data))
             self._silence_threshold = min(self._silence_threshold, volume)
-        logging.debug("Trained silence volume {}".format(self._silence_threshold))
+        logging.info("Trained silence volume {}".format(self._silence_threshold))
 
     def captureSound(self):
         logging.debug("starting capturing")
