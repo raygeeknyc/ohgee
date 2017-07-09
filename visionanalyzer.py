@@ -4,7 +4,7 @@ _DEBUG = logging.DEBUG
 # Import the packages we need for drawing and displaying images
 from PIL import Image
 
-#from picamera import PiCamera
+from picamera import PiCamera
 
 # Imports the Google Cloud client packages we need
 from google.cloud import vision
