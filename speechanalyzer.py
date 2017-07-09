@@ -105,10 +105,12 @@ class SpeechAnalyzer(multiprocessing.Process):
     def _analyzeSpeech(self):
         logging.debug("***speech analyzer analyzing")
         while not self._exit.is_set():
-            text = self._text_transcript.recv().replace("'","")
+            text = self._text_transcript.recv()
             document = self._language_client.document_from_text(text)
             entities = document.analyze_entities().entities
             tokens = document.analyze_syntax().tokens
+            sentences = document.sentences
+            logging.debug("text contained {} sentences".format(len(sentences)))
             logging.debug("analyzer received text: {}".format(text))
 
             sentiment = document.analyze_sentiment().sentiment
