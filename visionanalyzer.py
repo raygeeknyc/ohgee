@@ -89,13 +89,13 @@ class ImageAnalyzer(multiprocessing.Process):
 
     def trainMotion(self):
         self._camera.start_preview(fullscreen=False, window=(100,100,self._camera.resolution[0], self._camera.resolution[1]))
-        self._motion_threshold = 0
+        self._motion_threshold = 9999
         self.getNextFrame()
         self._prev_frame = self.capturePilFrame()
         for i in range(TRAINING_SAMPLES):
             self.getNextFrame()
             motion = self.calculateImageDifference()
-            self._motion_threshold = max(motion, self._motion_threshold)
+            self._motion_threshold = min(motion, self._motion_threshold)
         self._camera.stop_preview()
 
     def run(self):
