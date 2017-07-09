@@ -1,3 +1,3 @@
 # ohgee
 The OhGee Cloud Services Avatar
-A robot that uses speech and image recognition to understand and speech, an LED and images to interact with observers.
+A robot that understand speech and face sentiment; it uses an LED and arm to interact with observers.
