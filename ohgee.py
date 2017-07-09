@@ -163,6 +163,8 @@ if __name__ == '__main__':
     analysis_worker = speechanalyzer.SpeechAnalyzer(transcript, nl_results, log_queue, logging.getLogger('').getEffectiveLevel())
     logging.debug("Starting speech analysis")
     analysis_worker.start()
+    unused, _ = nl_results
+    unused.close()
     try:
         arm = GPIO.PWM(servoPin, 50)
         arm.start(0)

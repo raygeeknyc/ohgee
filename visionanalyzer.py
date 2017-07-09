@@ -23,14 +23,18 @@ import threading
 
 # This is the desired resolution of the Pi camera
 RESOLUTION = (320, 240)
-CAPTURE_RATE_FPS = 2
+CAPTURE_RATE_FPS = 4
 # This is over an observed covered camera's noise
 TRAINING_SAMPLES = 5
 # This is how much the green channel has to change to consider a pixel changed
 PIXEL_SHIFT_SENSITIVITY = 30
 
-# This is how long to check for a shutdown
+# This is how long to sleep in various threads between shutdown checks
 POLL_SECS = 0.5
+
+# This is the rate at which to send frame to the vision service
+ANALYSIS_RATE_FPS = 1.0/3
+_ANALYSIS_DELAY_SECS = 1.0/ANALYSIS_RATE_FPS
 
 def signal_handler(sig, frame):
     global STOP
@@ -51,6 +55,7 @@ class ImageAnalyzer(multiprocessing.Process):
         self._stop_capturing = False
         self._stop_analyzing = False
         self._last_frame_at = 0.0
+        self._last_analysis_at = 0.0
         self._frame_delay_secs = 1.0/CAPTURE_RATE_FPS
 
     def stop(self):
@@ -123,8 +128,11 @@ class ImageAnalyzer(multiprocessing.Process):
 
     def analyzeVision(self):
         while not self._stop_analyzing:
-            while True:
-                frame = None
+            frame = None
+            while (self._last_analysis_at + _ANALYSIS_DELAY_SECS) > time.time() and not self._stop_analyzing:
+                time.sleep(POLL_SECS)
+            self._last_analysis_at = time.time()
+            while True and not self._stop_analyzing:
                 try:
                     f = self._frames.get(block=False)
                     frame = f
@@ -132,7 +140,18 @@ class ImageAnalyzer(multiprocessing.Process):
                     break
             if frame:
                 logging.debug("Trailing frame read")
+                results = self._analyzeFrame(frame)
+                self._vision_queue.send(results)
+            else:
+                logging.debug("No frame in queue")
+        self._vision_queue.close()
         logging.debug("Exiting vision analyze thread")
+
+    def _analyzeFrame(frame):
+        remote_image - self._vision_client.image(content=frame)
+        labels = remote_image.detect_labels()
+        faces = remote_image.detect_faces(limit=5)
+        return (frame, labels, faces)
 
     def captureFrames(self):
         self._image_buffer = io.BytesIO()
@@ -154,6 +173,20 @@ class ImageAnalyzer(multiprocessing.Process):
         logging.debug("Exiting vision capture thread")
         self._camera.close()
 
+def watchForResults(vision_results_queue):
+    global STOP
+
+    _, incoming_results = vision_results_queue
+    try:
+        while True:
+            processed_image_results = incoming_results.recv()
+            image, labels, faces = processed_image_results
+            logging.info("{} faces detected".format(len(faces)))
+            for label in labels:
+                logging.info("label: {}".format(label.description))
+    except EOFError:
+        logging.debug("Done watching")
+
 if __name__ == '__main__':
     global STOP
     STOP = False
@@ -168,6 +201,10 @@ if __name__ == '__main__':
     try:
         logging.debug("Starting image analysis")
         vision_worker.start()
+        unused, _ = vision_results_queue
+        unused.close()
+        watcher = threading.Thread(target = watchForResults, args=(vision_results_queue,))
+        watcher.start()
         while not STOP:
             time.sleep(POLL_SECS)
     except Exception, e:
@@ -176,4 +213,5 @@ if __name__ == '__main__':
         logging.debug("Ending")
         vision_worker.stop()
         vision_worker.join()
+        logging.debug("background process returned, exiting main process")
         sys.exit(0)
