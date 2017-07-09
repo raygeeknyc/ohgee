@@ -19,11 +19,13 @@ FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 16000
 FRAMES_PER_BUFFER = 4096
-SILENCE_THRESHOLD = 500
 PAUSE_LENGTH_SECS = 1
 MAX_BUFFERED_SAMPLES = 1
 PAUSE_LENGTH_IN_SAMPLES = int((PAUSE_LENGTH_SECS * RATE / FRAMES_PER_BUFFER) + 0.5)
 SAMPLE_RETRY_DELAY_SECS = 0.1
+
+# This is how many samples to take to find the lowest sound level
+SILENCE_TRAINING_SAMPLES = 10
 
 class SpeechRecognizer(multiprocessing.Process):
     def __init__(self, transcript, log_queue, logging_level):
@@ -83,16 +85,25 @@ class SpeechRecognizer(multiprocessing.Process):
         logging.debug("setting stop_recognizing")
         self._stop_recognizing = True
 
+    def trainSilence(self, mic_stream):
+        logging.debug("Training silence")
+        self._silence_threshold = 999
+        for sample in xrange(SILENCE_TRAINING_SAMPLES):
+            data = mic_stream.read(FRAMES_PER_BUFFER)
+            volume = max(array.array('h', data))
+            self._silence_threshold = min(self._silence_threshold, volume)
+        logging.debug("Trained silence volume {}".format(self._silence_threshold))
+
     def captureSound(self):
         logging.debug("starting capturing")
         mic_stream = self._audio.open(format=FORMAT, channels=CHANNELS,
             rate=RATE, input=True,
             frames_per_buffer=FRAMES_PER_BUFFER)
 
+        self.trainSilence(mic_stream)
         consecutive_silent_samples = 999
         self._audio_stream.close()
         samples = 0
- 
         while not self._stop_capturing:
             samples += 1
             volume = 0
@@ -101,7 +112,7 @@ class SpeechRecognizer(multiprocessing.Process):
                 if self._suspend_listening.is_set():
                     continue
                 volume = max(array.array('h', data))
-                if volume <= SILENCE_THRESHOLD:
+                if volume <= self._silence_threshold:
                     consecutive_silent_samples += 1
                 else:
                     if consecutive_silent_samples >= PAUSE_LENGTH_IN_SAMPLES:

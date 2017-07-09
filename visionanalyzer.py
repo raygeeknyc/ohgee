@@ -72,9 +72,11 @@ class ImageAnalyzer(multiprocessing.Process):
         self._camera.capture(self._image_buffer, format="jpeg")
         self._image_buffer.seek(0)
         image = Image.open(self._image_buffer)
-        image = image.load()
+        image_pixels = image.load()
+        self._image_buffer.seek(0)
+        image = self._image_buffer.getvalue()
         self._last_frame_at = time.time()
-        return image
+        return (image, image_pixels)
 
     def getNextFrame(self):
         delay = (self._last_frame_at + self._frame_delay_secs) - time.time()
@@ -87,7 +89,7 @@ class ImageAnalyzer(multiprocessing.Process):
         changed_pixels = 0
         for x in xrange(self._camera.resolution[0]):
             for y in xrange(self._camera.resolution[1]):
-                if abs(self._current_frame[x,y][1] - self._prev_frame[x,y][1]) > PIXEL_SHIFT_SENSITIVITY:
+                if abs(self._current_frame[1][x,y][1] - self._prev_frame[1][x,y][1]) > PIXEL_SHIFT_SENSITIVITY:
                     changed_pixels += 1
         self._prev_frame = self._current_frame
         return changed_pixels
@@ -127,6 +129,7 @@ class ImageAnalyzer(multiprocessing.Process):
             sys.exit(0)
 
     def analyzeVision(self):
+        self._vision_client = vision.Client()
         while not self._stop_analyzing:
             frame = None
             while (self._last_analysis_at + _ANALYSIS_DELAY_SECS) > time.time() and not self._stop_analyzing:
@@ -147,11 +150,11 @@ class ImageAnalyzer(multiprocessing.Process):
         self._vision_queue.close()
         logging.debug("Exiting vision analyze thread")
 
-    def _analyzeFrame(frame):
-        remote_image - self._vision_client.image(content=frame)
+    def _analyzeFrame(self, frame):
+        remote_image = self._vision_client.image(content=frame[0])
         labels = remote_image.detect_labels()
         faces = remote_image.detect_faces(limit=5)
-        return (frame, labels, faces)
+        return (frame[0], labels, faces)
 
     def captureFrames(self):
         self._image_buffer = io.BytesIO()
