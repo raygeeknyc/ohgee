@@ -2,11 +2,9 @@ import logging
 _DEBUG = logging.DEBUG
 
 # Import the packages we need for drawing and displaying images
-from PIL import Image, ImageDraw
+from PIL import Image
 
-from picamera import PiCamera
-from picamera.array import PiRGBArray
-from scipy.misc import fromimage
+#from picamera import PiCamera
 
 # Imports the Google Cloud client packages we need
 from google.cloud import vision
@@ -20,6 +18,8 @@ import sys
 import os
 import time
 import signal
+import Queue
+import threading
 
 # This is the desired resolution of the Pi camera
 RESOLUTION = (320, 240)
@@ -100,7 +100,41 @@ class ImageAnalyzer(multiprocessing.Process):
 
     def run(self):
         self._initLogging()
-        logging.debug("vision analysis running")
+        try:
+            self._frames = Queue.Queue()
+            self._stop_capturing = False
+            self._stop_analyzing = False
+            self._capturer = threading.Thread(target=self.captureFrames)
+            self._capturer.start()
+            self._analyzer = threading.Thread(target=self.analyzeVision)
+            self._analyzer.start()
+            while not self._exit.is_set():
+                time.sleep(POLL_SECS)
+            logging.debug("Shutting down threads")
+            self._stop_capturing = True
+            self._capturer.join()
+            self._stop_analyzing = True
+            self._analyzer.join()
+        except Exception, e:
+            logging.exception("Error in vision main thread {}".format(e))
+        finally:
+            logging.debug("Exiting vision")
+            sys.exit(0)
+
+    def analyzeVision(self):
+        while not self._stop_analyzing:
+            while True:
+                frame = None
+                try:
+                    f = self._frames.get(block=False)
+                    frame = f
+                except Queue.Empty:
+                    break
+            if frame:
+                logging.debug("Trailing frame read")
+        logging.debug("Exiting vision analyze thread")
+
+    def captureFrames(self):
         self._image_buffer = io.BytesIO()
         self._camera = PiCamera()
         self._camera.resolution = RESOLUTION
@@ -108,17 +142,17 @@ class ImageAnalyzer(multiprocessing.Process):
         logging.info("Training motion detection")
         self.trainMotion()
         logging.info("Trained motion detection {}".format(self._motion_threshold))
-        while not self._exit.is_set():
+        while not self._stop_capturing:
             try:
                 self.getNextFrame()
                 motion = self.calculateImageDifference()
                 if motion > self._motion_threshold:
                     logging.info("motion={}".format(motion))
+                    self._frames.put(self._current_frame)
             except Exception, e:
                 logging.error("Error in analysis: {}".format(e))
-        logging.debug("ending analysis")
+        logging.debug("Exiting vision capture thread")
         self._camera.close()
-        sys.exit(0)
 
 if __name__ == '__main__':
     global STOP
