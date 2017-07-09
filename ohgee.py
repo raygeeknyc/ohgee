@@ -1,8 +1,8 @@
 import logging
 
 # reorder as appropriate
-_DEBUG = logging.INFO
 _DEBUG = logging.DEBUG
+_DEBUG = logging.INFO
 
 import multiprocessing
 from multiprocessingloghandler import ParentMultiProcessingLogHandler
@@ -37,6 +37,8 @@ ARM_UP_POSITION = 7.5
 ARM_WAVE_LOWER_SECS = 0.5
 ARM_WAVE_RAISE_SECS = 2
 ARM_WAVE_DELAY_SECS = 1
+
+GREETING_INTERVAL_SECS = 30
 
 SPEECH_TMP_FILE="/tmp/speech.wav"
 PICO_CMD='pico2wave -l en-US --wave "%s" "%s";aplay "%s"'
@@ -132,6 +134,7 @@ def receiveLanguageResults(nl_results):
 def watchForResults(vision_results_queue):
     logging.debug("Watching")
     _, incoming_results = vision_results_queue
+    last_greeting_at = 0.0
     try:
         while True:
             processed_image_results = incoming_results.recv()
@@ -139,6 +142,19 @@ def watchForResults(vision_results_queue):
             logging.debug("{} faces detected".format(len(faces)))
             for label in labels:
                 logging.debug("Label: {}".format(label.description))
+
+            since_greeted = time.time() - last_greeting_at
+            if since_greeted > GREETING_INTERVAL_SECS: 
+                greeting = visionanalyzer.getGreeting(labels)
+                if greeting:
+                    logging.debug("Label matched")
+                    last_greeting_at = time.time()
+                    greeting, wave_flag = greeting
+                    if greeting:
+                        logging.debug("Greeting %s (%d)" % (" ".join(greeting), len(greeting)))
+                        speech_queue.put(greeting)
+                    if wave_flag:
+                        startWaving()
     except EOFError:
         logging.debug("Done watching")
 

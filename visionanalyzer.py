@@ -13,6 +13,7 @@ from google.cloud.vision.likelihood import Likelihood
 import multiprocessing
 from multiprocessingloghandler import ParentMultiProcessingLogHandler
 from multiprocessingloghandler import ChildMultiProcessingLogHandler
+from random import randint
 import io
 import sys
 import os
@@ -44,6 +45,36 @@ def signal_handler(sig, frame):
     logging.debug("SIGINT")
     STOP = True
 signal.signal(signal.SIGINT, signal_handler)
+
+DOG_LABELS = ["dog", "canine"]
+DOG_GREETINGS = (["hello", "puppy"], ["woof", "woof"], ["bark"], ["good", "puppy"], ["nice", "doggie"])
+
+CAT_LABELS = ["cat", "feline"]
+CAT_GREETINGS = (["meow"], ["meow", "meow"], ["nice", "kitty"])
+
+EYEGLASS_LABELS = ["glasses", "eyewear"]
+EYEGLASS_GREETINGS = (["I", "like", "your", "glasses"], ["nice", "glasses"], [], [], [])
+
+# Only first first label found in tags will be used, so prioritize them in this list
+LABELS_GREETINGS = [(DOG_LABELS, DOG_GREETINGS, True),
+  (CAT_LABELS, CAT_GREETINGS, False),
+  (EYEGLASS_LABELS, EYEGLASS_GREETINGS, False)]
+
+def randomGreetingFrom(phrases):
+    if not phrases: return []
+    return phrases[randint(0,len(phrases)-1)]
+
+def getGreeting(labels):
+    for tags, greetings, wave_flag in LABELS_GREETINGS:
+        if labelMatch(labels, tags):
+            return (randomGreetingFrom(greetings), wave_flag)
+    return None
+
+def labelMatch(labels,tags):
+    for candidate_label in labels:
+        if candidate_label.description in tags:	
+            return candidate_label
+    return None
 
 class ImageAnalyzer(multiprocessing.Process):
     def __init__(self, vision_queue, log_queue, logging_level):
@@ -169,7 +200,7 @@ class ImageAnalyzer(multiprocessing.Process):
                 self.getNextFrame()
                 motion = self.calculateImageDifference()
                 if motion > self._motion_threshold:
-                    logging.info("motion={}".format(motion))
+                    logging.debug("motion={}".format(motion))
                     self._frames.put(self._current_frame)
             except Exception, e:
                 logging.error("Error in analysis: {}".format(e))
@@ -184,9 +215,9 @@ def watchForResults(vision_results_queue):
         while True:
             processed_image_results = incoming_results.recv()
             image, labels, faces = processed_image_results
-            logging.info("{} faces detected".format(len(faces)))
+            logging.debug("{} faces detected".format(len(faces)))
             for label in labels:
-                logging.info("label: {}".format(label.description))
+                logging.debug("label: {}".format(label.description))
     except EOFError:
         logging.debug("Done watching")
 
