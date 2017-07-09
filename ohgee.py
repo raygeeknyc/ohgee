@@ -12,6 +12,7 @@ import time
 import io
 import sys
 import os, signal
+import Queue
 
 import rgbled
 import speechrecognizer
@@ -28,12 +29,15 @@ MOOD_SET_DURATION_SECS = 4
 POLL_DELAY_SECS = 0.2
 
 servoPin = 18
-ARM_RELAXED_POSITION = 7.5
-ARM_UP_POSITION = 12.5
-ARM_DOWN_POSITION = 4.5
+ARM_RELAXED_POSITION = 10.5
+ARM_DOWN_POSITION = 12.5
+ARM_UP_POSITION = 7.5
 ARM_WAVE_LOWER_SECS = 0.5
 ARM_WAVE_RAISE_SECS = 2
-ARM_WAVE_DELAY_SECS = 5
+ARM_WAVE_DELAY_SECS = 1
+
+SPEECH_TMP_FILE="/tmp/speech.wav"
+PICO_CMD='pico2wave -l en-US --wave "%s" "%s";aplay "%s"'
 
 def expireMood():
     global mood_set_until
@@ -47,17 +51,17 @@ def setMoodTime():
     mood_set_until = time.time() + MOOD_SET_DURATION_SECS
 
 def showGoodMood(score):
-    print "Good mood {}".format(score)
+    logging.info("Good mood {}".format(score))
     led.setColor(rgbled.GREEN)
     setMoodTime()
 
 def showBadMood(score):
-    print "Bad mood {}".format(score)
+    logging.info("Bad mood {}".format(score))
     led.setColor(rgbled.RED)
     setMoodTime()
 
 def showMehMood(score):
-    print "Meh mood {}".format(score)
+    logging.info("Meh mood {}".format(score))
     led.setColor(rgbled.CYAN)
     setMoodTime()
 
@@ -71,9 +75,22 @@ def signal_handler(sig, frame):
     STOP = True
 signal.signal(signal.SIGINT, signal_handler)
  
+def speak(speech_queue):
+    global STOP
+    logging.debug("speaker started")
+    while not STOP:
+        logging.debug("waiting to talk")
+        utterance = " ".join(speech_queue.get())
+        recognition_worker.suspendListening()
+        logging.debug("saying {}".format(utterance))
+        os.system(PICO_CMD % (SPEECH_TMP_FILE, utterance, SPEECH_TMP_FILE))
+        recognition_worker.resumeListening()
+    logging.debug("speaker stopping")
+
 def wave():
     global waving
-    while True:
+    global STOP
+    while not STOP:
         while not waving:
             time.sleep(ARM_WAVE_DELAY_SECS)
         logging.debug("wave")
@@ -93,18 +110,21 @@ def receiveLanguageResults(nl_results):
         while True:
             phrase = nl_results.recv()
             tokens, entities, sentiment = phrase
+            text = " ".join([x.text_content for x in tokens])
+            logging.debug("got spoken phrase {}".format(text))
             if speechanalyzer.isGood(sentiment):
                 showGoodMood(sentiment.score)
             elif speechanalyzer.isBad(sentiment):
                 showBadMood(sentiment.score)
             else:
                 showMehMood(sentiment.score)
-            greeting = speechanalyzer.phraseMatch(tokens, speechanalyzer.GREETINGS)
-            farewells = speechanalyzer.phraseMatch(tokens, speechanalyzer.FAREWELLS)
-            if greeting:
-                startWaving()
-            if farewells:
-                startWaving()
+            response = speechanalyzer.getResponse(tokens)
+            if response:
+                logging.debug("phrase matched")
+                comeback, wave_flag = response
+                speech_queue.put(comeback)
+                if wave_flag:
+                    startWaving()
     except EOFError:
         logging.debug("done listening")
 
@@ -148,6 +168,9 @@ if __name__ == '__main__':
         arm.start(0)
         waver = threading.Thread(target = wave, args=())
         waver.start()
+        speech_queue = Queue.Queue()
+        speaker = threading.Thread(target = speak, args=(speech_queue,))
+        speaker.start()
         listener = threading.Thread(target = receiveLanguageResults, args=(nl_results,))
         listener.start()
         logging.debug("waiting")

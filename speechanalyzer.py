@@ -1,4 +1,5 @@
 import os
+from random import randint
 import logging
 import multiprocessing
 from multiprocessingloghandler import ChildMultiProcessingLogHandler
@@ -8,8 +9,32 @@ from google.cloud import language
 MOOD_THRESHOLD = 0.2
 LOWER_MOOD_THRESHOLD = -1 * MOOD_THRESHOLD
 
-GREETINGS = [["hello"],["hi"],["good", "morning"], ["hey", "there"]]
-FAREWELLS = [["goodbye"], ["bye"], ["farewell"], ["good", "night"], ["see","you"]]
+GREETINGS = (["hello"],["hi"],["good", "morning"], ["hey", "there"], ["good", "day"])
+FAREWELLS = (["goodnight"], ["goodbye"], ["bye"], ["farewell"], ["good", "night"], ["see","you"], ["talk", "to", "you", "later"])
+AFFECTIONS = (["youre", "adorable"], ["I", "adore", "you"], ["I", "love", "you"], ["I", "like", "you"], ["youre", "the", "best"], ["youre", "cute"], ["youre", "so", "cute"], ["youre", "sweet"], ["youre", "so", "sweet"], ["youre", "cool"], ["youre", "great"], ["cute", "robot"])
+ME_TOO = (["I", "feel", "the", "same"], ["that", "makes", "two", "of", "us"], ["I", "feel", "the", "same", "way"], ["same", "here"])
+THANKS = (["thank", "you"], ["thanks"])
+WELCOMES = (["youre", "welcome"], ["dont", "mention", "it"], ["de", "nada"], ["my", "pleasure"])
+HATES = (["I", "hate", "you"], ["I", "dont", "like", "you"], ["you", "suck"], ["youre", "stupid"], ["youre", "awful"], ["stupid", "robot"], ["dumb", "robot"])
+SADNESSES = (["sniff"], ["you", "break", "my", "heart"], ["that", "makes", "me", "sad"], ["Im", "sorry"])
+IN_KIND_SUFFIXES=(["to","you"], ["as","well"], ["too"], ["also"], ["to","you","as","well"], [], [], [])
+
+PROMPTS_RESPONSES = [(GREETINGS, GREETINGS, IN_KIND_SUFFIXES, True), 
+  (FAREWELLS, FAREWELLS, IN_KIND_SUFFIXES, True),
+  (AFFECTIONS, ME_TOO + AFFECTIONS, IN_KIND_SUFFIXES, False),
+  (THANKS, WELCOMES, None, False),
+  (HATES, SADNESSES, None, False)]
+
+def randomPhraseFrom(phrases):
+    if not phrases: return []
+    return phrases[randint(0,len(phrases)-1)]
+
+def getResponse(tokens):
+    for prompts, responses, suffixes, wave_flag in PROMPTS_RESPONSES:
+        if phraseMatch(tokens, prompts):
+            return (randomPhraseFrom(responses)+randomPhraseFrom(IN_KIND_SUFFIXES), wave_flag)
+    return None
+
 def phraseMatch(tokens, phrases):
     for phrase in phrases:
         matchedTokens = phraseInTokens(tokens, phrase)
@@ -80,7 +105,7 @@ class SpeechAnalyzer(multiprocessing.Process):
     def _analyzeSpeech(self):
         logging.debug("***speech analyzer analyzing")
         while not self._exit.is_set():
-            text = self._text_transcript.recv()
+            text = self._text_transcript.recv().replace("'","")
             document = self._language_client.document_from_text(text)
             entities = document.analyze_entities().entities
             tokens = document.analyze_syntax().tokens
