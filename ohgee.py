@@ -109,8 +109,7 @@ def receiveLanguageResults(nl_results):
     try:
         while True:
             phrase = nl_results.recv()
-            tokens, entities, sentiment = phrase
-            text = " ".join([x.text_content for x in tokens])
+            text, tokens, entities, sentiment = phrase
             logging.debug("got spoken phrase {}".format(text))
             if speechanalyzer.isGood(sentiment):
                 showGoodMood(sentiment.score)
@@ -118,7 +117,7 @@ def receiveLanguageResults(nl_results):
                 showBadMood(sentiment.score)
             else:
                 showMehMood(sentiment.score)
-            response = speechanalyzer.getResponse(tokens)
+            response = speechanalyzer.getResponse(text)
             if response:
                 logging.debug("phrase matched")
                 comeback, wave_flag = response

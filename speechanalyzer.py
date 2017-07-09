@@ -29,38 +29,39 @@ def randomPhraseFrom(phrases):
     if not phrases: return []
     return phrases[randint(0,len(phrases)-1)]
 
-def getResponse(tokens):
+def getResponse(phrase):
     for prompts, responses, suffixes, wave_flag in PROMPTS_RESPONSES:
-        if phraseMatch(tokens, prompts):
+        if phraseMatch(phrase, prompts):
             return (randomPhraseFrom(responses)+randomPhraseFrom(IN_KIND_SUFFIXES), wave_flag)
     return None
 
-def phraseMatch(tokens, phrases):
-    for phrase in phrases:
-        matchedTokens = phraseInTokens(tokens, phrase)
-        if matchedTokens:
-            return matchedTokens
+def phraseMatch(phrase, phrases):
+    for candidate_phrase in phrases:
+        matched_phrase = phraseInTokens(phrase, candidate_phrase)
+        if matched_phrase:
+            return matched_phrase
     return []
 
-def phraseInTokens(tokens, phrase):
-    if not phrase or not tokens:
+def phraseInTokens(phrase, candidate_phrase):
+    if not phrase or not candidate_phrase:
         return []
-    w = phrase[0]
+    w = candidate_phrase[0]
     matched = True
-    for i in range(len(tokens)-len(phrase)+1):
-        if tokens[i].text_content.upper() == w.upper():
+    words = phrase.split(" ")
+    for i in range(len(words)-len(candidate_phrase)+1):
+        if words[i].upper() == w.upper():
             for j in range(1,len(phrase)):
-                if tokens[i+j].text_content.upper() != phrase[j].upper():
+                if words[i+j].upper() != candidate_phrase[j].upper():
                     matched = False
             if matched:
-                return tokens[i:i+len(phrase)]
+                return words[i:i+len(candidate_phrase)]
     return []
 
-def greeted(tokens):
-    return phraseMatch(tokens, GREETINGS)
+def greeted(phrase):
+    return phraseMatch(phrase, GREETINGS)
 
-def departed(tokens):
-    return phraseMatch(tokens, FAREWELLS)
+def departed(phrase):
+    return phraseMatch(phrase, FAREWELLS)
 
 def isGood(sentiment):
     return sentiment.score >= MOOD_THRESHOLD
@@ -109,7 +110,7 @@ class SpeechAnalyzer(multiprocessing.Process):
             document = self._language_client.document_from_text(text)
             entities = document.analyze_entities().entities
             tokens = document.analyze_syntax().tokens
-            sentences = document.sentences
+            content = document.content
             logging.debug("text contained {} sentences".format(len(sentences)))
             logging.debug("analyzer received text: {}".format(text))
 
@@ -122,5 +123,5 @@ class SpeechAnalyzer(multiprocessing.Process):
 
             for token in tokens:
                 logging.debug("Token: {}: {}".format(token.part_of_speech, token.text_content))
-            results = (tokens, entities, sentiment)
+            results = (content, tokens, entities, sentiment)
             self._nl_results.send(results)
