@@ -47,13 +47,13 @@ def signal_handler(sig, frame):
 signal.signal(signal.SIGINT, signal_handler)
 
 DOG_LABELS = ["dog", "canine"]
-DOG_GREETINGS = (["hello", "puppy"], ["woof", "woof"], ["bark"], ["good", "puppy"], ["nice", "doggie"])
+DOG_GREETINGS = (["here", "doggie"], ["hi","puppy"],  ["hello", "puppy"], ["woof", "woof"], ["bark"], ["good", "puppy"], ["nice", "doggie"])
 
 CAT_LABELS = ["cat", "feline"]
 CAT_GREETINGS = (["meow"], ["meow", "meow"], ["nice", "kitty"])
 
 EYEGLASS_LABELS = ["glasses", "eyewear"]
-EYEGLASS_GREETINGS = (["I", "like", "your", "glasses"], ["nice", "glasses"], [], [], [])
+EYEGLASS_GREETINGS = (["those", "are", "nice", "eyeglasses"], ["I", "like", "your", "glasses"], ["nice", "glasses"], [], [], [])
 
 # Only first first label found in tags will be used, so prioritize them in this list
 LABELS_GREETINGS = [(DOG_LABELS, DOG_GREETINGS, True),
