@@ -191,6 +191,7 @@ class ImageAnalyzer(multiprocessing.Process):
         self._image_buffer = io.BytesIO()
         self._camera = PiCamera()
         self._camera.resolution = RESOLUTION
+        self._camera.vflip = True
         prev_array = None
         logging.info("Training motion detection")
         self.trainMotion()

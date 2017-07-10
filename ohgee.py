@@ -4,6 +4,7 @@ import logging
 _DEBUG = logging.DEBUG
 _DEBUG = logging.INFO
 
+INITIAL_WAKEUP_GREETING = ["I'm", "awake"]
 import multiprocessing
 from multiprocessingloghandler import ParentMultiProcessingLogHandler
 import threading
@@ -217,6 +218,8 @@ if __name__ == '__main__':
         speech_queue = Queue.Queue()
         speaker = threading.Thread(target = speak, args=(speech_queue,))
         speaker.start()
+        
+        speech_queue.put(INITIAL_WAKEUP_GREETING)
         listener = threading.Thread(target = receiveLanguageResults, args=(nl_results,))
         listener.start()
         logging.info("Waiting")
