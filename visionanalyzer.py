@@ -200,8 +200,11 @@ class ImageAnalyzer(multiprocessing.Process):
                     break
             if frame:
                 logging.debug("Trailing frame read")
-                results = self._analyzeFrame(frame)
-                self._vision_queue.send(results)
+                try:
+                    results = self._analyzeFrame(frame)
+                    self._vision_queue.send(results)
+                except Exception, e:
+                    logging.exception(e)
             else:
                 logging.debug("No frame in queue")
         self._vision_queue.close()
