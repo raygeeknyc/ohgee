@@ -8,6 +8,7 @@ INITIAL_WAKEUP_GREETING = ["I'm", "awake"]
 import multiprocessing
 from multiprocessingloghandler import ParentMultiProcessingLogHandler
 import threading
+import collections
 import RPi.GPIO as GPIO
 import time
 import io
@@ -56,17 +57,17 @@ def setMoodTime():
     mood_set_until = time.time() + MOOD_SET_DURATION_SECS
 
 def showGoodMood(score):
-    logging.info("Good mood {}".format(score))
+    logging.debug("Good mood {}".format(score))
     led.setColor(rgbled.GREEN)
     setMoodTime()
 
 def showBadMood(score):
-    logging.info("Bad mood {}".format(score))
+    logging.debug("Bad mood {}".format(score))
     led.setColor(rgbled.RED)
     setMoodTime()
 
 def showMehMood(score):
-    logging.info("Meh mood {}".format(score))
+    logging.debug("Meh mood {}".format(score))
     led.setColor(rgbled.CYAN)
     setMoodTime()
 
@@ -134,28 +135,59 @@ def receiveLanguageResults(nl_results):
 
 def watchForResults(vision_results_queue):
     logging.debug("Watching")
-    _, incoming_results = vision_results_queue
+    _, vision_results_queue = vision_results_queue
+    recent_sentiments = collections.deque([0.0, 0.0, 0.0], maxlen=3)
+    recent_face_counts = collections.deque([0.0, 0.0, 0.0], maxlen=3)
+    
     last_greeting_at = 0.0
     try:
         while True:
-            processed_image_results = incoming_results.recv()
-            image, labels, faces = processed_image_results
+            greeting = None
+            wave_flag = False
+            processed_image_results = vision_results_queue.recv()
+            image, labels, faces, sentiment = processed_image_results
+            recent_sentiments.appendleft(sentiment)
+            recent_face_counts.appendleft(len(faces))
             logging.debug("{} faces detected".format(len(faces)))
+            logging.debug("{} sentiment detected".format(sentiment))
             for label in labels:
                 logging.debug("Label: {}".format(label.description))
 
+            feeling_good = False
+            feeling_bad = False
+            if recent_sentiments[0] < 0.0 and recent_sentiments[0] < recent_sentiments[1]:
+                logging.debug("feeling bad")
+                feeling_bad = True
+            if recent_sentiments[0] > 0.0 and recent_sentiments[0] > recent_sentiments[1]:
+                logging.debug("feeling good")
+                feeling_good = True
+
+            if feeling_good:
+                showGoodMood(recent_sentiments[0])
+            if feeling_bad:
+                showBadMood(recent_sentiments[0])
+
+            if recent_face_counts[0] > recent_face_counts[1]:
+                wave_flag = True
+                logging.debug("Arrival")
+                greeting = speechanalyzer.getGreeting()
+            if recent_face_counts[0] < recent_face_counts[1]:
+                wave_flag = True
+                logging.debug("Departure")
+                greeting = speechanalyzer.getFarewell()
+            specific_greeting = visionanalyzer.getGreeting(labels)
+            if specific_greeting:
+                logging.debug("Greeting label matched")
+                greeting, wave_flag = specific_greeting
+
             since_greeted = time.time() - last_greeting_at
             if since_greeted > GREETING_INTERVAL_SECS: 
-                greeting = visionanalyzer.getGreeting(labels)
                 if greeting:
-                    logging.debug("Label matched")
                     last_greeting_at = time.time()
-                    greeting, wave_flag = greeting
-                    if greeting:
-                        logging.debug("Greeting %s (%d)" % (" ".join(greeting), len(greeting)))
-                        speech_queue.put(greeting)
-                    if wave_flag:
-                        startWaving()
+                    logging.debug("Greeting %s (%d)" % (" ".join(greeting), len(greeting)))
+                    speech_queue.put(greeting)
+            if wave_flag:
+                startWaving()
     except EOFError:
         logging.debug("Done watching")
 

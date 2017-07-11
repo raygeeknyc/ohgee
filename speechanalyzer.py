@@ -9,14 +9,14 @@ from google.cloud import language
 MOOD_THRESHOLD = 0.2
 LOWER_MOOD_THRESHOLD = -1 * MOOD_THRESHOLD
 
-GREETINGS = (["hello"],["hi"],["good", "morning"], ["hey", "there"], ["good", "day"])
-FAREWELLS = (["goodnight"], ["goodbye"], ["bye"], ["farewell"], ["good", "night"], ["see","you"], ["talk", "to", "you", "later"])
-AFFECTIONS = (["you're", "adorable"], ["I", "adore", "you"], ["I", "love", "you"], ["I", "like", "you"], ["you're", "the", "best"], ["you're", "cute"], ["you're", "so", "cute"], ["you're", "sweet"], ["you're", "so", "sweet"], ["you're", "cool"], ["you're", "great"], ["cute", "robot"])
+GREETINGS = (["hello"],["hi"],["good", "morning"], ["hey", "there"], ["good", "day"], ["nice", "to", "see", "you"], ["good", "to", "see", "you"], ["welcome"])
+FAREWELLS = (["goodnight"], ["goodbye"], ["bye"], ["farewell"], ["good", "night"], ["see","you"], ["talk", "to", "you", "later"], ["take", "care"], ["bye", "bye"], ["see", "you", "later"])
+AFFECTIONS = (["you're", "adorable"], ["I", "adore", "you"], ["I", "love", "you"], ["I", "like", "you"], ["you're", "the", "best"], ["you're", "cute"], ["you're", "so", "cute"], ["you're", "sweet"], ["you're", "so", "sweet"], ["you're", "cool"], ["you're", "great"], ["cute", "robot"], ["you're", "awesome"], ["you're", "amazing"])
 ME_TOO = (["I", "feel", "the", "same"], ["that", "makes", "two", "of", "us"], ["I", "feel", "the", "same", "way"], ["same", "here"])
 THANKS = (["thank", "you"], ["thanks"])
-WELCOMES = (["you're", "welcome"], ["don't", "mention", "it"], ["de", "nada"], ["my", "pleasure"])
-HATES = (["I", "hate", "you"], ["I", "don't", "like", "you"], ["you", "suck"], ["you're", "stupid"], ["you're", "awful"], ["stupid", "robot"], ["dumb", "robot"])
-SADNESSES = (["sniff"], ["you", "break", "my", "heart"], ["that", "makes", "me", "sad"], ["Im", "sorry"])
+WELCOMES = (["you're", "welcome"], ["don't", "mention", "it"], ["day", "nada"], ["my", "pleasure"], ["no", "worries"])
+HATES = (["I", "hate", "you"], ["I", "don't", "like", "you"], ["you", "suck"], ["you're", "stupid"], ["you're", "awful"], ["stupid", "robot"], ["dumb", "robot"], ["you", "stink"])
+SADNESSES = (["sniff"], ["you", "break", "my", "heart"], ["that", "makes", "me", "sad"], ["I'm", "sorry"], ["ouch"], ["that", "hurts"], ["I'm", "so", "sorry"])
 # Add in empty lists to weigh the random selection from the tuple towards null responses
 IN_KIND_SUFFIXES=(["to","you"], ["as","well"], ["too"], ["also"], ["to","you","as","well"], [], [], [], [], [], [], [])
 
@@ -57,6 +57,12 @@ def phraseInTokens(phrase, candidate_phrase):
             if matched:
                 return words[i:i+len(candidate_phrase)]
     return []
+
+def getFarewell():
+    return randomPhraseFrom(FAREWELLS)
+
+def getGreeting():
+    return randomPhraseFrom(GREETINGS)
 
 def greeted(phrase):
     return phraseMatch(phrase, GREETINGS)

@@ -76,6 +76,32 @@ def labelMatch(labels,tags):
             return candidate_label
     return None
 
+# Sentiment is -1, 0 or +1 for this sentiment and level
+# -1 == bad, 0 == meh, +1 == good
+def getSentimentForLevel(face, level):
+    if face.joy == level or face.surprise == level:
+        return 1
+    if face.anger == level or face.sorrow == level:
+        return -1
+    return 0
+
+def getSentimentWeightedByLevel(face):
+    sentiment = getSentimentForLevel(face, Likelihood.VERY_LIKELY)
+    if sentiment != 0:
+       return sentiment
+    sentiment = getSentimentForLevel(face, Likelihood.LIKELY)
+    if sentiment != 0:
+       return sentiment * 0.75
+    sentiment = getSentimentForLevel(face, Likelihood.POSSIBLE)
+    if sentiment != 0:
+       return sentiment * 0.5
+    sentiment = getSentimentForLevel(face, Likelihood.UNLIKELY)
+    if sentiment != 0:
+       return sentiment * 0.25
+    sentiment = getSentimentForLevel(face, Likelihood.VERY_UNLIKELY)
+    if sentiment != 0:
+       return 0.0
+
 class ImageAnalyzer(multiprocessing.Process):
     def __init__(self, vision_queue, log_queue, logging_level):
         multiprocessing.Process.__init__(self)
@@ -185,7 +211,13 @@ class ImageAnalyzer(multiprocessing.Process):
         remote_image = self._vision_client.image(content=frame[0])
         labels = remote_image.detect_labels()
         faces = remote_image.detect_faces(limit=5)
-        return (frame[0], labels, faces)
+        strongest_sentiment = 0.0
+        max_confidence = 0.0
+        for face in faces:
+            if face.detection_confidence > max_confidence:
+                sentiment = getSentimentWeightedByLevel(face)
+                max_confidence = face.detection_confidence
+        return (frame[0], labels, faces, strongest_sentiment)
 
     def captureFrames(self):
         self._image_buffer = io.BytesIO()
