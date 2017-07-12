@@ -1,5 +1,8 @@
 import logging
 _DEBUG = logging.DEBUG
+SENTIMENT_CONFIDENCE_THRESHOLD = 0.75
+GOOD_SENTIMENT_THRESHOLD = SENTIMENT_CONFIDENCE_THRESHOLD
+BAD_SENTIMENT_THRESHOLD = -1*SENTIMENT_CONFIDENCE_THRESHOLD
 
 # Import the packages we need for drawing and displaying images
 from PIL import Image
@@ -91,7 +94,7 @@ def getSentimentWeightedByLevel(face):
        return sentiment
     sentiment = getSentimentForLevel(face, Likelihood.LIKELY)
     if sentiment != 0:
-       return sentiment * 0.75
+       return sentiment * SENTIMENT_CONFIDENCE_THRESHOLD
     sentiment = getSentimentForLevel(face, Likelihood.POSSIBLE)
     if sentiment != 0:
        return sentiment * 0.5
@@ -225,7 +228,7 @@ class ImageAnalyzer(multiprocessing.Process):
         max_confidence = 0.0
         for face in faces:
             if face.detection_confidence > max_confidence:
-                sentiment = getSentimentWeightedByLevel(face)
+                max_sentiment = getSentimentWeightedByLevel(face)
                 max_confidence = face.detection_confidence
         return (frame[0], labels, faces, strongest_sentiment)
 

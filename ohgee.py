@@ -155,10 +155,10 @@ def watchForResults(vision_results_queue):
 
             feeling_good = False
             feeling_bad = False
-            if recent_sentiments[0] < 0.0 and recent_sentiments[0] < recent_sentiments[1]:
+            if recent_sentiments[0] <= visionanalyzer.BAD_SENTIMENT_THRESHOLD and recent_sentiments[1] <= visionanalyzer.BAD_SENTIMENT_THRESHOLD and and recent_sentiments[0] < recent_sentiments[2]:
                 logging.debug("feeling bad")
                 feeling_bad = True
-            if recent_sentiments[0] > 0.0 and recent_sentiments[0] > recent_sentiments[1]:
+            if recent_sentiments[0] >= visionanalyzer.GOOD_SENTIMENT_THRESHOLD and recent_sentiments[1] >= visionanalyzer.GOOD_SENTIMENT_THRESHOLD and and recent_sentiments[0] > recent_sentiments[2]:
                 logging.debug("feeling good")
                 feeling_good = True
 
@@ -167,11 +167,11 @@ def watchForResults(vision_results_queue):
             if feeling_bad:
                 showBadMood(recent_sentiments[0])
 
-            if recent_face_counts[0] > recent_face_counts[1]:
+            if recent_face_counts[0] > recent_face_counts[1] and recent_face_counts[0] > recent_face_counts[2]:
                 wave_flag = True
                 logging.debug("Arrival")
                 greeting = speechanalyzer.getGreeting()
-            if recent_face_counts[0] < recent_face_counts[1]:
+            if recent_face_counts[0] < recent_face_counts[1] and recent_face_counts[0] < recent_face_counts[2] :
                 wave_flag = True
                 logging.debug("Departure")
                 greeting = speechanalyzer.getFarewell()
