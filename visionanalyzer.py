@@ -152,15 +152,22 @@ class ImageAnalyzer(multiprocessing.Process):
         return changed_pixels
 
     def trainMotion(self):
-        self._camera.start_preview(fullscreen=False, window=(100,100,self._camera.resolution[0], self._camera.resolution[1]))
-        self._motion_threshold = 9999
-        self.getNextFrame()
-        self._prev_frame = self.capturePilFrame()
-        for i in range(TRAINING_SAMPLES):
+        logging.debug("Training motion")
+        trained = False
+        try:
+            self._camera.start_preview(fullscreen=False, window=(100,100,self._camera.resolution[0], self._camera.resolution[1]))
+            self._motion_threshold = 9999
             self.getNextFrame()
-            motion = self.calculateImageDifference()
-            self._motion_threshold = min(motion, self._motion_threshold)
-        self._camera.stop_preview()
+            self._prev_frame = self.capturePilFrame()
+            for i in range(TRAINING_SAMPLES):
+                self.getNextFrame()
+                motion = self.calculateImageDifference()
+                self._motion_threshold = min(motion, self._motion_threshold)
+            trained = True
+        finally:
+            self._camera.stop_preview()
+        logging.debug("Trained {}".format(trained))
+        return trained
 
     def run(self):
         self._initLogging()
@@ -229,7 +236,9 @@ class ImageAnalyzer(multiprocessing.Process):
         self._camera.vflip = True
         prev_array = None
         logging.info("Training motion detection")
-        self.trainMotion()
+        for retry in xrange(3):
+            if self.trainMotion():
+                break
         logging.info("Trained motion detection {}".format(self._motion_threshold))
         while not self._stop_capturing:
             try:
