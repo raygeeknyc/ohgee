@@ -1,6 +1,6 @@
 import logging
 _DEBUG = logging.DEBUG
-SENTIMENT_CONFIDENCE_THRESHOLD = 0.75
+SENTIMENT_CONFIDENCE_THRESHOLD = 0.50
 GOOD_SENTIMENT_THRESHOLD = SENTIMENT_CONFIDENCE_THRESHOLD
 BAD_SENTIMENT_THRESHOLD = -1*SENTIMENT_CONFIDENCE_THRESHOLD
 
@@ -83,10 +83,12 @@ def labelMatch(labels,tags):
 # -1 == bad, 0 == meh, +1 == good
 def getSentimentForLevel(face, level):
     if face.joy == level or face.surprise == level:
-        return 1
+        logging.debug("getSentimentForLevel: %s joy: %s surprise: %s" % (str(level), str(face.joy), str(face.surprise)))
+        return 1.0
     if face.anger == level or face.sorrow == level:
-        return -1
-    return 0
+        logging.debug("getSentimentForLevel: %s anger: %s sorrow: %s" % (str(level), str(face.anger), str(face.sorrow)))
+        return -1.0
+    return 0.0
 
 def getSentimentWeightedByLevel(face):
     sentiment = getSentimentForLevel(face, Likelihood.VERY_LIKELY)
@@ -101,9 +103,7 @@ def getSentimentWeightedByLevel(face):
     sentiment = getSentimentForLevel(face, Likelihood.UNLIKELY)
     if sentiment != 0:
        return sentiment * 0.25
-    sentiment = getSentimentForLevel(face, Likelihood.VERY_UNLIKELY)
-    if sentiment != 0:
-       return 0.0
+    return 0.0
 
 class ImageAnalyzer(multiprocessing.Process):
     def __init__(self, vision_queue, log_queue, logging_level):
@@ -228,7 +228,7 @@ class ImageAnalyzer(multiprocessing.Process):
         max_confidence = 0.0
         for face in faces:
             if face.detection_confidence > max_confidence:
-                max_sentiment = getSentimentWeightedByLevel(face)
+                strongest_sentiment = getSentimentWeightedByLevel(face)
                 max_confidence = face.detection_confidence
         return (frame[0], labels, faces, strongest_sentiment)
 

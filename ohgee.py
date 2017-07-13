@@ -152,7 +152,6 @@ def watchForResults(vision_results_queue):
             logging.debug("{} sentiment detected".format(sentiment))
             for label in labels:
                 logging.debug("Label: {}".format(label.description))
-
             feeling_good = False
             feeling_bad = False
             if recent_sentiments[0] <= visionanalyzer.BAD_SENTIMENT_THRESHOLD and recent_sentiments[1] <= visionanalyzer.BAD_SENTIMENT_THRESHOLD and recent_sentiments[0] < recent_sentiments[2]:
