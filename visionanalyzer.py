@@ -99,7 +99,7 @@ def getSentimentWeightedByLevel(face):
        return sentiment * SENTIMENT_CONFIDENCE_THRESHOLD
     sentiment = getSentimentForLevel(face, Likelihood.POSSIBLE)
     if sentiment != 0:
-       return sentiment * 0.5
+       return sentiment * SENTIMENT_CONFIDENCE_THRESHOLD
     sentiment = getSentimentForLevel(face, Likelihood.UNLIKELY)
     if sentiment != 0:
        return sentiment * 0.25
