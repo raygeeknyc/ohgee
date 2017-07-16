@@ -49,6 +49,10 @@ def signal_handler(sig, frame):
     STOP = True
 signal.signal(signal.SIGINT, signal_handler)
 
+BAD_MOOD_GREETINGS = (["I'm", "sorry", "that", "you're", "not", "feeling", "happy"], ["You", "look", "down"], ["I", "hope", "that", "I", "can", "cheer", "you", "up"], ["I", "hope", "that", "you", "feel", "better", "soon"], ["Smile!"])
+
+GOOD_MOOD_GREETINGS = (["I'm", "glad", "that", "you", "are", "happy"], ["You", "look", "happy"], ["You", "cheer", "me", "up"], ["It's", "great", "to", "see", "you", "happy"], ["Great", "day"])
+
 DOG_LABELS = ["dog", "canine"]
 DOG_GREETINGS = (["here", "doggie"], ["hi","puppy"],  ["hello", "puppy"], ["woof", "woof"], ["bark"], ["good", "puppy"], ["nice", "doggie"])
 
@@ -66,6 +70,12 @@ LABELS_GREETINGS = [(DOG_LABELS, DOG_GREETINGS, True),
 def randomGreetingFrom(phrases):
     if not phrases: return []
     return phrases[randint(0,len(phrases)-1)]
+
+def getBadMoodGreeting():
+    return (randomGreetingFrom(BAD_MOOD_GREETINGS), False)
+
+def getGoodMoodGreeting():
+    return (randomGreetingFrom(GOOD_MOOD_GREETINGS), False)
 
 def getGreeting(labels):
     for tags, greetings, wave_flag in LABELS_GREETINGS:

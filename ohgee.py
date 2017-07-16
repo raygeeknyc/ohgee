@@ -1,8 +1,8 @@
 import logging
 
 # reorder as appropriate
-_DEBUG = logging.DEBUG
 _DEBUG = logging.INFO
+_DEBUG = logging.DEBUG
 
 INITIAL_WAKEUP_GREETING = ["I'm", "awake"]
 import multiprocessing
@@ -140,10 +140,16 @@ def watchForResults(vision_results_queue):
     recent_face_counts = collections.deque([0.0, 0.0, 0.0], maxlen=3)
     
     last_greeting_at = 0.0
+    extended_mood_reported = False
     try:
         while True:
             greeting = None
             wave_flag = False
+            feeling_good = False
+            feeling_bad = False
+            feeling_good_extended = False
+            feeling_bad_extended = False
+
             processed_image_results = vision_results_queue.recv()
             image, labels, faces, sentiment = processed_image_results
             recent_sentiments.appendleft(sentiment)
@@ -152,8 +158,11 @@ def watchForResults(vision_results_queue):
             logging.debug("{} sentiment detected".format(sentiment))
             for label in labels:
                 logging.debug("Label: {}".format(label.description))
-            feeling_good = False
-            feeling_bad = False
+
+            # Two consecutive frames without strong sentiment means that we're ready to report the next extended sentiment
+            if recent_sentiments[0] > visionanalyzer.BAD_SENTIMENT_THRESHOLD and recent_sentiments[0] < visionanalyzer.GOOD_SENTIMENT_THRESHOLD and recent_sentiments[1] > visionanalyzer.BAD_SENTIMENT_THRESHOLD and recent_sentiments[1] < visionanalyzer.GOOD_SENTIMENT_THRESHOLD:
+                extended_mood_reported = False
+
             if recent_sentiments[0] <= visionanalyzer.BAD_SENTIMENT_THRESHOLD and recent_sentiments[1] <= visionanalyzer.BAD_SENTIMENT_THRESHOLD and recent_sentiments[0] < recent_sentiments[2]:
                 logging.debug("feeling bad")
                 feeling_bad = True
@@ -161,11 +170,33 @@ def watchForResults(vision_results_queue):
                 logging.debug("feeling good")
                 feeling_good = True
 
+            if recent_sentiments[0] <= visionanalyzer.BAD_SENTIMENT_THRESHOLD and recent_sentiments[1] <= visionanalyzer.BAD_SENTIMENT_THRESHOLD and recent_sentiments[2] < visionanalyzer.BAD_SENTIMENT_THRESHOLD:
+                logging.debug("Feeling bad for a while")
+                feeling_bad_extended = True
+            if recent_sentiments[0] >= visionanalyzer.GOOD_SENTIMENT_THRESHOLD and recent_sentiments[1] >= visionanalyzer.GOOD_SENTIMENT_THRESHOLD and recent_sentiments[2] > visionanalyzer.GOOD_SENTIMENT_THRESHOLD:
+                logging.debug("Feeling good for a while")
+                feeling_good_extended = True
+
             if feeling_good:
                 showGoodMood(recent_sentiments[0])
             if feeling_bad:
                 showBadMood(recent_sentiments[0])
 
+            specific_greeting = visionanalyzer.getGreeting(labels)
+            if specific_greeting:
+                logging.debug("Greeting label matched")
+                greeting, wave_flag = specific_greeting
+
+            if feeling_good_extended and not extended_mood_reported:
+                showGoodMood(recent_sentiments[0])
+                greeting, wave_flag = visionanalyzer.getGoodMoodGreeting()
+                extended_mood_reported = True
+                
+            if feeling_bad_extended and not extended_mood_reported:
+                showGoodMood(recent_sentiments[0])
+                greeting, wave_flag = visionanalyzer.getBadMoodGreeting()
+                extended_mood_reported = True
+                
             if recent_face_counts[0] > recent_face_counts[1] and recent_face_counts[0] > recent_face_counts[2]:
                 wave_flag = True
                 logging.debug("Arrival")
@@ -174,10 +205,6 @@ def watchForResults(vision_results_queue):
                 wave_flag = True
                 logging.debug("Departure")
                 greeting = speechanalyzer.getFarewell()
-            specific_greeting = visionanalyzer.getGreeting(labels)
-            if specific_greeting:
-                logging.debug("Greeting label matched")
-                greeting, wave_flag = specific_greeting
 
             since_greeted = time.time() - last_greeting_at
             if since_greeted > GREETING_INTERVAL_SECS: 
@@ -268,9 +295,9 @@ if __name__ == '__main__':
         logging.debug("Waiting for background processes to exit")
         logging.debug("wait for vision")
         vision_worker.join()
-        logging.debug("wait for recognition")
+        logging.debug("wait for recognition to exit")
         recognition_worker.join()
-        logging.debug("wait for analysis")
+        logging.debug("wait for analysis to exit")
         analysis_worker.join()
         led.setColor(rgbled.OFF)
         arm.stop()
