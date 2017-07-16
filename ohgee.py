@@ -1,8 +1,8 @@
 import logging
 
 # reorder as appropriate
-_DEBUG = logging.INFO
 _DEBUG = logging.DEBUG
+_DEBUG = logging.INFO
 
 INITIAL_WAKEUP_GREETING = ["I'm", "awake"]
 import multiprocessing
@@ -143,6 +143,7 @@ def watchForResults(vision_results_queue):
     extended_mood_reported = False
     try:
         while True:
+            high_priority_greeting = False
             greeting = None
             wave_flag = False
             feeling_good = False
@@ -188,14 +189,18 @@ def watchForResults(vision_results_queue):
                 greeting, wave_flag = specific_greeting
 
             if feeling_good_extended and not extended_mood_reported:
+                logging.debug("Talking about feeling good")
                 showGoodMood(recent_sentiments[0])
                 greeting, wave_flag = visionanalyzer.getGoodMoodGreeting()
                 extended_mood_reported = True
+                high_priority_greeting = True
                 
             if feeling_bad_extended and not extended_mood_reported:
-                showGoodMood(recent_sentiments[0])
+                logging.debug("Talking about feeling bad")
+                showBadMood(recent_sentiments[0])
                 greeting, wave_flag = visionanalyzer.getBadMoodGreeting()
                 extended_mood_reported = True
+                high_priority_greeting = True
                 
             if recent_face_counts[0] > recent_face_counts[1] and recent_face_counts[0] > recent_face_counts[2]:
                 wave_flag = True
@@ -207,7 +212,7 @@ def watchForResults(vision_results_queue):
                 greeting = speechanalyzer.getFarewell()
 
             since_greeted = time.time() - last_greeting_at
-            if since_greeted > GREETING_INTERVAL_SECS: 
+            if since_greeted > GREETING_INTERVAL_SECS or high_priority_greeting: 
                 if greeting:
                     last_greeting_at = time.time()
                     logging.debug("Greeting %s (%d)" % (" ".join(greeting), len(greeting)))
