@@ -17,8 +17,8 @@ THANKS = (["thank", "you"], ["thanks"])
 WELCOMES = (["you're", "welcome"], ["don't", "mention", "it"], ["day", "nada"], ["my", "pleasure"], ["no", "worries"])
 HATES = (["I", "hate", "you"], ["I", "don't", "like", "you"], ["you", "suck"], ["you're", "stupid"], ["you're", "awful"], ["stupid", "robot"], ["dumb", "robot"], ["you", "stink"])
 SADNESSES = (["sniff"], ["you", "break", "my", "heart"], ["that", "makes", "me", "sad"], ["I'm", "sorry"], ["ouch"], ["that", "hurts"], ["I'm", "so", "sorry"])
-PINGS = (["ping"]]
-ACKS = (["pong"], ["ack"]]
+PINGS = (["ping"])
+ACKS = (["pong"], ["ack"])
 # Add in empty lists to weigh the random selection from the tuple towards null responses
 IN_KIND_SUFFIXES=(["to","you"], ["as","well"], ["too"], ["also"], ["to","you","as","well"], [], [], [], [], [], [], [])
 
