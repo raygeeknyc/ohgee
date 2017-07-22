@@ -4,10 +4,11 @@ SENTIMENT_CONFIDENCE_THRESHOLD = 0.50
 GOOD_SENTIMENT_THRESHOLD = SENTIMENT_CONFIDENCE_THRESHOLD
 BAD_SENTIMENT_THRESHOLD = -1*SENTIMENT_CONFIDENCE_THRESHOLD
 
+if __name__ == '__main__':
+    from picamera import PiCamera
+
 # Import the packages we need for drawing and displaying images
 from PIL import Image
-
-from picamera import PiCamera
 
 # Imports the Google Cloud client packages we need
 from google.cloud import vision
@@ -103,15 +104,19 @@ def getSentimentForLevel(face, level):
 def getSentimentWeightedByLevel(face):
     sentiment = getSentimentForLevel(face, Likelihood.VERY_LIKELY)
     if sentiment != 0:
+       print "VERY LIKELY %s" % str(sentiment)
        return sentiment
     sentiment = getSentimentForLevel(face, Likelihood.LIKELY)
     if sentiment != 0:
+       print "LIKELY %s" % str(sentiment)
        return sentiment * SENTIMENT_CONFIDENCE_THRESHOLD
     sentiment = getSentimentForLevel(face, Likelihood.POSSIBLE)
     if sentiment != 0:
+       print "POSSIBLE %s" % str(sentiment)
        return sentiment * SENTIMENT_CONFIDENCE_THRESHOLD
     sentiment = getSentimentForLevel(face, Likelihood.UNLIKELY)
     if sentiment != 0:
+       print "UNLIKELY %s" % str(sentiment)
        return sentiment * 0.25
     return 0.0
 
