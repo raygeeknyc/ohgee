@@ -17,8 +17,8 @@ THANKS = (["thank", "you"], ["thanks"])
 WELCOMES = (["you're", "welcome"], ["don't", "mention", "it"], ["day", "nada"], ["my", "pleasure"], ["no", "worries"])
 HATES = (["I", "hate", "you"], ["I", "don't", "like", "you"], ["you", "suck"], ["you're", "stupid"], ["you're", "awful"], ["stupid", "robot"], ["dumb", "robot"], ["you", "stink"])
 SADNESSES = (["sniff"], ["you", "break", "my", "heart"], ["that", "makes", "me", "sad"], ["I'm", "sorry"], ["ouch"], ["that", "hurts"], ["I'm", "so", "sorry"])
-PINGS = (["ping"])
-ACKS = (["pong"], ["ack"])
+PINGS = (["ping", "me"], ["pinging", "you"])
+ACKS = (["pong"], ["ack"], ["right", "back", "at", "you"])
 # Add in empty lists to weigh the random selection from the tuple towards null responses
 IN_KIND_SUFFIXES=(["to","you"], ["as","well"], ["too"], ["also"], ["to","you","as","well"], [], [], [], [], [], [], [])
 
@@ -34,13 +34,15 @@ def randomPhraseFrom(phrases):
     return phrases[randint(0,len(phrases)-1)]
 
 def getResponse(phrase):
+    logging.debug("Looking to match phrase {}".format(phrase))
     for prompts, responses, suffixes, wave_flag in PROMPTS_RESPONSES:
         if phraseMatch(phrase, prompts):
-            return (randomPhraseFrom(responses)+randomPhraseFrom(IN_KIND_SUFFIXES), wave_flag)
+            return (randomPhraseFrom(responses)+randomPhraseFrom(suffixes), wave_flag)
     return None
 
 def phraseMatch(phrase, phrases):
     for candidate_phrase in phrases:
+        logging.debug("Matching with {}".format(candidate_phrase))
         matched_phrase = phraseInTokens(phrase, candidate_phrase)
         if matched_phrase:
             return matched_phrase
