@@ -19,5 +19,8 @@ if [[ $rc -ne 0 ]]; then
 fi
 echo "updating"
 git pull 2>&1
+if [[ -z "$DISPLAY" ]];then
+  export DISPLAY=":0.0"
+fi
 ./setup_auth.sh 2>&1
 nohup python ohgee.py &
