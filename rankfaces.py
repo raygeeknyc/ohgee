@@ -1,8 +1,6 @@
 # Import the packages we need for drawing and displaying images
 from PIL import Image, ImageDraw
 import logging
-logging.getLogger('').setLevel(logging.INFO)
-
 
 # Imports the Google Cloud client packages we need
 from google.cloud import vision
@@ -44,7 +42,7 @@ def getFaces(image):
 def rankSentiment(face):
     return getSentimentWeightedByLevel(face)
 
-def findFaceDetails(faces):
+def findFacesDetails(faces):
     face_details = []
     if faces:
         for face in faces:
@@ -79,7 +77,7 @@ if __name__ == '__main__':
 
             faces = getFaces(image)
     
-            details = findFaceDetails(faces)
+            details = findFacesDetails(faces)
 
             for face_sentiment, face_boundary in details:
                 sentiment_color = getColorForSentiment(face_sentiment)
@@ -92,8 +90,6 @@ if __name__ == '__main__':
                 mouth_size_v = (face_boundary[1][1] - nose_level)/2.0
                 mouth_size=min(mouth_size_v, mouth_size_h)
                 mouth_inset = ((face_boundary[1][0]-face_boundary[0][0])-mouth_size)/2
-                print "Mouth size: {}".format(mouth_size)
-                print "Nose level : {}".format(nose_level)
 
                 canvas.ellipse((face_boundary[0][0]+((face_boundary[1][0] - face_boundary[0][0])/3.0)-eye_size, eye_level-eye_size, face_boundary[0][0]+((face_boundary[1][0]-face_boundary[0][0])/3.0)+eye_size, eye_level + eye_size), None, outline=COLOR_FEATURES) 
                 canvas.ellipse((face_boundary[0][0]+((face_boundary[1][0] - face_boundary[0][0])/3.0)*2-eye_size, eye_level-eye_size, face_boundary[0][0]+((face_boundary[1][0] - face_boundary[0][0])/3.0)*2+eye_size, eye_level+eye_size), None, outline=COLOR_FEATURES) 

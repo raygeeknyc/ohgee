@@ -4,15 +4,14 @@ SENTIMENT_CONFIDENCE_THRESHOLD = 0.50
 GOOD_SENTIMENT_THRESHOLD = SENTIMENT_CONFIDENCE_THRESHOLD
 BAD_SENTIMENT_THRESHOLD = -1*SENTIMENT_CONFIDENCE_THRESHOLD
 
-if __name__ == '__main__':
-    from picamera import PiCamera
-
 # Import the packages we need for drawing and displaying images
-from PIL import Image
+from PIL import Image, ImageDraw
 
 # Imports the Google Cloud client packages we need
 from google.cloud import vision
 from google.cloud.vision.likelihood import Likelihood
+
+from picamera import PiCamera
 
 import multiprocessing
 from multiprocessingloghandler import ParentMultiProcessingLogHandler
@@ -40,6 +39,11 @@ POLL_SECS = 0.5
 # This is the rate at which to send frame to the vision service
 ANALYSIS_RATE_FPS = 1.0/2
 _ANALYSIS_DELAY_SECS = 1.0/ANALYSIS_RATE_FPS
+
+COLOR_MEH = (0, 0, 127)
+COLOR_BAD = (200, 0, 0)
+COLOR_GOOD = (0, 200, 0)
+COLOR_FEATURES = (255,255,255)
 
 def signal_handler(sig, frame):
     global STOP
@@ -104,19 +108,15 @@ def getSentimentForLevel(face, level):
 def getSentimentWeightedByLevel(face):
     sentiment = getSentimentForLevel(face, Likelihood.VERY_LIKELY)
     if sentiment != 0:
-       print "VERY LIKELY %s" % str(sentiment)
        return sentiment
     sentiment = getSentimentForLevel(face, Likelihood.LIKELY)
     if sentiment != 0:
-       print "LIKELY %s" % str(sentiment)
        return sentiment * SENTIMENT_CONFIDENCE_THRESHOLD
     sentiment = getSentimentForLevel(face, Likelihood.POSSIBLE)
     if sentiment != 0:
-       print "POSSIBLE %s" % str(sentiment)
        return sentiment * SENTIMENT_CONFIDENCE_THRESHOLD
     sentiment = getSentimentForLevel(face, Likelihood.UNLIKELY)
     if sentiment != 0:
-       print "UNLIKELY %s" % str(sentiment)
        return sentiment * 0.25
     return 0.0
 
@@ -227,7 +227,11 @@ class ImageAnalyzer(multiprocessing.Process):
                 logging.debug("Trailing frame read")
                 try:
                     results = self._analyzeFrame(frame)
-                    self._vision_queue.send(results)
+                    buffer = io.BytesIO()
+                    results[0].save(buffer, format="JPEG")
+                    buffer.seek(0)
+                    img_bytes = buffer.getvalue()
+                    self._vision_queue.send((img_bytes, results[1], results[2], results[3]))
                 except Exception, e:
                     logging.exception(e)
             else:
@@ -239,13 +243,18 @@ class ImageAnalyzer(multiprocessing.Process):
         remote_image = self._vision_client.image(content=frame[0])
         labels = remote_image.detect_labels()
         faces = remote_image.detect_faces(limit=5)
+        details = findFacesDetails(faces)
+        im = Image.open(io.BytesIO(frame[0]))
+        canvas = ImageDraw.Draw(im)
+        obscureFacesWithSentiments(canvas, details)
+
         strongest_sentiment = 0.0
         max_confidence = 0.0
         for face in faces:
             if face.detection_confidence > max_confidence:
                 strongest_sentiment = getSentimentWeightedByLevel(face)
                 max_confidence = face.detection_confidence
-        return (frame[0], labels, faces, strongest_sentiment)
+        return (im, labels, faces, strongest_sentiment)
 
     def captureFrames(self):
         self._image_buffer = io.BytesIO()
@@ -270,6 +279,30 @@ class ImageAnalyzer(multiprocessing.Process):
         logging.debug("Exiting vision capture thread")
         self._camera.close()
 
+def findFacesDetails(faces):
+    face_details = []
+    if faces:
+        for face in faces:
+            top = 9999
+            left = 9999
+            bottom = 0
+            right = 0
+            for point in face.bounds.vertices:
+                top = min(top, point.y_coordinate)
+                left = min(left, point.x_coordinate)
+                bottom = max(bottom, point.y_coordinate)
+                right = max(right, point.x_coordinate)
+            sentiment = rankSentiment(face)
+            face_details.append((sentiment, ((left, top), (right, bottom))))
+    return face_details
+
+def getColorForSentiment(sentiment):
+    if sentiment < 0:
+        return COLOR_BAD
+    if sentiment > 0:
+        return COLOR_GOOD
+    return COLOR_MEH
+
 def watchForResults(vision_results_queue):
     global STOP
 
@@ -283,6 +316,28 @@ def watchForResults(vision_results_queue):
                 logging.debug("label: {}".format(label.description))
     except EOFError:
         logging.debug("Done watching")
+
+def obscureFacesWithSentiments(canvas, face_details):
+   for face_sentiment, face_boundary in face_details:
+        sentiment_color = getColorForSentiment(face_sentiment)
+        canvas.ellipse(face_boundary, fill=sentiment_color, outline=None)
+        eye_size = max(1, (face_boundary[1][0] - face_boundary[0][0]) / 50)
+        nose_size = 2*eye_size
+        eye_level = face_boundary[0][1] + (face_boundary[1][1] - face_boundary[0][1])/3.0
+        nose_level = face_boundary[0][1] + (face_boundary[1][1] - face_boundary[0][1])/2.0
+        mouth_size_h = (face_boundary[1][0] - face_boundary[0][0])/2.0
+        mouth_size_v = (face_boundary[1][1] - nose_level)/2.0
+        mouth_size=min(mouth_size_v, mouth_size_h)
+        mouth_inset = ((face_boundary[1][0]-face_boundary[0][0])-mouth_size)/2
+        canvas.ellipse((face_boundary[0][0]+((face_boundary[1][0] - face_boundary[0][0])/3.0)-eye_size, eye_level-eye_size, face_boundary[0][0]+((face_boundary[1][0]-face_boundary[0][0])/3.0)+eye_size, eye_level + eye_size), None, outline=COLOR_FEATURES)
+        canvas.ellipse((face_boundary[0][0]+((face_boundary[1][0] - face_boundary[0][0])/3.0)*2-eye_size, eye_level-eye_size, face_boundary[0][0]+((face_boundary[1][0] - face_boundary[0][0])/3.0)*2+eye_size, eye_level+eye_size), None, outline=COLOR_FEATURES)
+
+        canvas.ellipse((face_boundary[0][0]+((face_boundary[1][0] - face_boundary[0][0])/2.0)-nose_size, nose_level-nose_size, face_boundary[0][0]+((face_boundary[1][0] - face_boundary[0][0])/2.0)+nose_size, nose_level+nose_size), COLOR_FEATURES, outline=COLOR_FEATURES)
+
+        if sentiment_color == COLOR_GOOD:
+            canvas.arc(( face_boundary[0][0]+mouth_inset, nose_level, face_boundary[0][0]+mouth_inset+mouth_size, nose_level+mouth_size), 35, 135, fill=COLOR_FEATURES)
+        elif sentiment_color == COLOR_BAD:
+            canvas.arc(( face_boundary[0][0]+mouth_inset, face_boundary[1][1]-(face_boundary[1][1]-nose_level)*0.67, face_boundary[0][0]+mouth_inset+mouth_size, face_boundary[1][1]), 215, 335, fill=COLOR_FEATURES)
 
 if __name__ == '__main__':
     global STOP
