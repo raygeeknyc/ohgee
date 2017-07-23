@@ -245,6 +245,7 @@ def startWaving():
 def maintainDisplay(root_window, image_queue):
     canvas = Tkinter.Canvas(root_window, width=root_window.winfo_screenwidth(), height=root_window.winfo_screenheight())
     canvas.pack()
+    logged = False
     while not STOP:
         time.sleep(POLL_DELAY_SECS)
         try:
@@ -252,14 +253,18 @@ def maintainDisplay(root_window, image_queue):
             buffer = io.BytesIO(image)
             buffer.seek(0)
             image = Image.open(buffer)
-            image.show()
             image = image.resize((root_window.winfo_screenwidth(), root_window.winfo_screenheight()))
             tk_image = PIL.ImageTk.PhotoImage(image)
             canvas.create_image(0, 0, image=tk_image, anchor="nw")
             canvas.pack()
         except Queue.Empty:
             pass
-        expireMood()
+        except Exception, e:
+            if not logged:
+                logging.exception(e)
+                logged = True
+        finally:
+            expireMood()
     logging.info("Stopping")
     root_window.quit()
     
