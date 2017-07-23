@@ -4,6 +4,10 @@ import logging
 _DEBUG = logging.DEBUG
 _DEBUG = logging.INFO
 
+import Tkinter
+import PIL
+from PIL import ImageTk, Image
+
 INITIAL_WAKEUP_GREETING = ["I'm", "awake"]
 import multiprocessing
 from multiprocessingloghandler import ParentMultiProcessingLogHandler
@@ -133,7 +137,7 @@ def receiveLanguageResults(nl_results):
     except EOFError:
         logging.debug("Done listening")
 
-def watchForResults(vision_results_queue):
+def watchForVisionResults(vision_results_queue, image_queue):
     logging.debug("Watching")
     _, vision_results_queue = vision_results_queue
     recent_sentiments = collections.deque([0.0, 0.0, 0.0], maxlen=3)
@@ -152,7 +156,7 @@ def watchForResults(vision_results_queue):
             feeling_bad_extended = False
 
             processed_image_results = vision_results_queue.recv()
-            image, labels, faces, sentiment = processed_image_results
+            processed_image, labels, faces, sentiment = processed_image_results
             recent_sentiments.appendleft(sentiment)
             recent_face_counts.appendleft(len(faces))
             logging.debug("{} faces detected".format(len(faces)))
@@ -219,6 +223,8 @@ def watchForResults(vision_results_queue):
                     speech_queue.put(greeting)
             if wave_flag:
                 startWaving()
+
+            image_queue.put(processed_image)
     except EOFError:
         logging.debug("Done watching")
 
@@ -235,8 +241,32 @@ def startWaving():
     global waving
     if not waving:
         waving = True
+
+def maintainDisplay(root_window, image_queue):
+    canvas = Tkinter.Canvas(root_window, width=root_window.winfo_screenwidth(), height=root_window.winfo_screenheight())
+    canvas.pack()
+    while not STOP:
+        time.sleep(POLL_DELAY_SECS)
+        try:
+            image = image_queue.get(False)
+            buffer = io.BytesIO(image)
+            buffer.seek(0)
+            image = Image.open(buffer)
+            image.show()
+            image = image.resize((root_window.winfo_screenwidth(), root_window.winfo_screenheight()))
+            tk_image = PIL.ImageTk.PhotoImage(image)
+            canvas.create_image(0, 0, image=tk_image, anchor="nw")
+            canvas.pack()
+        except Queue.Empty:
+            pass
+        expireMood()
+    logging.info("Stopping")
+    root_window.quit()
     
 if __name__ == '__main__':
+    root = Tkinter.Tk()
+    root.geometry("%dx%d+%d+%d" % (root.winfo_screenwidth(), root.winfo_screenheight(), 0, 0))
+
     led = rgbled.RgbLed(rgbled.redPin, rgbled.greenPin, rgbled.bluePin)
     led.setColor(rgbled.OFF)
 
@@ -275,8 +305,12 @@ if __name__ == '__main__':
         waver = threading.Thread(target = wave, args=())
         waver.start()
 
-        watcher = threading.Thread(target = watchForResults, args=(vision_results_queue,))
+        image_queue = Queue.Queue()
+        watcher = threading.Thread(target = watchForVisionResults, args=(vision_results_queue, image_queue))
         watcher.start()
+
+        displayer = threading.Thread(target = maintainDisplay, args=(root, image_queue,))
+        displayer.start()
 
         speech_queue = Queue.Queue()
         speaker = threading.Thread(target = speak, args=(speech_queue,))
@@ -285,11 +319,9 @@ if __name__ == '__main__':
         speech_queue.put(INITIAL_WAKEUP_GREETING)
         listener = threading.Thread(target = receiveLanguageResults, args=(nl_results,))
         listener.start()
+
         logging.info("Waiting")
-        while not STOP:
-            time.sleep(POLL_DELAY_SECS)
-            expireMood()
-        logging.info("Stopping")
+        root.mainloop()
     except Exception, e:
         logging.error("Error in main: {}".format(e))
     finally:

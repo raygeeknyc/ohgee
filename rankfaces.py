@@ -1,8 +1,6 @@
 # Import the packages we need for drawing and displaying images
 from PIL import Image, ImageDraw
 import logging
-logging.getLogger('').setLevel(logging.INFO)
-
 
 # Imports the Google Cloud client packages we need
 from google.cloud import vision
@@ -44,7 +42,7 @@ def getFaces(image):
 def rankSentiment(face):
     return getSentimentWeightedByLevel(face)
 
-def findFaceDetails(faces):
+def findFacesDetails(faces):
     face_details = []
     if faces:
         for face in faces:
@@ -79,7 +77,7 @@ if __name__ == '__main__':
 
             faces = getFaces(image)
     
-            details = findFaceDetails(faces)
+            details = findFacesDetails(faces)
 
             for face_sentiment, face_boundary in details:
                 sentiment_color = getColorForSentiment(face_sentiment)
