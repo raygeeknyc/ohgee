@@ -292,7 +292,7 @@ def findFacesDetails(faces):
                 left = min(left, point.x_coordinate)
                 bottom = max(bottom, point.y_coordinate)
                 right = max(right, point.x_coordinate)
-            sentiment = rankSentiment(face)
+            sentiment = getSentimentWeightedByLevel(face)
             face_details.append((sentiment, ((left, top), (right, bottom))))
     return face_details
 
