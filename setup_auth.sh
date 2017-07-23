@@ -6,5 +6,6 @@ if [[ ! -r "$GOOGLE_APPLICATION_CREDENTIALS" ]]; then
   gcloud auth application-default login
 else
   export GOOGLE_APPLICATION_CREDENTIALS
+  export GOOGLE_CLOUD_PROJECT=paidtech
 fi
 echo "authenticated"
