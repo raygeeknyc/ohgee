@@ -12,7 +12,6 @@ while [ $(date +%s) -lt $endTime ]; do  # Loop until interval has elapsed.
   fi
 done
 pico2wave -l en-US --wave "/tmp/ohgee_help.wav" "installing";aplay "/tmp/ohgee_help.wav"
-sudo apt-get -y --force-yes install python-imaging-tk
 if [[ $rc -ne 0 ]]; then
   pico2wave -l en-US --wave "/tmp/ohgee_help.wav" "help!  no network";aplay "/tmp/ohgee_help.wav"
   echo "sudo reboot" | at now + 1 hour
@@ -20,7 +19,7 @@ if [[ $rc -ne 0 ]]; then
   exit 255
 fi
 echo "updating"
-git pull 2>&1
+./update.sh
 if [[ -z "$DISPLAY" ]];then
   export DISPLAY=":0.0"
 fi
