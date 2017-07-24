@@ -178,7 +178,7 @@ def watchForVisionResults(vision_results_queue, image_queue):
             if recent_sentiments[0] <= visionanalyzer.BAD_SENTIMENT_THRESHOLD and recent_sentiments[1] <= visionanalyzer.BAD_SENTIMENT_THRESHOLD and recent_sentiments[2] <= visionanalyzer.BAD_SENTIMENT_THRESHOLD:
                 logging.debug("Feeling bad for a while")
                 feeling_bad_extended = True
-            if recent_sentiments[0] >= visionanalyzer.GOOD_SENTIMENT_THRESHOLD and recent_sentiments[1] >= visionanalyzer.GOOD_SENTIMENT_THRESHOLD and recent_sentiments[2] => visionanalyzer.GOOD_SENTIMENT_THRESHOLD:
+            if recent_sentiments[0] >= visionanalyzer.GOOD_SENTIMENT_THRESHOLD and recent_sentiments[1] >= visionanalyzer.GOOD_SENTIMENT_THRESHOLD and recent_sentiments[2] >= visionanalyzer.GOOD_SENTIMENT_THRESHOLD:
                 logging.debug("Feeling good for a while")
                 feeling_good_extended = True
 
