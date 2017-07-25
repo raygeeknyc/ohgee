@@ -66,12 +66,16 @@ DOG_GREETINGS = (["here", "doggie"], ["hi","puppy"],  ["hello", "puppy"], ["woof
 CAT_LABELS = ["cat", "feline"]
 CAT_GREETINGS = (["meow"], ["meow", "meow"], ["nice", "kitty"])
 
+HAT_LABELS = ["hat", "cap", "headgear"]
+HAT_GREETINGS = (["that's", "a", "nice", "hat"], ["nice", "hat"], ["nice", "cap"], ["I", "like", "your", "hat"])
+
 EYEGLASS_LABELS = ["glasses", "eyewear"]
-EYEGLASS_GREETINGS = (["those", "are", "nice", "eyeglasses"], ["I", "like", "your", "glasses"], ["nice", "glasses"], [], [], [])
+EYEGLASS_GREETINGS = (["those", "are", "nice", "eye", "glasses"], ["I", "like", "your", "glasses"], ["nice", "glasses"], ["nice", "eye", "glasses"], [], [], [])
 
 # Only first first label found in tags will be used, so prioritize them in this list
 LABELS_GREETINGS = [(DOG_LABELS, DOG_GREETINGS, True),
   (CAT_LABELS, CAT_GREETINGS, False),
+  (HAT_LABELS, HAT_GREETINGS, False),
   (EYEGLASS_LABELS, EYEGLASS_GREETINGS, False)]
 
 def randomGreetingFrom(phrases):
