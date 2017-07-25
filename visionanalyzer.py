@@ -26,8 +26,8 @@ import Queue
 import threading
 
 # This is the desired resolution of the Pi camera
-RESOLUTION = (320, 240)
-CAPTURE_RATE_FPS = 4
+RESOLUTION = (600, 400)
+CAPTURE_RATE_FPS = 2
 # This is over an observed covered camera's noise
 TRAINING_SAMPLES = 5
 # This is how much the green channel has to change to consider a pixel changed
@@ -37,7 +37,7 @@ PIXEL_SHIFT_SENSITIVITY = 30
 POLL_SECS = 0.5
 
 # This is the rate at which to send frame to the vision service
-ANALYSIS_RATE_FPS = 1.0/2
+ANALYSIS_RATE_FPS = 0.67
 _ANALYSIS_DELAY_SECS = 1.0/ANALYSIS_RATE_FPS
 
 COLOR_MEH = (0, 0, 127)
