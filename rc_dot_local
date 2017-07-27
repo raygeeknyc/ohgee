@@ -1,3 +1,4 @@
+/usr/bin/touch /tmp/ohgee.out
 /bin/mv /tmp/ohgee.out /tmp/last-ohgee.out
 /usr/bin/touch /tmp/ohgee.out
 /bin/chmod 777 /tmp/ohgee.out
