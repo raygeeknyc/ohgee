@@ -1,8 +1,8 @@
 import logging
 
 # reorder as appropriate
-_DEBUG = logging.INFO
 _DEBUG = logging.DEBUG
+_DEBUG = logging.INFO
 
 import Tkinter
 import PIL
