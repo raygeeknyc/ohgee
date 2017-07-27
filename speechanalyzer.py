@@ -116,8 +116,8 @@ class SpeechAnalyzer(multiprocessing.Process):
   
     def _analyzeSpeech(self):
         logging.debug("***speech analyzer analyzing")
-        try:
-            while not self._exit.is_set():
+        while not self._exit.is_set():
+            try:
                 text = self._text_transcript.recv()
                 document = self._language_client.document_from_text(text)
                 content = document.content
@@ -135,8 +135,11 @@ class SpeechAnalyzer(multiprocessing.Process):
                     logging.debug("Token: {}: {}".format(token.part_of_speech, token.text_content))
                 results = (content, tokens, entities, sentiment)
                 self._nl_results.send(results)
-        except EOFError, e:
-            logging.debug("end of speech analyzer")
-        finally:
-            self._text_transcript.close()
-            self._nl_results.close()
+            except EOFError:
+                logging.debug("EOF on speech analyzer input")
+                break
+            except Exception, e:
+                logging.exception("Error analyzing speech {}".format(e))
+        logging.debug("end of speech analyzer")
+        self._text_transcript.close()
+        self._nl_results.close()
