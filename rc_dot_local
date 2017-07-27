@@ -1,3 +1,4 @@
+/bin/mv /tmp/ohgee.out /tmp/last-ohgee.out
 /usr/bin/touch /tmp/ohgee.out
 /bin/chmod 777 /tmp/ohgee.out
 su - pi -c "cd Documents/workspace/ohgee;pwd;./autorun.sh" 2>&1 > /tmp/ohgee.out
