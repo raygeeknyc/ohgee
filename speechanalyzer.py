@@ -19,6 +19,8 @@ HATES = (["I", "hate", "you"], ["I", "don't", "like", "you"], ["you", "suck"], [
 SADNESSES = (["sniff"], ["you", "break", "my", "heart"], ["that", "makes", "me", "sad"], ["I'm", "sorry"], ["ouch"], ["that", "hurts"], ["I'm", "so", "sorry"])
 PINGS = (["ping", "me"], ["pinging", "you"])
 ACKS = (["pong"], ["ack"], ["right", "back", "at", "you"])
+OTHER_PRODUCTS = (["bing", "sucks"]), ["bing"])
+PRODUCT_RECS = (["go", "chrome"], ["make", "mine", "chrome"])
 # Add in empty lists to weigh the random selection from the tuple towards null responses
 IN_KIND_SUFFIXES=(["to","you"], ["as","well"], ["too"], ["also"], ["to","you","as","well"], [], [], [], [], [], [], [])
 
@@ -27,7 +29,8 @@ PROMPTS_RESPONSES = [(GREETINGS, GREETINGS, IN_KIND_SUFFIXES, True),
   (AFFECTIONS, ME_TOO + AFFECTIONS, IN_KIND_SUFFIXES, False),
   (THANKS, WELCOMES, None, False),
   (PINGS, ACKS, None, False),
-  (HATES, SADNESSES, None, False)]
+  (HATES, SADNESSES, None, False),
+  (OTHER_PRODUCTS, PRODUCT_RECS, None, False)]
 
 def randomPhraseFrom(phrases):
     if not phrases: return []
