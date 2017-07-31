@@ -21,6 +21,7 @@ else
   exit 255
 fi
 pico2wave -l en-US --wave "/tmp/ohgee_help.wav" "updating";aplay "/tmp/ohgee_help.wav"
+chmod a+x *.sh
 ./update.sh 2>&1
 if [[ -z "$DISPLAY" ]];then
   export DISPLAY=":0.0"
