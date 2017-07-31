@@ -1,5 +1,4 @@
 import os
-from random import randint
 import logging
 import multiprocessing
 from multiprocessingloghandler import ChildMultiProcessingLogHandler
@@ -8,75 +7,6 @@ from google.cloud import language
 
 MOOD_THRESHOLD = 0.2
 LOWER_MOOD_THRESHOLD = -1 * MOOD_THRESHOLD
-
-GREETINGS = (["hello"],["hi"],["good", "morning"], ["hey", "there"], ["good", "day"], ["nice", "to", "see", "you"], ["good", "to", "see", "you"], ["welcome"])
-FAREWELLS = (["goodnight"], ["goodbye"], ["bye"], ["farewell"], ["good", "night"], ["see","you"], ["talk", "to", "you", "later"], ["take", "care"], ["bye", "bye"], ["see", "you", "later"])
-AFFECTIONS = (["you're", "adorable"], ["I", "adore", "you"], ["I", "love", "you"], ["I", "like", "you"], ["you're", "the", "best"], ["you're", "cute"], ["you're", "so", "cute"], ["you're", "sweet"], ["you're", "so", "sweet"], ["you're", "cool"], ["you're", "great"], ["cute", "robot"], ["you're", "awesome"], ["you're", "amazing"])
-ME_TOO = (["I", "feel", "the", "same"], ["that", "makes", "two", "of", "us"], ["I", "feel", "the", "same", "way"], ["same", "here"])
-THANKS = (["thank", "you"], ["thanks"])
-WELCOMES = (["you're", "welcome"], ["don't", "mention", "it"], ["day", "nada"], ["my", "pleasure"], ["no", "worries"])
-HATES = (["I", "hate", "you"], ["I", "don't", "like", "you"], ["you", "suck"], ["you're", "stupid"], ["you're", "awful"], ["stupid", "robot"], ["dumb", "robot"], ["you", "stink"])
-SADNESSES = (["sniff"], ["you", "break", "my", "heart"], ["that", "makes", "me", "sad"], ["I'm", "sorry"], ["ouch"], ["that", "hurts"], ["I'm", "so", "sorry"])
-PINGS = (["ping", "me"], ["pinging", "you"])
-ACKS = (["pong"], ["ack"], ["right", "back", "at", "you"])
-OTHER_PRODUCTS = (["bing", "sucks"], ["bing"])
-PRODUCT_RECS = (["go", "chrome"], ["make", "mine", "chrome"], ["go", "google"])
-# Add in empty lists to weigh the random selection from the tuple towards null responses
-IN_KIND_SUFFIXES=(["to","you"], ["as","well"], ["too"], ["also"], ["to","you","as","well"], [], [], [], [], [], [], [])
-
-PROMPTS_RESPONSES = [(GREETINGS, GREETINGS, IN_KIND_SUFFIXES, True), 
-  (FAREWELLS, FAREWELLS, IN_KIND_SUFFIXES, True),
-  (AFFECTIONS, ME_TOO + AFFECTIONS, IN_KIND_SUFFIXES, False),
-  (THANKS, WELCOMES, None, False),
-  (PINGS, ACKS, None, False),
-  (HATES, SADNESSES, None, False),
-  (OTHER_PRODUCTS, PRODUCT_RECS, None, False)]
-
-def randomPhraseFrom(phrases):
-    if not phrases: return []
-    return phrases[randint(0,len(phrases)-1)]
-
-def getResponse(phrase):
-    logging.debug("Looking to match phrase {}".format(phrase))
-    for prompts, responses, suffixes, wave_flag in PROMPTS_RESPONSES:
-        if phraseMatch(phrase, prompts):
-            return (randomPhraseFrom(responses)+randomPhraseFrom(suffixes), wave_flag)
-    return None
-
-def phraseMatch(phrase, phrases):
-    for candidate_phrase in phrases:
-        logging.debug("Matching with {}".format(candidate_phrase))
-        matched_phrase = phraseInTokens(phrase, candidate_phrase)
-        if matched_phrase:
-            return matched_phrase
-    return []
-
-def phraseInTokens(phrase, candidate_phrase):
-    if not phrase or not candidate_phrase:
-        return []
-    w = candidate_phrase[0]
-    matched = True
-    words = phrase.split(" ")
-    for i in range(len(words)-len(candidate_phrase)+1):
-        if words[i].upper() == w.upper():
-            for j in range(1,len(candidate_phrase)):
-                if words[i+j].upper() != candidate_phrase[j].upper():
-                    matched = False
-            if matched:
-                return words[i:i+len(candidate_phrase)]
-    return []
-
-def getFarewell():
-    return randomPhraseFrom(FAREWELLS)
-
-def getGreeting():
-    return randomPhraseFrom(GREETINGS)
-
-def greeted(phrase):
-    return phraseMatch(phrase, GREETINGS)
-
-def departed(phrase):
-    return phraseMatch(phrase, FAREWELLS)
 
 def isGood(sentiment):
     return sentiment.score >= MOOD_THRESHOLD

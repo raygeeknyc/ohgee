@@ -22,6 +22,7 @@ import Queue
 
 import rgbled
 import speechrecognizer
+import phraseresponder
 import speechanalyzer
 import visionanalyzer
 
@@ -209,11 +210,11 @@ def watchForVisionResults(vision_results_queue, image_queue):
             if recent_face_counts[0] > recent_face_counts[1] and recent_face_counts[0] > recent_face_counts[2]:
                 wave_flag = True
                 logging.debug("Arrival")
-                greeting = speechanalyzer.getGreeting()
+                greeting = phraseresponder.getGreeting()
             if recent_face_counts[0] < recent_face_counts[1] and recent_face_counts[0] < recent_face_counts[2] :
                 wave_flag = True
                 logging.debug("Departure")
-                greeting = speechanalyzer.getFarewell()
+                greeting = phraseresponder.getFarewell()
 
             since_greeted = time.time() - last_greeting_at
             if since_greeted > GREETING_INTERVAL_SECS or high_priority_greeting: 
