@@ -7,6 +7,7 @@ from random import randint
 from datetime import datetime
 
 GREETINGS = (["hello"],["hi"], ["hey", "there"], ["nice", "to", "see", "you"], ["good", "to", "see", "you"], ["welcome"], ["good", "day"])
+ALL_DAY_GREETINGS = (["good", "morning"], ["good", "afternoon"], ["good", "evening"], ["good", "night"])
 FAREWELLS = (["goodbye"], ["bye"], ["farewell"], ["see","you"], ["talk", "to", "you", "later"], ["take", "care"], ["bye", "bye"], ["see", "you", "later"])
 AFFECTIONS = (["you're", "adorable"], ["I", "adore", "you"], ["I", "love", "you"], ["I", "like", "you"], ["you're", "the", "best"], ["you're", "cute"], ["you're", "so", "cute"], ["you're", "sweet"], ["you're", "so", "sweet"], ["you're", "cool"], ["you're", "great"], ["cute", "robot"], ["you're", "awesome"], ["you're", "amazing"])
 ME_TOOS = (["I", "feel", "the", "same"], ["that", "makes", "two", "of", "us"], ["I", "feel", "the", "same", "way"], ["same", "here"])
@@ -34,6 +35,9 @@ def timeGreetings():
 
 def timeFarewells():
     return timeGreetings()
+
+def fixedGreetings():
+    return ALL_DAY_GREETINGS
 
 def greetings():
     return GREETINGS+timeGreetings()
@@ -94,6 +98,7 @@ def getResponse(phrase):
     return None
 
 PROMPTS_RESPONSES = [(greetings, greetings, inKindSuffixes, True), 
+  (fixedGreetings, greetings, inKindSuffixes, True),
   (farewells, farewells, inKindSuffixes, True),
   (affections, affectionResponses, inKindSuffixes, False),
   (thanks, welcomes, None, False),
