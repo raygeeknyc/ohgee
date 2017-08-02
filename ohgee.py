@@ -120,7 +120,7 @@ def receiveLanguageResults(nl_results):
     try:
         while True:
             phrase = nl_results.recv()
-            text, tokens, entities, sentiment = phrase
+            text, tokens, entities, sentiment, decorated_noun = phrase
             logging.debug("Got spoken phrase {}".format(text))
             if speechanalyzer.isGood(sentiment):
                 showGoodMood(sentiment.score)
