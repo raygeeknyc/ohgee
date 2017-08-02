@@ -8,6 +8,9 @@ from google.cloud import language
 MOOD_THRESHOLD = 0.2
 LOWER_MOOD_THRESHOLD = -1 * MOOD_THRESHOLD
 
+POS_NOUN = "NOUN"
+POS_ADJECTIVE = "ADJ"
+
 def isGood(sentiment):
     return sentiment.score >= MOOD_THRESHOLD
 
@@ -66,7 +69,20 @@ class SpeechAnalyzer(multiprocessing.Process):
 
                 for token in tokens:
                     logging.debug("Token: {}: {}".format(token.part_of_speech, token.text_content))
-                results = (content, tokens, entities, sentiment)
+                noun = None
+                adjective = None
+                decorated_noun = None
+                for token in reversed(tokens):
+                    if token.part_of_speech == POS_NOUN:
+                        noun = token.text_content
+                        continue
+                    if token.part_of_speech == POS_ADJECTIVE and noun:
+                        adjective = token.text_content
+                        break
+                if noun and adjective:
+                    decorated_noun = (noun, adjective)
+
+                results = (content, tokens, entities, sentiment, decorated_noun)
                 self._nl_results.send(results)
             except EOFError:
                 logging.debug("EOF on speech analyzer input")
