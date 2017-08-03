@@ -8,7 +8,7 @@ import Tkinter
 import PIL
 from PIL import ImageTk, Image
 
-import ../authinfo
+import authinfo
 import multiprocessing
 from multiprocessingloghandler import ParentMultiProcessingLogHandler
 import threading
