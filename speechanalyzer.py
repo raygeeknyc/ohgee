@@ -80,7 +80,7 @@ class SpeechAnalyzer(multiprocessing.Process):
                         adjective = token.text_content
                         break
                 if noun and adjective:
-                    decorated_noun = (noun, adjective)
+                    decorated_noun = (adjective, noun)
 
                 results = (content, tokens, entities, sentiment, decorated_noun)
                 self._nl_results.send(results)
