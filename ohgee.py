@@ -8,7 +8,7 @@ import Tkinter
 import PIL
 from PIL import ImageTk, Image
 
-INITIAL_WAKEUP_GREETING = ["I'm", "awake"]
+import ../authinfo
 import multiprocessing
 from multiprocessingloghandler import ParentMultiProcessingLogHandler
 import threading
@@ -36,6 +36,8 @@ global mood_set_until
 mood_set_until = 0
 MOOD_SET_DURATION_SECS = 4
 POLL_DELAY_SECS = 0.2
+
+INITIAL_WAKEUP_GREETING = ["I'm", "awake"]
 
 servoPin = 18
 ARM_RELAXED_POSITION = 10.5
@@ -252,15 +254,23 @@ def startWaving():
     if not waving:
         waving = True
 
-def searchForTerm(search_term):
+def searchForTerm(search_engine, search_term):
     logging.debug("search for: {}".format(search_term))
-    
+    search_results = search_engine.cse().list(
+        q=" ".join(search_term),
+        cx=authinfo.ctx
+    ).execute()
+    for result in search_results:
+        logging.debug("Search result: {}".format(result))
+
 def searchForObjects(search_queue):
+    search_engine = build("customsearch", "v1",
+        developerKey=authinfo.developer_key)
     while not STOP:
         try:
             search_term = search_queue.get(False)
             logging.debug("Search term {}".format(search_term))
-            searchForTerm(search_term)
+            searchForTerm(search_engine, search_term)
         except Queue.empty:
             pass
         except Exception, e:
