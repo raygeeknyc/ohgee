@@ -46,6 +46,7 @@ ARM_WAVE_RAISE_SECS = 2
 ARM_WAVE_DELAY_SECS = 1
 
 GREETING_INTERVAL_SECS = 30
+SEARCH_INTERVAL_SECS = 10
 
 SPEECH_TMP_FILE="/tmp/speech.wav"
 PICO_CMD='pico2wave -l en-US --wave "%s" "%s";aplay "%s"'
@@ -114,9 +115,11 @@ def wave():
         arm.ChangeDutyCycle(0)
         waving = False
 
-def receiveLanguageResults(nl_results):
+def receiveLanguageResults(nl_results, search_queue):
     logging.debug("Listening")
     _, nl_results = nl_results
+    last_search_at = 0.0
+    
     try:
         while True:
             phrase = nl_results.recv()
@@ -135,6 +138,12 @@ def receiveLanguageResults(nl_results):
                 speech_queue.put(comeback)
                 if wave_flag:
                     startWaving()
+            if decorated_noun:
+                since_searched = time.time() - last_search_at
+                if since_searched > SEARCH_INTERVAL_SECS:
+                    search_queue.put(decorated_noun)
+                    last_search_at = time.time()
+
     except EOFError:
         logging.debug("Done listening")
 
@@ -216,9 +225,9 @@ def watchForVisionResults(vision_results_queue, image_queue):
                 logging.debug("Departure")
                 greeting = phraseresponder.getFarewell()
 
-            since_greeted = time.time() - last_greeting_at
-            if since_greeted > GREETING_INTERVAL_SECS or high_priority_greeting: 
-                if greeting:
+            if greeting:
+                since_greeted = time.time() - last_greeting_at
+                if since_greeted > GREETING_INTERVAL_SECS or high_priority_greeting: 
                     last_greeting_at = time.time()
                     logging.debug("Greeting %s (%d)" % (" ".join(greeting), len(greeting)))
                     speech_queue.put(greeting)
@@ -243,14 +252,33 @@ def startWaving():
     if not waving:
         waving = True
 
+def searchForTerm(search_term):
+    logging.debug("search for: {}".format(search_term))
+    
+def searchForObjects(search_queue):
+    while not STOP:
+        try:
+            search_term = search_queue.get(False)
+            logging.debug("Search term {}".format(search_term))
+            searchForTerm(search_term)
+        except Queue.empty:
+            pass
+        except Exception, e:
+            logging.exception(e)
+    logging.debug("done searching")
+
 def maintainDisplay(root_window, image_queue):
     canvas = Tkinter.Canvas(root_window, width=root_window.winfo_screenwidth(), height=root_window.winfo_screenheight())
     canvas.pack()
     logged = False
     while not STOP:
-        time.sleep(POLL_DELAY_SECS)
         try:
-            image = image_queue.get(False)
+            while True:
+                try:
+                    image = image_queue.get(False)
+                    break
+                except Queue.Empty:
+                    time.sleep(POLL_DELAY_SECS)
             buffer = io.BytesIO(image)
             buffer.seek(0)
             image = Image.open(buffer)
@@ -258,8 +286,6 @@ def maintainDisplay(root_window, image_queue):
             tk_image = PIL.ImageTk.PhotoImage(image)
             canvas.create_image(0, 0, image=tk_image, anchor="nw")
             canvas.pack()
-        except Queue.Empty:
-            pass
         except Exception, e:
             if not logged:
                 logging.exception(e)
@@ -316,6 +342,10 @@ if __name__ == '__main__':
         watcher = threading.Thread(target = watchForVisionResults, args=(vision_results_queue, image_queue))
         watcher.start()
 
+        search_queue = Queue.Queue()
+        searcher = threading.Thread(target = searchForObjects, args=(search_queue))
+        searcher.start()
+
         displayer = threading.Thread(target = maintainDisplay, args=(root, image_queue,))
         displayer.start()
 
@@ -324,7 +354,7 @@ if __name__ == '__main__':
         speaker.start()
         
         speech_queue.put(INITIAL_WAKEUP_GREETING)
-        listener = threading.Thread(target = receiveLanguageResults, args=(nl_results,))
+        listener = threading.Thread(target = receiveLanguageResults, args=(nl_results, search_queue,))
         listener.start()
 
         logging.info("Waiting")
