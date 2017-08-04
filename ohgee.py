@@ -9,6 +9,7 @@ import PIL
 from PIL import ImageTk, Image
 
 import authinfo
+from googleapiclient.discovery import build
 import multiprocessing
 from multiprocessingloghandler import ParentMultiProcessingLogHandler
 import threading
@@ -258,6 +259,7 @@ def searchForTerm(search_engine, search_term):
     logging.debug("search for: {}".format(search_term))
     search_results = search_engine.cse().list(
         q=" ".join(search_term),
+        searchType="image",
         cx=authinfo.ctx
     ).execute()
     for result in search_results:
