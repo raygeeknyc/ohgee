@@ -25,9 +25,7 @@ def isSmallContent(url):
     return True
 
 def getImage(image_stream):
-    image = Image.open(image_stream)
-    image = image.resize(DISPLAY_RESOLUTION)
-    return image
+    return image_stream.getvalue()
 
 service = build("customsearch", "v1",
     developerKey=authinfo.developer_key)

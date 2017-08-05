@@ -254,17 +254,20 @@ def startWaving():
     if not waving:
         waving = True
 
-def searchForTerm(search_term):
+def searchForTermImage(search_term):
     logging.debug("search for: {}".format(search_term))
-    imagesearch.getTopImage(search_term)
+    image = imagesearch.getTopImage(search_term)
+    return image
 
-def searchForObjects(search_queue):
+def searchForObjects(search_queue, image_queue):
     logging.debug("search thread started")
     while not STOP:
         try:
             search_term = search_queue.get(False)
             logging.debug("Search term {}".format(search_term))
-            searchForTerm(search_term)
+            top_image = searchForTermImage(search_term)
+            if top_image:
+                image_queue.put(top_image)
         except Queue.Empty:
             pass
         except Exception, e:
@@ -349,7 +352,7 @@ if __name__ == '__main__':
         watcher.start()
 
         search_queue = Queue.Queue()
-        searcher = threading.Thread(target = searchForObjects, args=(search_queue,))
+        searcher = threading.Thread(target = searchForObjects, args=(search_queue, image_queue,))
         searcher.start()
 
         displayer = threading.Thread(target = maintainDisplay, args=(root, image_queue,))
