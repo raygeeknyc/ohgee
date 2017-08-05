@@ -266,6 +266,7 @@ def searchForTerm(search_engine, search_term):
         logging.debug("Search result: {}".format(result))
 
 def searchForObjects(search_queue):
+    logging.debug("search thread started")
     search_engine = build("customsearch", "v1",
         developerKey=authinfo.developer_key)
     while not STOP:
@@ -273,10 +274,12 @@ def searchForObjects(search_queue):
             search_term = search_queue.get(False)
             logging.debug("Search term {}".format(search_term))
             searchForTerm(search_engine, search_term)
-        except Queue.empty:
+        except Queue.Empty:
             pass
         except Exception, e:
             logging.exception(e)
+        finally:
+            time.sleep(POLL_DELAY_SECS)
     logging.debug("done searching")
 
 def maintainDisplay(root_window, image_queue):
@@ -355,7 +358,7 @@ if __name__ == '__main__':
         watcher.start()
 
         search_queue = Queue.Queue()
-        searcher = threading.Thread(target = searchForObjects, args=(search_queue))
+        searcher = threading.Thread(target = searchForObjects, args=(search_queue,))
         searcher.start()
 
         displayer = threading.Thread(target = maintainDisplay, args=(root, image_queue,))

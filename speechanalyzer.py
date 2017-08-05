@@ -81,6 +81,7 @@ class SpeechAnalyzer(multiprocessing.Process):
                         break
                 if noun and adjective:
                     decorated_noun = (adjective, noun)
+                    logging.debug("ADJ+NOUN {}".format(decorated_noun))
 
                 results = (content, tokens, entities, sentiment, decorated_noun)
                 self._nl_results.send(results)
