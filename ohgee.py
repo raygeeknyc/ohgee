@@ -8,8 +8,6 @@ import Tkinter
 import PIL
 from PIL import ImageTk, Image
 
-import authinfo
-from googleapiclient.discovery import build
 import multiprocessing
 from multiprocessingloghandler import ParentMultiProcessingLogHandler
 import threading
@@ -26,6 +24,7 @@ import speechrecognizer
 import phraseresponder
 import speechanalyzer
 import visionanalyzer
+import imagesearch
 
 global STOP
 STOP = False
@@ -255,25 +254,17 @@ def startWaving():
     if not waving:
         waving = True
 
-def searchForTerm(search_engine, search_term):
+def searchForTerm(search_term):
     logging.debug("search for: {}".format(search_term))
-    search_results = search_engine.cse().list(
-        q=" ".join(search_term),
-        searchType="image",
-        cx=authinfo.ctx
-    ).execute()
-    for result in search_results:
-        logging.debug("Search result: {}".format(result))
+    imagesearch.getTopImage(search_term)
 
 def searchForObjects(search_queue):
     logging.debug("search thread started")
-    search_engine = build("customsearch", "v1",
-        developerKey=authinfo.developer_key)
     while not STOP:
         try:
             search_term = search_queue.get(False)
             logging.debug("Search term {}".format(search_term))
-            searchForTerm(search_engine, search_term)
+            searchForTerm(search_term)
         except Queue.Empty:
             pass
         except Exception, e:
