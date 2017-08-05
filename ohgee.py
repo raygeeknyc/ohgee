@@ -134,7 +134,7 @@ def receiveLanguageResults(nl_results, search_queue):
                 showBadMood(sentiment.score)
             else:
                 showMehMood(sentiment.score)
-            response = speechanalyzer.getResponse(text)
+            response = phraseresponder.getResponse(text)
             if response:
                 logging.debug("Phrase matched")
                 comeback, wave_flag = response

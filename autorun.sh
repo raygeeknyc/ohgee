@@ -26,5 +26,5 @@ chmod a+x *.sh
 if [[ -z "$DISPLAY" ]];then
   export DISPLAY=":0.0"
 fi
-./setup_auth.sh 2>&1
+. ./setup_auth.sh 2>&1
 nohup python ohgee.py &
