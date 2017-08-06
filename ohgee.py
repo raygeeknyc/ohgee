@@ -287,7 +287,7 @@ def maintainDisplay(root_window, image_queue):
                     image = image_queue.get(False)
                     break
                 except Queue.Empty:
-                    time.sleep(POLL_DELAY_SECS)
+                    pass
             buffer = io.BytesIO(image)
             buffer.seek(0)
             image = Image.open(buffer)
