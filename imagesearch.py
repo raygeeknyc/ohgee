@@ -9,7 +9,7 @@ from googleapiclient.discovery import build
 import authinfo
 
 # Maximum content size to fetch - VGA 24 bit + overhead
-MAXIMUM_CONTENT_SIZE = int(640*480*3*1.10)
+MAXIMUM_CONTENT_SIZE = int(320*240*3*1.10)
 DISPLAY_RESOLUTION = (640,480)
 
 def isSmallContent(url):

@@ -35,7 +35,9 @@ waving = False
 global mood_set_until
 mood_set_until = 0
 MOOD_SET_DURATION_SECS = 4
-POLL_DELAY_SECS = 0.2
+SEARCH_POLL_DELAY_SECS = 0.5
+IMAGE_POLL_DELAY_SECS = 0.1
+IMAGE_MIN_DISPLAY_SECS = 0.3
 
 INITIAL_WAKEUP_GREETING = ["I'm", "awake"]
 
@@ -261,33 +263,42 @@ def searchForTermImage(search_term):
 
 def searchForObjects(search_queue, image_queue):
     logging.debug("search thread started")
+    search_term = None
     while not STOP:
         try:
-            search_term = search_queue.get(False)
+            t = search_queue.get(False)
+            logging.debug("Search queue had an entry")
+            search_term = t
+        except Queue.Empty:
+            if not search_term:
+                logging.debug("Empty search queue, waiting")
+                time.sleep(SEARCH_POLL_DELAY_SECS)
+                continue
             logging.debug("Search term {}".format(search_term))
             top_image = searchForTermImage(search_term)
             if top_image:
                 image_queue.put(top_image)
-        except Queue.Empty:
-            pass
+            search_term = None
         except Exception, e:
             logging.exception(e)
-        finally:
-            time.sleep(POLL_DELAY_SECS)
     logging.debug("done searching")
 
 def maintainDisplay(root_window, image_queue):
     canvas = Tkinter.Canvas(root_window, width=root_window.winfo_screenwidth(), height=root_window.winfo_screenheight())
     canvas.pack()
     logged = False
+    image = None
     while not STOP:
         try:
-            while True:
-                try:
-                    image = image_queue.get(False)
-                    break
-                except Queue.Empty:
-                    pass
+            t = image_queue.get(False)
+            logging.debug("Image queue had an entry")
+            image = t
+        except Queue.Empty:
+            if not image:
+                logging.debug("Empty image queue, waiting")
+                time.sleep(IMAGE_POLL_DELAY_SECS)
+                continue
+            logging.debug("got the most recent image")
             buffer = io.BytesIO(image)
             buffer.seek(0)
             image = Image.open(buffer)
@@ -295,13 +306,15 @@ def maintainDisplay(root_window, image_queue):
             tk_image = PIL.ImageTk.PhotoImage(image)
             canvas.create_image(0, 0, image=tk_image, anchor="nw")
             canvas.pack()
+            image = None
+            time.sleep(IMAGE_MIN_DISPLAY_SECS)
         except Exception, e:
             if not logged:
                 logging.exception(e)
                 logged = True
         finally:
             expireMood()
-    logging.info("Stopping")
+    logging.debug("Stopping image display")
     root_window.quit()
     
 if __name__ == '__main__':
@@ -366,7 +379,7 @@ if __name__ == '__main__':
         listener = threading.Thread(target = receiveLanguageResults, args=(nl_results, search_queue,))
         listener.start()
 
-        logging.info("Waiting")
+        logging.debug("Waiting")
         root.mainloop()
     except Exception, e:
         logging.error("Error in main: {}".format(e))
