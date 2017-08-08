@@ -31,23 +31,27 @@ service = build("customsearch", "v1",
     developerKey=authinfo.developer_key)
 
 def getTopImage(search_term):
-    res = service.cse().list(
-        q=" ".join(search_term),
-        searchType = "image",
-        cx=authinfo.ctx
-    ).execute()
+    try:
+        res = service.cse().list(
+            q=" ".join(search_term),
+            searchType = "image",
+            cx=authinfo.ctx
+        ).execute()
 
-    if not 'items' in res:
-        logging.debug("No result !!\nres is: {}".format(res))
+        if not 'items' in res:
+            logging.debug("No result !!\nres is: {}".format(res))
+            return None
+        else:
+            for item in res['items']:
+                image_url = item['link']
+                if not image_url or not isSmallContent(image_url):
+                    logging.debug("Skipping {}".format(item['link'].encode('utf-8')))
+                    continue
+                logging.debug("Fetching {} from {}".format(item['title'].encode('utf-8'), item['link'].encode('utf-8')))
+                image_stream = StringIO(requests.get(image_url, stream=True, allow_redirects=True).content)
+                if image_stream:
+                    return getImage(image_stream)
+    except Exception, e:
+        logging.exception("Error getting image {}".format(e))
+    finally:    
         return None
-    else:
-        for item in res['items']:
-            image_url = item['link']
-            if not image_url or not isSmallContent(image_url):
-                logging.debug("Skipping {}".format(item['link'].encode('utf-8')))
-                continue
-            logging.debug("Fetching {} from {}".format(item['title'].encode('utf-8'), item['link'].encode('utf-8')))
-            image_stream = StringIO(requests.get(image_url, stream=True, allow_redirects=True).content)
-            if image_stream:
-                return getImage(image_stream)
-    return None
