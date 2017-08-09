@@ -37,7 +37,7 @@ mood_set_until = 0
 MOOD_SET_DURATION_SECS = 3
 SEARCH_POLL_DELAY_SECS = 0.5
 IMAGE_POLL_DELAY_SECS = 0.1
-IMAGE_MIN_DISPLAY_SECS = 0.2
+IMAGE_MIN_DISPLAY_SECS = 0.3
 
 INITIAL_WAKEUP_GREETING = ["I'm", "awake"]
 
@@ -289,6 +289,7 @@ def searchForObjects(search_queue, image_queue):
             top_image = searchForTermImage(search_term)
             if top_image:
                 image_queue.put(top_image)
+                logging.debug("Put image on display queue")
             search_term = None
         except Exception, e:
             logging.exception(e)
@@ -299,17 +300,21 @@ def maintainDisplay(root_window, image_queue):
     canvas.pack()
     logged = False
     image = None
+    skipped_images = 0
     while not STOP:
         try:
             t = image_queue.get(False)
             logging.debug("Image queue had an entry")
             image = t
+            skipped_images += 1
         except Queue.Empty:
             if not image:
                 logging.debug("Empty image queue, waiting")
+                skipped_images = 0
                 time.sleep(IMAGE_POLL_DELAY_SECS)
                 continue
-            logging.debug("got the most recent image")
+            skipped_images -= 1
+            logging.debug("got the most recent image, skipped over {} images".format(skipped_images))
             buffer = io.BytesIO(image)
             buffer.seek(0)
             image = Image.open(buffer)

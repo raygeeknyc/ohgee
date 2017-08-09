@@ -50,8 +50,9 @@ def getTopImage(search_term):
                 logging.debug("Fetching {} from {}".format(item['title'].encode('utf-8'), item['link'].encode('utf-8')))
                 image_stream = StringIO(requests.get(image_url, stream=True, allow_redirects=True).content)
                 if image_stream:
+                    logging.debug("image was fetched")
                     return getImage(image_stream)
     except Exception, e:
         logging.exception("Error getting image {}".format(e))
-    finally:    
-        return None
+    logging.debug("No image fetched")
+    return None
