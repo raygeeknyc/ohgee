@@ -95,12 +95,16 @@ def speak(speech_queue):
     global STOP
     logging.debug("Speaker started")
     while not STOP:
-        logging.debug("Waiting to talk")
-        utterance = " ".join(speech_queue.get())
-        recognition_worker.suspendListening()
-        logging.debug("Saying {}".format(utterance))
-        os.system(PICO_CMD % (SPEECH_TMP_FILE, utterance, SPEECH_TMP_FILE))
-        recognition_worker.resumeListening()
+        try:
+            logging.debug("Waiting to talk")
+            utterance = " ".join(speech_queue.get())
+            recognition_worker.suspendListening()
+            logging.debug("Saying {}".format(utterance))
+            os.system(PICO_CMD % (SPEECH_TMP_FILE, utterance, SPEECH_TMP_FILE))
+        except Exception, e:
+            logging.exception("Error speaking {}".format(e))
+        finally:
+            recognition_worker.resumeListening()
     logging.debug("Speaker stopping")
 
 def wave():
@@ -124,8 +128,8 @@ def receiveLanguageResults(nl_results, search_queue):
     _, nl_results = nl_results
     last_search_at = 0.0
     
-    try:
-        while True:
+    while True:
+        try:
             phrase = nl_results.recv()
             text, tokens, entities, sentiment, decorated_noun = phrase
             logging.debug("Got spoken phrase {}".format(text))
@@ -147,9 +151,12 @@ def receiveLanguageResults(nl_results, search_queue):
                 if since_searched > SEARCH_INTERVAL_SECS:
                     search_queue.put(decorated_noun)
                     last_search_at = time.time()
-
-    except EOFError:
-        logging.debug("Done listening")
+        except EOFError:
+            logging.debug("End of NL results queue")
+            break
+        except Exception, e:
+            logging.exception("Error speaking {}".format(e))
+    logging.debug("Done listening")
 
 def watchForVisionResults(vision_results_queue, image_queue):
     logging.debug("Watching")
@@ -159,8 +166,8 @@ def watchForVisionResults(vision_results_queue, image_queue):
     
     last_greeting_at = 0.0
     extended_mood_reported = False
-    try:
-        while True:
+    while True:
+        try:
             high_priority_greeting = False
             greeting = None
             wave_flag = False
@@ -168,7 +175,7 @@ def watchForVisionResults(vision_results_queue, image_queue):
             feeling_bad = False
             feeling_good_extended = False
             feeling_bad_extended = False
-
+   
             processed_image_results = vision_results_queue.recv()
             processed_image, labels, faces, sentiment = processed_image_results
             recent_sentiments.appendleft(sentiment)
@@ -177,11 +184,11 @@ def watchForVisionResults(vision_results_queue, image_queue):
             logging.debug("{} sentiment detected".format(sentiment))
             for label in labels:
                 logging.debug("Label: {}".format(label.description))
-
+  
             # Two consecutive frames without strong sentiment means that we're ready to report the next extended sentiment
             if recent_sentiments[0] > visionanalyzer.BAD_SENTIMENT_THRESHOLD and recent_sentiments[0] < visionanalyzer.GOOD_SENTIMENT_THRESHOLD and recent_sentiments[1] > visionanalyzer.BAD_SENTIMENT_THRESHOLD and recent_sentiments[1] < visionanalyzer.GOOD_SENTIMENT_THRESHOLD:
                 extended_mood_reported = False
-
+ 
             if recent_sentiments[0] <= visionanalyzer.BAD_SENTIMENT_THRESHOLD and recent_sentiments[1] <= visionanalyzer.BAD_SENTIMENT_THRESHOLD and recent_sentiments[0] < recent_sentiments[2]:
                 logging.debug("feeling bad")
                 feeling_bad = True
@@ -239,8 +246,12 @@ def watchForVisionResults(vision_results_queue, image_queue):
                 startWaving()
 
             image_queue.put(processed_image)
-    except EOFError:
-        logging.debug("Done watching")
+        except EOFError:
+            logging.debug("End of vision queue")
+            break
+        except Exception, e:
+            logging.exception("Error watching {}".format(e))
+    logging.debug("Done watching")
 
 def lowerArm():
     arm.ChangeDutyCycle(ARM_DOWN_POSITION)
