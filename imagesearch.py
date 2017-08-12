@@ -1,4 +1,5 @@
 import PIL
+import sys
 from PIL import Image
 import logging
 from StringIO import StringIO

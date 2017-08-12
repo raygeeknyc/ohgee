@@ -26,5 +26,10 @@ chmod a+x *.sh
 if [[ -z "$DISPLAY" ]];then
   export DISPLAY=":0.0"
 fi
-. ./setup_auth.sh 2>&1
+eval `./setup_auth.sh` # sets rc
+if [[ $rc -ne 0 ]]; then
+  pico2wave -l en-US --wave "/tmp/ohgee_help.wav" "HELP!  Error authenticating cloud services";aplay "/tmp/ohgee_help.wav"
+  exit 255
+fi
 nohup python ohgee.py &
+exit 0
