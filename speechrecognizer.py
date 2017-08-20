@@ -99,7 +99,7 @@ class SpeechRecognizer(multiprocessing.Process):
                 volume = 100
             finally:
                 self._silence_threshold = min(self._silence_threshold, volume)
-        logging.info("Trained silence volume {}".format(self._silence_threshold))
+        logging.info("Trained silence volume {} pause samples {}".format(self._silence_threshold, PAUSE_LENGTH_IN_SAMPLES))
 
     def captureSound(self):
         logging.debug("starting capturing")
