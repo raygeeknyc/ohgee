@@ -19,7 +19,7 @@ FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 16000
 FRAMES_PER_BUFFER = 4096
-PAUSE_LENGTH_SECS = 1
+PAUSE_LENGTH_SECS = 1.0
 MAX_BUFFERED_SAMPLES = 1
 PAUSE_LENGTH_IN_SAMPLES = int((PAUSE_LENGTH_SECS * RATE / FRAMES_PER_BUFFER) + 0.5)
 SAMPLE_RETRY_DELAY_SECS = 0.1
@@ -88,17 +88,19 @@ class SpeechRecognizer(multiprocessing.Process):
         self._stop_recognizing = True
 
     def trainSilence(self, mic_stream):
-        logging.info("Training silence")
+        logging.debug("Training silence")
         self._silence_threshold = 999
+        silence_samples = 0
         for sample in xrange(SILENCE_TRAINING_SAMPLES):
             try:
                 data = mic_stream.read(FRAMES_PER_BUFFER)
                 volume = max(array.array('h', data))
+                logging.debug("sample {}".format(volume))
+                self._silence_threshold += volume
+                silence_samples += 1
             except Exception, e:
                 logging.exception("Training mic read raised exception: {}".format(e))
-                volume = 100
-            finally:
-                self._silence_threshold = min(self._silence_threshold, volume)
+        self._silence_threshold /= silence_samples
         logging.info("Trained silence volume {} pause samples {}".format(self._silence_threshold, PAUSE_LENGTH_IN_SAMPLES))
 
     def captureSound(self):
@@ -119,6 +121,7 @@ class SpeechRecognizer(multiprocessing.Process):
                 if self._suspend_listening.is_set():
                     continue
                 volume = max(array.array('h', data))
+                logging.debug("Volume max {}".format(volume))
                 if volume <= self._silence_threshold:
                     consecutive_silent_samples += 1
                 else:
@@ -155,11 +158,13 @@ class SpeechRecognizer(multiprocessing.Process):
             try:
                 if self._audio_stream.closed:
                     if not waiting:
-                        logging.debug("waiting for sound")
+                        logging.debug("waiting for sound to analyze")
                         waiting = True
                     time.sleep(SAMPLE_RETRY_DELAY_SECS)
                     continue
-                waiting = False
+                if waiting:
+                    logging.debug("heard sound to analyze")
+                    waiting = False
                 alternatives = audio_sample.streaming_recognize('en-US',
                     interim_results=True)
                 for alternative in alternatives:
