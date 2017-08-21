@@ -89,7 +89,7 @@ class SpeechRecognizer(multiprocessing.Process):
 
     def trainSilence(self, mic_stream):
         logging.debug("Training silence")
-        self._silence_threshold = 999
+        self._silence_threshold = 0
         silence_samples = 0
         for sample in xrange(SILENCE_TRAINING_SAMPLES):
             try:
