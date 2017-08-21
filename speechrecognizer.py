@@ -90,6 +90,7 @@ class SpeechRecognizer(multiprocessing.Process):
     def trainSilence(self, mic_stream):
         logging.debug("Training silence")
         self._silence_threshold = 0
+        silence_min = 9999
         silence_samples = 0
         for sample in xrange(SILENCE_TRAINING_SAMPLES):
             try:
@@ -97,11 +98,13 @@ class SpeechRecognizer(multiprocessing.Process):
                 volume = max(array.array('h', data))
                 logging.debug("sample {}".format(volume))
                 self._silence_threshold += volume
+                silence_min = min(volume, silence_min)
                 silence_samples += 1
             except Exception, e:
                 logging.exception("Training mic read raised exception: {}".format(e))
         self._silence_threshold /= silence_samples
-        logging.info("Trained silence volume {} pause samples {}".format(self._silence_threshold, PAUSE_LENGTH_IN_SAMPLES))
+        self._silence_threshold -= (self._silence_threshold - silence_min)/2
+        logging.info("Trained silence volume {} min was {} pause samples {}".format(self._silence_threshold, silence_min, PAUSE_LENGTH_IN_SAMPLES))
 
     def captureSound(self):
         logging.debug("starting capturing")
