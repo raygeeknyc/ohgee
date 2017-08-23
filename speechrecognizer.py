@@ -69,7 +69,7 @@ class SpeechRecognizer(multiprocessing.Process):
             self._capturer.start()
             self._exit.wait()
         except Exception, e:
-            logging.exception("recognizer process exception: {}".format(str(e)))
+            logging.exception("recognizer process exception")
         finally:
             self._stopCapturing()
             self._stopRecognizing()
@@ -101,9 +101,10 @@ class SpeechRecognizer(multiprocessing.Process):
                 silence_min = min(volume, silence_min)
                 silence_samples += 1
             except Exception, e:
-                logging.exception("Training mic read raised exception: {}".format(e))
+                logging.exception("Training mic read raised exception")
         self._silence_threshold /= silence_samples
         self._silence_threshold -= (self._silence_threshold - silence_min)/2
+        self._silence_threshold = silence_min
         logging.info("Trained silence volume {} min was {} pause samples {}".format(self._silence_threshold, silence_min, PAUSE_LENGTH_IN_SAMPLES))
 
     def captureSound(self):
@@ -138,7 +139,7 @@ class SpeechRecognizer(multiprocessing.Process):
                 if consecutive_silent_samples < PAUSE_LENGTH_IN_SAMPLES:
                     self._audio_buffer.put(data)
             except IOError, e:
-                logging.exception(e)
+                logging.exception("IOError capturing audio")
         logging.debug("ending sound capture")
         # stop Recording
         mic_stream.stop_stream()
@@ -183,6 +184,5 @@ class SpeechRecognizer(multiprocessing.Process):
                 logging.debug("empty stream recognition attempted")
                 continue
             except Exception, e:
-                logging.exception("error recognizing speech: {}".format(e))
-                continue
+                logging.exception("error recognizing speech")
         logging.debug("stopped recognizing")

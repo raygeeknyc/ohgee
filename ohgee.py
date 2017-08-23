@@ -102,7 +102,7 @@ def speak(speech_queue):
             logging.debug("Saying {}".format(utterance))
             os.system(PICO_CMD % (SPEECH_TMP_FILE, utterance, SPEECH_TMP_FILE))
         except Exception, e:
-            logging.exception("Error speaking {}".format(e))
+            logging.exception("Error speaking")
         finally:
             recognition_worker.resumeListening()
     logging.debug("Speaker stopping")
@@ -155,7 +155,7 @@ def receiveLanguageResults(nl_results, search_queue):
             logging.debug("End of NL results queue")
             break
         except Exception, e:
-            logging.exception("Error speaking {}".format(e))
+            logging.exception("Error speaking")
     logging.debug("Done listening")
 
 def watchForVisionResults(vision_results_queue, image_queue):
@@ -250,7 +250,7 @@ def watchForVisionResults(vision_results_queue, image_queue):
             logging.debug("End of vision queue")
             break
         except Exception, e:
-            logging.exception("Error watching {}".format(e))
+            logging.exception("Error watching")
     logging.debug("Done watching")
 
 def lowerArm():
@@ -292,7 +292,7 @@ def searchForObjects(search_queue, image_queue):
                 logging.debug("Put image on display queue")
             search_term = None
         except Exception, e:
-            logging.exception(e)
+            logging.exception("error searching")
     logging.debug("done searching")
 
 def maintainDisplay(root_window, image_queue):
@@ -326,7 +326,7 @@ def maintainDisplay(root_window, image_queue):
             time.sleep(IMAGE_MIN_DISPLAY_SECS)
         except Exception, e:
             if not logged:
-                logging.exception(e)
+                logging.exception("error displaying")
                 logged = True
         finally:
             expireMood()

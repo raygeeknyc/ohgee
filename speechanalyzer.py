@@ -46,7 +46,7 @@ class SpeechAnalyzer(multiprocessing.Process):
             self._analyzeSpeech()
             logging.debug("speech analyzer done analyzing")
         except Exception, e:
-            logging.exception("speech analyzer exception: {}".format(str(e)))
+            logging.exception("speech analyzer exception")
         finally:
             logging.debug("speech analyzer terminating")
   
@@ -89,7 +89,7 @@ class SpeechAnalyzer(multiprocessing.Process):
                 logging.debug("EOF on speech analyzer input")
                 break
             except Exception, e:
-                logging.exception("Error analyzing speech {}".format(e))
+                logging.exception("Error analyzing speech")
         logging.debug("end of speech analyzer")
         self._text_transcript.close()
         self._nl_results.close()

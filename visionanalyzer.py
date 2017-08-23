@@ -211,7 +211,7 @@ class ImageAnalyzer(multiprocessing.Process):
             self._stop_analyzing = True
             self._analyzer.join()
         except Exception, e:
-            logging.exception("Error in vision main thread {}".format(e))
+            logging.exception("Error in vision main thread")
         finally:
             logging.debug("Exiting vision")
             sys.exit(0)
@@ -239,7 +239,7 @@ class ImageAnalyzer(multiprocessing.Process):
                     img_bytes = buffer.getvalue()
                     self._vision_queue.send((img_bytes, results[1], results[2], results[3]))
                 except Exception, e:
-                    logging.exception(e)
+                    logging.exception("error reading image")
             else:
                 logging.debug("No frame in queue")
         self._vision_queue.close()
@@ -366,7 +366,7 @@ if __name__ == '__main__':
         while not STOP:
             time.sleep(POLL_SECS)
     except Exception, e:
-        logging.exception("Main exception {}".format(e))
+        logging.exception("Main exception")
     finally:
         logging.debug("Ending")
         vision_worker.stop()
