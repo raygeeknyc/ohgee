@@ -25,8 +25,8 @@ chmod a+x *.sh
 
 ####
 # Temporary fix for a conflict in update.sh
-git fetch origin master
-git reset --hard FETCH_head
+# git fetch origin master
+# git reset --hard FETCH_head
 ####
 
 ./update.sh 2>&1
