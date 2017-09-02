@@ -13,7 +13,7 @@ import io
 import sys
 
 def maintainDisplay(root_window):
-    image = Image.open('test.jpg')
+    image = Image.open('resources/test.jpg')
     tk_image = ImageTk.PhotoImage(image)
     tk.Label(root_window, image=tk_image).pack()
     root_window.mainloop()
