@@ -17,10 +17,10 @@ HATES = (["I", "hate", "you"], ["I", "don't", "like", "you"], ["you", "suck"], [
 SADNESSES = (["sniff"], ["you", "break", "my", "heart"], ["that", "makes", "me", "sad"], ["I'm", "sorry"], ["ouch"], ["that", "hurts"], ["I'm", "so", "sorry"])
 PINGS = (["ping", "me"], ["pinging", "you"])
 ACKS = (["pong"], ["ack"], ["right", "back", "at", "you"])
-OTHER_PRODUCTS = (["bing", "sucks"], ["bing"])
+OTHER_PRODUCTS = (["bing", "sucks"], ["use", "bing"])
 PRODUCT_RECS = (["go", "chrome"], ["make", "mine", "chrome"], ["go", "google"])
 # Add in empty lists to weigh the random selection from the tuple towards null responses
-IN_KIND_SUFFIXES=(["to","you"], ["as","well"], ["too"], ["also"], ["to","you","as","well"], [], [], [], [], [], [], [])
+IN_KIND_SUFFIXES=(["to","you"], ["as","well"], ["too"], ["also"], ["to","you","as","well"], [], [], [], [], [], [], [], [], [], [])
 
 def timeGreetings():
     hour = datetime.now().hour

@@ -36,7 +36,8 @@ def getTopImage(search_term):
         res = service.cse().list(
             q=" ".join(search_term),
             searchType = "image",
-            cx=authinfo.ctx
+            cx=authinfo.ctx,
+            safe = "medium"
         ).execute()
 
         if not 'items' in res:

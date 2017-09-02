@@ -22,6 +22,13 @@ else
 fi
 pico2wave -l en-US --wave "/tmp/ohgee_help.wav" "updating";aplay "/tmp/ohgee_help.wav"
 chmod a+x *.sh
+
+####
+# Temporary fix for a conflict in update.sh
+# git fetch origin master
+# git reset --hard FETCH_head
+####
+
 ./update.sh 2>&1
 if [[ -z "$DISPLAY" ]];then
   export DISPLAY=":0.0"
