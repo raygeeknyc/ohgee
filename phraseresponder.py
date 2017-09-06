@@ -1,3 +1,4 @@
+# BUG - single list tuples below raise an error in getResponse()
 import logging
 _DEBUG=logging.INFO
 _DEBUG=logging.DEBUG
@@ -7,13 +8,13 @@ from random import randint
 from datetime import datetime
 
 POP_1_PROMPTS = (["who", "is", "the", "man"], ["risk", "his", "neck"])
-POP_1_RESPONSES = (["SHAFT"])
+POP_1_RESPONSES = (["SHAFT"], ["that's", "shaft"])
 
-POP_2_PROMPTS = (["bad", "mother"])
-POP_2_RESPONSES = (["shut", "your", "mouth"])
+POP_2_PROMPTS = (["bad", "mother"], ["say", "this", "shaft"])
+POP_2_RESPONSES = (["shut", "your", "mouth"], ["shut", "your", "mouth"])
 
-POP_3_PROMPTS = (["shaft"])
-POP_3_RESPONSES = (["we", "can", "dig", "it"])
+POP_3_PROMPTS = (["about", "shaft"], ["bout", "shaft"])
+POP_3_RESPONSES = (["we", "can", "dig", "it"], ["dig", "it"])
 
 GREETINGS = (["hello"],["hi"], ["hey", "there"], ["nice", "to", "see", "you"], ["good", "to", "see", "you"], ["welcome"], ["good", "day"])
 ALL_DAY_GREETINGS = (["good", "morning"], ["good", "afternoon"], ["good", "evening"], ["good", "night"])
@@ -132,8 +133,8 @@ PROMPTS_RESPONSES = [(greetings, greetings, inKindSuffixes, True),
   (pings, acks, None, False),
   (hates, sadnesses, None, False),
   (pop1Prompts, pop1Responses, None, False),
-  (pop2Prompts, pop2Responses, True, False),
-  (pop3Prompts, pop3Responses, True, False),
+  (pop2Prompts, pop2Responses, None, True),
+  (pop3Prompts, pop3Responses, None, True),
   (otherProducts, productRecs, None, False)]
 
 def phraseMatch(phrase, candidate_phrase_generator):

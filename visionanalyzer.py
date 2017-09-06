@@ -38,8 +38,8 @@ PIXEL_SHIFT_SENSITIVITY = 30
 # This is how long to sleep in various threads between shutdown checks
 POLL_SECS = 0.5
 
-# This is the rate at which to send frame to the vision service
-ANALYSIS_RATE_FPS = 0.67
+# This is the rate at which to send frames to the vision service
+ANALYSIS_RATE_FPS = 1
 _ANALYSIS_DELAY_SECS = 1.0/ANALYSIS_RATE_FPS
 
 COLOR_MEH = (0, 0, 127)
