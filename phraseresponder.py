@@ -131,6 +131,9 @@ PROMPTS_RESPONSES = [(greetings, greetings, inKindSuffixes, True),
   (thanks, welcomes, None, False),
   (pings, acks, None, False),
   (hates, sadnesses, None, False),
+  (pop1Prompts, pop1Responses, None, False),
+  (pop2Prompts, pop2Responses, True, False),
+  (pop3Prompts, pop3Responses, True, False),
   (otherProducts, productRecs, None, False)]
 
 def phraseMatch(phrase, candidate_phrase_generator):
