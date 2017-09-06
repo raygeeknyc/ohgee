@@ -6,13 +6,13 @@ import os
 from random import randint
 from datetime import datetime
 
-POP_1_GREETINGS = (["who", "is", "the", "man"], ["risk", "his", "neck"])
+POP_1_PROMPTS = (["who", "is", "the", "man"], ["risk", "his", "neck"])
 POP_1_RESPONSES = (["SHAFT"])
 
-POP_2_GREETINGS = (["bad", "mother"])
+POP_2_PROMPTS = (["bad", "mother"])
 POP_2_RESPONSES = (["shut", "your", "mouth"])
 
-POP_3_GREETINGS = (["shaft"])
+POP_3_PROMPTS = (["shaft"])
 POP_3_RESPONSES = (["we", "can", "dig", "it"])
 
 GREETINGS = (["hello"],["hi"], ["hey", "there"], ["nice", "to", "see", "you"], ["good", "to", "see", "you"], ["welcome"], ["good", "day"])
@@ -71,6 +71,24 @@ def hates():
 
 def sadnesses():
     return SADNESSES
+
+def pop1Prompts():
+    return POP_1_PROMPTS
+
+def pop2Prompts():
+    return POP_2_PROMPTS
+
+def pop3Prompts():
+    return POP_3_PROMPTS
+
+def pop1Responses():
+    return POP_1_RESPONSES
+
+def pop2Responses():
+    return POP_2_RESPONSES
+
+def pop3Responses():
+    return POP_3_RESPONSES
 
 def pings():
     return PINGS
