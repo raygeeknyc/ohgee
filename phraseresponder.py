@@ -13,7 +13,7 @@ POP_1_RESPONSES = (["SHAFT"], ["john", "shaft"], ["SHAFT.", "right", "on"], ["SH
 POP_2_PROMPTS = (["a", "bad", "mother"], ["they", "say", "this", "shaft", "is", "a"])
 POP_2_RESPONSES = (["shut", "your", "mouth"], ["shut", "your", "mouth"])
 
-POP_3_PROMPTS = ("hey", "I'm", "talking", "about"], ["about", "shaft"])
+POP_3_PROMPTS = (["hey", "I'm", "talking", "about"], ["about", "shaft"])
 POP_3_RESPONSES = (["we", "can", "dig", "it"], ["dig", "it"])
 
 GREETINGS = (["hello"],["hi"], ["hey", "there"], ["nice", "to", "see", "you"], ["good", "to", "see", "you"], ["welcome"], ["good", "day"])
