@@ -246,7 +246,7 @@ def watchForVisionResults(vision_results_queue, image_queue):
             if wave_flag:
                 startWaving()
 
-            image_queue.put(processed_image, False)
+            image_queue.put((processed_image, False))
         except EOFError:
             logging.debug("End of vision queue")
             break
@@ -289,7 +289,7 @@ def searchForObjects(search_queue, image_queue):
             logging.debug("Search term {}".format(search_term))
             top_image = searchForTermImage(search_term)
             if top_image:
-                image_queue.put(top_image, True)
+                image_queue.put((top_image, True))
                 logging.debug("Put image on display queue")
             search_term = None
         except Exception, e:
@@ -319,7 +319,7 @@ def maintainDisplay(root_window, image_queue):
             (image, sticky) = t
             if sticky:
                 logging.debug("Sticky image")
-                showImageFor(image, STICKY_IMAGE_DISPLAY_SECS)
+                showImageFor(root_window, canvas, image, STICKY_IMAGE_DISPLAY_SECS)
                 image = None
             else:
                 skipped_images += 1
@@ -331,7 +331,7 @@ def maintainDisplay(root_window, image_queue):
                 continue
             skipped_images -= 1
             logging.debug("got the most recent image, skipped over {} images".format(skipped_images))
-            showImageFor(image, IMAGE_MIN_DISPLAY_SECS)
+            showImageFor(root_window, canvas, image, IMAGE_MIN_DISPLAY_SECS)
             image = None
         except Exception, e:
             if not logged:
