@@ -314,11 +314,11 @@ def maintainDisplay(root_window, image_queue):
     skipped_images = 0
     while not STOP:
         try:
-            t = image_queue.get(False)
+            image, sticky = image_queue.get(False)
             logging.debug("Image queue had an entry")
-            (image, sticky) = t
             if sticky:
                 logging.debug("Sticky image")
+                logging.debug("showing image")
                 showImageFor(root_window, canvas, image, STICKY_IMAGE_DISPLAY_SECS)
                 image = None
             else:
@@ -331,6 +331,7 @@ def maintainDisplay(root_window, image_queue):
                 continue
             skipped_images -= 1
             logging.debug("got the most recent image, skipped over {} images".format(skipped_images))
+            logging.debug("showing non-sticky image")
             showImageFor(root_window, canvas, image, IMAGE_MIN_DISPLAY_SECS)
             image = None
         except Exception, e:
