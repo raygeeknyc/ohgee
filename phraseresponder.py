@@ -8,7 +8,7 @@ from random import randint
 from datetime import datetime
 
 POP_1_PROMPTS = (["the", "man", "that", "will"], ["will", "risk", "his", "neck"], ["the", "cat", "that", "won't", "drop", "out"], ["out", "when", "there's", "danger", "all", "about"])
-POP_1_RESPONSES = (["SHAFT"], ["john", "shaft"], ["SHAFT.", "right", "on"], ["SHAFT.", "can", "ya", "dig", "it"], ["SHAFT"])
+POP_1_RESPONSES = (["SHAFT"], ["john", "shaft"], ["SHAFT.", "right", "on"], ["SHAFT.", "can", "ya", "dig", "it"], ["SHAFT"], ["SHAFT.", "you're", "damn", "right"])
 
 POP_2_PROMPTS = (["a", "bad", "mother"], ["they", "say", "this", "shaft", "is", "a"])
 POP_2_RESPONSES = (["shut", "your", "mouth"], ["shut", "your", "mouth"])
