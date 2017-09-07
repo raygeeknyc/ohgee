@@ -38,7 +38,6 @@ MOOD_SET_DURATION_SECS = 3
 SEARCH_POLL_DELAY_SECS = 0.5
 IMAGE_POLL_DELAY_SECS = 0.3
 IMAGE_MIN_DISPLAY_SECS = 0.3
-STICKY_IMAGE_DISPLAY_SECS = 1.5
 
 INITIAL_WAKEUP_GREETING = ["I'm", "awake"]
 
@@ -246,7 +245,7 @@ def watchForVisionResults(vision_results_queue, image_queue):
             if wave_flag:
                 startWaving()
 
-            image_queue.put((processed_image, False))
+            image_queue.put(processed_image)
         except EOFError:
             logging.debug("End of vision queue")
             break
@@ -289,23 +288,13 @@ def searchForObjects(search_queue, image_queue):
             logging.debug("Search term {}".format(search_term))
             top_image = searchForTermImage(search_term)
             if top_image:
-                image_queue.put((top_image, True))
+                image_queue.put(top_image)
                 logging.debug("Put image on display queue")
             search_term = None
         except Exception, e:
             logging.exception("error searching")
     logging.debug("done searching")
 
-def showImageFor(window, canvas, image, image_display_secs):
-    buffer = io.BytesIO(image)
-    buffer.seek(0)
-    image = Image.open(buffer)
-    image = image.resize((window.winfo_screenwidth(), window.winfo_screenheight()))
-    tk_image = PIL.ImageTk.PhotoImage(image)
-    canvas.create_image(0, 0, image=tk_image, anchor="nw")
-    canvas.pack()
-    time.sleep(image_display_secs)
-    
 def maintainDisplay(root_window, image_queue):
     canvas = Tkinter.Canvas(root_window, width=root_window.winfo_screenwidth(), height=root_window.winfo_screenheight())
     canvas.pack()
@@ -314,15 +303,10 @@ def maintainDisplay(root_window, image_queue):
     skipped_images = 0
     while not STOP:
         try:
-            image, sticky = image_queue.get(False)
+            t = image_queue.get(False)
             logging.debug("Image queue had an entry")
-            if sticky:
-                logging.debug("Sticky image")
-                logging.debug("showing image")
-                showImageFor(root_window, canvas, image, STICKY_IMAGE_DISPLAY_SECS)
-                image = None
-            else:
-                skipped_images += 1
+            image = t
+            skipped_images += 1
         except Queue.Empty:
             if not image:
                 logging.debug("Empty image queue, waiting")
@@ -331,9 +315,15 @@ def maintainDisplay(root_window, image_queue):
                 continue
             skipped_images -= 1
             logging.debug("got the most recent image, skipped over {} images".format(skipped_images))
-            logging.debug("showing non-sticky image")
-            showImageFor(root_window, canvas, image, IMAGE_MIN_DISPLAY_SECS)
+            buffer = io.BytesIO(image)
+            buffer.seek(0)
+            image = Image.open(buffer)
+            image = image.resize((root_window.winfo_screenwidth(), root_window.winfo_screenheight()))
+            tk_image = PIL.ImageTk.PhotoImage(image)
+            canvas.create_image(0, 0, image=tk_image, anchor="nw")
+            canvas.pack()
             image = None
+            time.sleep(IMAGE_MIN_DISPLAY_SECS)
         except Exception, e:
             if not logged:
                 logging.exception("error displaying")
@@ -342,7 +332,7 @@ def maintainDisplay(root_window, image_queue):
             expireMood()
     logging.debug("Stopping image display")
     root_window.quit()
-
+    
 if __name__ == '__main__':
     root = Tkinter.Tk()
     root.wm_attributes('-type', 'splash')
