@@ -7,14 +7,14 @@ import os
 from random import randint
 from datetime import datetime
 
-POP_1_PROMPTS = (["who", "is", "the", "man"], ["risk", "his", "neck"])
-POP_1_RESPONSES = (["SHAFT"], ["that's", "shaft"])
+POP_1_PROMPTS = (["who", "is", "the", "man"], ["who", "would", "risk", "his", "neck"], ["his", "neck", "for", "his", "brother", "man"], ["the", "cat", "that", "won't", "cop", "out", "when"], ["danger", all", "about"] )
+POP_1_RESPONSES = (["SHAFT"], ["that's", "shaft"], ["john", "shaft"])
 
-POP_2_PROMPTS = (["bad", "mother"], ["say", "this", "shaft"])
+POP_2_PROMPTS = (["is", "a", "bad", "mother"], ["they", "say", "this", "shaft", "is"])
 POP_2_RESPONSES = (["shut", "your", "mouth"], ["shut", "your", "mouth"])
 
-POP_3_PROMPTS = (["about", "shaft"], ["bout", "shaft"])
-POP_3_RESPONSES = (["we", "can", "dig", "it"], ["dig", "it"])
+POP_3_PROMPTS = (["talking", "about", "shaft"], ["talking", "bout", "shaft"])
+POP_3_RESPONSES = (["we", "can", "dig", "it"], ["dig", "it"], ["right", "on"])
 
 GREETINGS = (["hello"],["hi"], ["hey", "there"], ["nice", "to", "see", "you"], ["good", "to", "see", "you"], ["welcome"], ["good", "day"])
 ALL_DAY_GREETINGS = (["good", "morning"], ["good", "afternoon"], ["good", "evening"], ["good", "night"])

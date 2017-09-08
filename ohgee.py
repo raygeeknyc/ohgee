@@ -36,8 +36,8 @@ global mood_set_until
 mood_set_until = 0
 MOOD_SET_DURATION_SECS = 3
 SEARCH_POLL_DELAY_SECS = 0.5
-IMAGE_POLL_DELAY_SECS = 0.3
-IMAGE_MIN_DISPLAY_SECS = 0.3
+IMAGE_POLL_DELAY_SECS = 0.5
+IMAGE_MIN_DISPLAY_SECS = 0.5
 
 INITIAL_WAKEUP_GREETING = ["I'm", "awake"]
 
@@ -300,6 +300,7 @@ def maintainDisplay(root_window, image_queue):
     canvas.pack()
     logged = False
     image = None
+    tk_image = None
     skipped_images = 0
     while not STOP:
         try:
@@ -319,9 +320,9 @@ def maintainDisplay(root_window, image_queue):
             buffer.seek(0)
             image = Image.open(buffer)
             image = image.resize((root_window.winfo_screenwidth(), root_window.winfo_screenheight()))
+            prev_frame = tk_image
             tk_image = PIL.ImageTk.PhotoImage(image)
             canvas.create_image(0, 0, image=tk_image, anchor="nw")
-            canvas.pack()
             image = None
             time.sleep(IMAGE_MIN_DISPLAY_SECS)
         except Exception, e:
