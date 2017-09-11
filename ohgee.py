@@ -36,8 +36,9 @@ global mood_set_until
 mood_set_until = 0
 MOOD_SET_DURATION_SECS = 3
 SEARCH_POLL_DELAY_SECS = 0.5
-IMAGE_POLL_DELAY_SECS = 0.5
-IMAGE_MIN_DISPLAY_SECS = 0.5
+IMAGE_POLL_DELAY_SECS = 0.1
+IMAGE_STICKY_DISPLAY_SECS = 2
+IMAGE_MIN_DISPLAY_SECS = 0.2
 
 INITIAL_WAKEUP_GREETING = ["I'm", "awake"]
 
@@ -244,8 +245,8 @@ def watchForVisionResults(vision_results_queue, image_queue):
                     speech_queue.put(greeting)
             if wave_flag:
                 startWaving()
-
-            image_queue.put(processed_image)
+            image_queue.put((processed_image, False))
+            logging.debug("Put a processed image")
         except EOFError:
             logging.debug("End of vision queue")
             break
@@ -288,7 +289,7 @@ def searchForObjects(search_queue, image_queue):
             logging.debug("Search term {}".format(search_term))
             top_image = searchForTermImage(search_term)
             if top_image:
-                image_queue.put(top_image)
+                image_queue.put((top_image, True))
                 logging.debug("Put image on display queue")
             search_term = None
         except Exception, e:
@@ -304,31 +305,42 @@ def maintainDisplay(root_window, image_queue):
     skipped_images = 0
     while not STOP:
         try:
-            t = image_queue.get(False)
-            logging.debug("Image queue had an entry")
-            image = t
-            skipped_images += 1
-        except Queue.Empty:
-            if not image:
-                logging.debug("Empty image queue, waiting")
-                skipped_images = 0
-                time.sleep(IMAGE_POLL_DELAY_SECS)
-                continue
-            skipped_images -= 1
-            logging.debug("got the most recent image, skipped over {} images".format(skipped_images))
-            buffer = io.BytesIO(image)
-            buffer.seek(0)
-            image = Image.open(buffer)
-            image = image.resize((root_window.winfo_screenwidth(), root_window.winfo_screenheight()))
-            prev_frame = tk_image
-            tk_image = PIL.ImageTk.PhotoImage(image)
-            canvas.create_image(0, 0, image=tk_image, anchor="nw")
-            image = None
-            time.sleep(IMAGE_MIN_DISPLAY_SECS)
+            try:
+                show_image = False
+                t = image_queue.get(False)
+                logging.debug("Image queue had an entry")
+                image, sticky = t
+                if sticky:
+                    logging.debug("got a sticky image")
+                    show_image = True
+                    image_display_min_secs = IMAGE_STICKY_DISPLAY_SECS
+                else:
+                    skipped_images += 1
+            except Queue.Empty:
+                if not image:
+                    logging.debug("Empty image queue, waiting")
+                    skipped_images = 0
+                    time.sleep(IMAGE_POLL_DELAY_SECS)
+                else:
+                    skipped_images -= 1
+                    show_image = True
+                    image_display_min_secs = IMAGE_MIN_DISPLAY_SECS
+                    logging.debug("got the most recent image, skipped over {} images".format(skipped_images))
+            if show_image:
+                buffer = io.BytesIO(image)
+                buffer.seek(0)
+                image = Image.open(buffer)
+                image = image.resize((root_window.winfo_screenwidth(), root_window.winfo_screenheight()))
+                prev_frame = tk_image
+                tk_image = PIL.ImageTk.PhotoImage(image)
+                canvas.create_image(0, 0, image=tk_image, anchor="nw")
+                image = None
+                time.sleep(image_display_min_secs)
         except Exception, e:
             if not logged:
                 logging.exception("error displaying")
                 logged = True
+                continue
         finally:
             expireMood()
     logging.debug("Stopping image display")
