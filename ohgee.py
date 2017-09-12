@@ -179,6 +179,8 @@ def watchForVisionResults(vision_results_queue, image_queue):
    
             processed_image_results = vision_results_queue.recv()
             processed_image, labels, faces, sentiment = processed_image_results
+            image_queue.put((processed_image, False))
+            logging.debug("Put a processed image %s" % id(processed_image))
             recent_sentiments.appendleft(sentiment)
             recent_face_counts.appendleft(len(faces))
             logging.debug("{} faces detected".format(len(faces)))
@@ -245,8 +247,6 @@ def watchForVisionResults(vision_results_queue, image_queue):
                     speech_queue.put(greeting)
             if wave_flag:
                 startWaving()
-            image_queue.put((processed_image, False))
-            logging.debug("Put a processed image")
         except EOFError:
             logging.debug("End of vision queue")
             break
@@ -310,6 +310,7 @@ def maintainDisplay(root_window, image_queue):
                 t = image_queue.get(False)
                 logging.debug("Image queue had an entry")
                 image, sticky = t
+                logging.debug("image %s" % id(image))
                 if sticky:
                     logging.debug("got a sticky image")
                     show_image = True
@@ -327,6 +328,7 @@ def maintainDisplay(root_window, image_queue):
                     image_display_min_secs = IMAGE_MIN_DISPLAY_SECS
                     logging.debug("got the most recent image, skipped over {} images".format(skipped_images))
             if show_image:
+                logging.debug("displaying image %s" % id(image))
                 buffer = io.BytesIO(image)
                 buffer.seek(0)
                 image = Image.open(buffer)
@@ -335,6 +337,7 @@ def maintainDisplay(root_window, image_queue):
                 tk_image = PIL.ImageTk.PhotoImage(image)
                 canvas.create_image(0, 0, image=tk_image, anchor="nw")
                 image = None
+                logging.debug("displayed image %s" % id(image))
                 time.sleep(image_display_min_secs)
         except Exception, e:
             if not logged:

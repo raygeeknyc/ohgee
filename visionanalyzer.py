@@ -36,7 +36,7 @@ TRAINING_SAMPLES = 5
 PIXEL_SHIFT_SENSITIVITY = 30
 
 # This is how long to sleep in various threads between shutdown checks
-POLL_SECS = 0.5
+POLL_SECS = 0.1
 
 # This is the rate at which to send frames to the vision service
 ANALYSIS_RATE_FPS = 1
@@ -112,6 +112,8 @@ def getSentimentForLevel(face, level):
     return 0.0
 
 def getSentimentWeightedByLevel(face):
+    logging.debug("joy: {}, surprise:{}, anger:{}, sorrow:{}".format(
+        face.joy, face.surprise, face.anger, face.sorrow))
     sentiment = getSentimentForLevel(face, Likelihood.VERY_LIKELY)
     if sentiment != 0:
        return sentiment
@@ -237,6 +239,7 @@ class ImageAnalyzer(multiprocessing.Process):
                     results[0].save(buffer, format="JPEG")
                     buffer.seek(0)
                     img_bytes = buffer.getvalue()
+                    logging.debug("send image %s" % id(img_bytes))
                     self._vision_queue.send((img_bytes, results[1], results[2], results[3]))
                 except Exception, e:
                     logging.exception("error reading image")
@@ -259,6 +262,7 @@ class ImageAnalyzer(multiprocessing.Process):
         for face in faces:
             if face.detection_confidence > max_confidence:
                 strongest_sentiment = getSentimentWeightedByLevel(face)
+                logging.debug("sentiment:{}".format(strongest_sentiment))
                 max_confidence = face.detection_confidence
         return (im, labels, faces, strongest_sentiment)
 
