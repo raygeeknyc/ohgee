@@ -138,7 +138,6 @@ class ImageAnalyzer(multiprocessing.Process):
         self._stop_capturing = False
         self._stop_analyzing = False
         self._last_frame_at = 0.0
-        self._last_analysis_at = 0.0
         self._frame_delay_secs = 1.0/CAPTURE_RATE_FPS
 
     def stop(self):
@@ -160,7 +159,7 @@ class ImageAnalyzer(multiprocessing.Process):
         self._image_buffer.seek(0)
         image = self._image_buffer.getvalue()
         self._last_frame_at = time.time()
-        logging.info("capturePilFrame took {}".format(time.time()-s))
+        logging.debug("capturePilFrame took {}".format(time.time()-s))
         return (image, image_pixels)
 
     def getNextFrame(self):
@@ -190,7 +189,7 @@ class ImageAnalyzer(multiprocessing.Process):
             if changed_pixels >= changed_pixels_threshold:
                 break
         self._prev_frame = self._current_frame
-        logging.info("imageDifferenceOverThreshold took {}".format(time.time()-s))
+        logging.debug("imageDifferenceOverThreshold took {}".format(time.time()-s))
         return changed_pixels >= changed_pixels_threshold
 
     def trainMotion(self):
@@ -236,31 +235,32 @@ class ImageAnalyzer(multiprocessing.Process):
 
     def analyzeVision(self):
         self._vision_client = vision.Client()
+        skipped_images = 0
+        frame = None
         while not self._stop_analyzing:
-            frame = None
-            while (self._last_analysis_at + _ANALYSIS_DELAY_SECS) > time.time() and not self._stop_analyzing:
-                time.sleep(POLL_SECS)
-            self._last_analysis_at = time.time()
-            while True and not self._stop_analyzing:
-                try:
-                    f = self._frames.get(block=False)
-                    frame = f
-                except Queue.Empty:
-                    break
-            if frame:
-                logging.debug("Trailing frame read")
-                try:
-                    results = self._analyzeFrame(frame)
-                    buffer = io.BytesIO()
-                    results[0].save(buffer, format="JPEG")
-                    buffer.seek(0)
-                    img_bytes = buffer.getvalue()
-                    logging.debug("send image %s" % id(img_bytes))
-                    self._vision_queue.send((img_bytes, results[1], results[2], results[3]))
-                except Exception, e:
-                    logging.exception("error reading image")
-            else:
-                logging.debug("No frame in queue")
+            try:
+                frame = self._frames.get(block=False)
+                skipped_images += 1
+            except Queue.Empty:
+                if not frame:
+                    logging.debug("Empty image queue, waiting")
+                    skipped_images = 0
+                    time.sleep(POLL_SECS)
+                else:
+                    skipped_images -= 1
+                    logging.debug("Trailing frame read, skipped {} frames".format(skipped_images))
+                    try:
+                        results = self._analyzeFrame(frame)
+                        buffer = io.BytesIO()
+                        results[0].save(buffer, format="JPEG")
+                        buffer.seek(0)
+                        img_bytes = buffer.getvalue()
+                        logging.debug("send image %s" % id(img_bytes))
+                        self._vision_queue.send((img_bytes, results[1], results[2], results[3]))
+                    except Exception, e:
+                        logging.exception("error reading image")
+                    finally:
+                        frame = None
         self._vision_queue.close()
         logging.debug("Exiting vision analyze thread")
 
@@ -281,7 +281,7 @@ class ImageAnalyzer(multiprocessing.Process):
                 strongest_sentiment = getSentimentWeightedByLevel(face)
                 logging.debug("sentiment:{}".format(strongest_sentiment))
                 max_confidence = face.detection_confidence
-        logging.info("_analyzeFrame took {}".format(time.time()-s))
+        logging.debug("_analyzeFrame took {}".format(time.time()-s))
         return (im, labels, faces, strongest_sentiment)
 
     def captureFrames(self):
