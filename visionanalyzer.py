@@ -151,6 +151,7 @@ class ImageAnalyzer(multiprocessing.Process):
         logging.getLogger(str(os.getpid())).setLevel(self._logging_level)
 
     def capturePilFrame(self):
+        s=time.time()
         self._image_buffer.seek(0)
         self._camera.capture(self._image_buffer, format="jpeg", use_video_port=True)
         self._image_buffer.seek(0)
@@ -159,6 +160,7 @@ class ImageAnalyzer(multiprocessing.Process):
         self._image_buffer.seek(0)
         image = self._image_buffer.getvalue()
         self._last_frame_at = time.time()
+        logging.info("capturePilFrame took {}".format(time.time()-s))
         return (image, image_pixels)
 
     def getNextFrame(self):
@@ -176,6 +178,20 @@ class ImageAnalyzer(multiprocessing.Process):
                     changed_pixels += 1
         self._prev_frame = self._current_frame
         return changed_pixels
+
+    def imageDifferenceOverThreshold(self, changed_pixels_threshold):
+        "Detect changes in the green channel."
+        s=time.time()
+        changed_pixels = 0
+        for x in xrange(self._camera.resolution[0]):
+            for y in xrange(self._camera.resolution[1]):
+                if abs(self._current_frame[1][x,y][1] - self._prev_frame[1][x,y][1]) > PIXEL_SHIFT_SENSITIVITY:
+                    changed_pixels += 1
+            if changed_pixels >= changed_pixels_threshold:
+                break
+        self._prev_frame = self._current_frame
+        logging.info("imageDifferenceOverThreshold took {}".format(time.time()-s))
+        return changed_pixels >= changed_pixels_threshold
 
     def trainMotion(self):
         logging.debug("Training motion")
@@ -249,6 +265,7 @@ class ImageAnalyzer(multiprocessing.Process):
         logging.debug("Exiting vision analyze thread")
 
     def _analyzeFrame(self, frame):
+        s=time.time()
         remote_image = self._vision_client.image(content=frame[0])
         labels = remote_image.detect_labels()
         faces = remote_image.detect_faces(limit=5)
@@ -264,6 +281,7 @@ class ImageAnalyzer(multiprocessing.Process):
                 strongest_sentiment = getSentimentWeightedByLevel(face)
                 logging.debug("sentiment:{}".format(strongest_sentiment))
                 max_confidence = face.detection_confidence
+        logging.info("_analyzeFrame took {}".format(time.time()-s))
         return (im, labels, faces, strongest_sentiment)
 
     def captureFrames(self):
@@ -280,9 +298,7 @@ class ImageAnalyzer(multiprocessing.Process):
         while not self._stop_capturing:
             try:
                 self.getNextFrame()
-                motion = self.calculateImageDifference()
-                if motion > self._motion_threshold:
-                    logging.debug("motion={}".format(motion))
+                if self.imageDifferenceOverThreshold(self._motion_threshold):
                     self._frames.put(self._current_frame)
             except Exception, e:
                 logging.error("Error in analysis: {}".format(e))
