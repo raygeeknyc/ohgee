@@ -170,6 +170,7 @@ class SpeechRecognizer(multiprocessing.Process):
                 if waiting:
                     logging.debug("heard sound to analyze")
                     waiting = False
+                logging.debug("recognizing speech")
                 alternatives = audio_sample.streaming_recognize('en-US',
                     interim_results=True)
                 for alternative in alternatives:

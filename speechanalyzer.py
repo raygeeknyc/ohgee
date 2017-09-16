@@ -55,6 +55,7 @@ class SpeechAnalyzer(multiprocessing.Process):
         while not self._exit.is_set():
             try:
                 text = self._text_transcript.recv()
+                logging.debug("analyzing speech")
                 document = self._language_client.document_from_text(text)
                 content = document.content
                 logging.debug("analyzer received text: {}".format(content))

@@ -266,6 +266,7 @@ class ImageAnalyzer(multiprocessing.Process):
 
     def _analyzeFrame(self, frame):
         s=time.time()
+        logging.debug("analyzing image")
         remote_image = self._vision_client.image(content=frame[0])
         labels = remote_image.detect_labels()
         faces = remote_image.detect_faces(limit=5)
@@ -299,7 +300,10 @@ class ImageAnalyzer(multiprocessing.Process):
             try:
                 self.getNextFrame()
                 if self.imageDifferenceOverThreshold(self._motion_threshold):
+                    logging.debug("Motion detected")
                     self._frames.put(self._current_frame)
+                    self.getNextFrame()
+                    self._prev_frame = self._current_frame
             except Exception, e:
                 logging.error("Error in analysis: {}".format(e))
         logging.debug("Exiting vision capture thread")
