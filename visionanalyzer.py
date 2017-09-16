@@ -358,10 +358,10 @@ def obscureFacesWithSentiments(canvas, face_details):
         canvas.ellipse((face_boundary[0][0]+((face_boundary[1][0] - face_boundary[0][0])/3.0)-eye_size, eye_level-eye_size, face_boundary[0][0]+((face_boundary[1][0]-face_boundary[0][0])/3.0)+eye_size, eye_level + eye_size), None, outline=COLOR_FEATURES)
         canvas.ellipse((face_boundary[0][0]+((face_boundary[1][0] - face_boundary[0][0])/3.0)*2-eye_size, eye_level-eye_size, face_boundary[0][0]+((face_boundary[1][0] - face_boundary[0][0])/3.0)*2+eye_size, eye_level+eye_size), None, outline=COLOR_FEATURES)
 
-        canvas.ellipse((face_boundary[0][0]+((face_boundary[1][0] - face_boundary[0][0])/2.0)-nose_size, nose_level-nose_size, face_boundary[0][0]+((face_boundary[1][0] - face_boundary[0][0])/2.0)+nose_size, nose_level+nose_size), COLOR_FEATURES, outline=COLOR_FEATURES, fill=COLOR_FEATURES)
+        canvas.ellipse((face_boundary[0][0]+((face_boundary[1][0] - face_boundary[0][0])/2.0)-nose_size, nose_level-nose_size, face_boundary[0][0]+((face_boundary[1][0] - face_boundary[0][0])/2.0)+nose_size, nose_level+nose_size), outline=COLOR_FEATURES, fill=COLOR_FEATURES)
 
         if sentiment_color == COLOR_GOOD:
-            canvas.chord(( face_boundary[0][0]+mouth_inset, nose_level, face_boundary[0][0]+mouth_inset+mouth_size, nose_level+mouth_size), 35, 135, fill=COLOR_FEATURES), outline=COLOR_FEATURES
+            canvas.chord(( face_boundary[0][0]+mouth_inset, nose_level, face_boundary[0][0]+mouth_inset+mouth_size, nose_level+mouth_size), 35, 135, fill=COLOR_FEATURES, outline=COLOR_FEATURES)
         elif sentiment_color == COLOR_BAD:
             canvas.chord(( face_boundary[0][0]+mouth_inset, face_boundary[1][1]-(face_boundary[1][1]-nose_level)*0.67, face_boundary[0][0]+mouth_inset+mouth_size, face_boundary[1][1]), 215, 335, fill=COLOR_FEATURES, outline=COLOR_FEATURES)
 
