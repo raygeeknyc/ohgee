@@ -19,6 +19,9 @@ POP_3_RESPONSES = (["we", "can", "dig", "it"], ["dig", "it"], ["right", "on"])
 POP_4_PROMPTS = (["shut", "your", "mouth"], ["shut", "your", "mouth"])
 POP_4_RESPONSES = (["hey", "I'm", "talking", "about", "shaft"], ["hey", "I'm", "talkin", "bout", "shaft"])
 
+NEWS_1_PROMPTS = (["president","trump"], ["donald", "trump"])
+NEWS_1_RESPONSES = (["Trump", "is", "a", "chump"], ["donald", "chump"])
+
 GREETINGS = (["hello"],["hi"], ["hey", "there"], ["nice", "to", "see", "you"], ["good", "to", "see", "you"], ["welcome"], ["good", "day"])
 ALL_DAY_GREETINGS = (["good", "morning"], ["good", "afternoon"], ["good", "evening"], ["good", "night"])
 FAREWELLS = (["goodbye"], ["bye"], ["farewell"], ["see","you"], ["talk", "to", "you", "later"], ["take", "care"], ["bye", "bye"], ["see", "you", "later"])
@@ -88,6 +91,9 @@ def pop3Prompts():
 def pop4Prompts():
     return POP_4_PROMPTS
 
+def news1Prompts():
+    return NEWS_1_PROMPTS
+
 def pop1Responses():
     return POP_1_RESPONSES
 
@@ -99,6 +105,9 @@ def pop3Responses():
 
 def pop4Responses():
     return POP_4_RESPONSES
+
+def news1Responses():
+    return NEWS_1_RESPONSES
 
 def pings():
     return PINGS
@@ -145,6 +154,7 @@ PROMPTS_RESPONSES = [(greetings, greetings, inKindSuffixes, True),
   (pop2Prompts, pop2Responses, None, True),
   (pop3Prompts, pop3Responses, None, True),
   (pop4Prompts, pop4Responses, None, False),
+  (news1Prompts, news1Responses, None, False),
   (otherProducts, productRecs, None, False)]
 
 def phraseMatch(phrase, candidate_phrase_generator):
