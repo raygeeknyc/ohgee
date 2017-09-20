@@ -26,7 +26,7 @@ BANAL_1_PROMPTS = (["you", "know", "what"], ["guess", "what"])
 BANAL_1_RESPONSES = (["what?"],["no", "what?"])
 
 BANAL_2_PROMPTS = (["how's", "the", "weather"], ["hows", "the", "weather"])
-BANAL_2_RESPONSES = (["chili", "today", "hot", "tamale"], ["chili", "today", "hot", "tamale"])
+BANAL_2_RESPONSES = (["chili", "today", "hot", "ta-ma-lay"], ["chili", "today", "but", "hot", "ta-ma-lay"])
 
 GREETINGS = (["hello"],["hi"], ["hey", "there"], ["nice", "to", "see", "you"], ["good", "to", "see", "you"], ["welcome"], ["good", "day"])
 ALL_DAY_GREETINGS = (["good", "morning"], ["good", "afternoon"], ["good", "evening"], ["good", "night"])
