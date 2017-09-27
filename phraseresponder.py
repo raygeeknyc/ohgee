@@ -25,7 +25,7 @@ NEWS_1_RESPONSES = (["Trump", "is", "a", "chump"], ["donald", "chump"])
 BANAL_1_PROMPTS = (["you", "know", "what"], ["guess", "what"])
 BANAL_1_RESPONSES = (["what?"],["no", "what?"])
 
-BANAL_2_PROMPTS = (["how's", "the", "weather"], ["hows", "the", "weather"])
+BANAL_2_PROMPTS = (["how's", "the", "weather"], ["hows", "the", "weather"], ["what's", "the", "weather"], ["whats", "the", "weather"])
 BANAL_2_RESPONSES = (["chili", "today", "hot", "ta-ma-lay"], ["chili", "today", "but", "hot", "ta-ma-lay"])
 
 GREETINGS = (["hello"],["hi"], ["hey", "there"], ["nice", "to", "see", "you"], ["good", "to", "see", "you"], ["welcome"], ["good", "day"])
