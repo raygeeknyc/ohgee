@@ -25,7 +25,7 @@ NEWS_1_RESPONSES = (["Trump", "is", "a", "chump"], ["donald", "chump"])
 BANAL_1_PROMPTS = (["you", "know", "what"], ["guess", "what"])
 BANAL_1_RESPONSES = (["what?"],["no", "what?"])
 
-GIRLS_COUNT_PROMPTS = (["what's", "the", "number"], ["the", "number", "is", "what", "now"])
+GIRLS_COUNT_PROMPTS = (["what's", "the", "number"], ["the", "number", "is", "what", "now"], ["the", "numbers", "what", "now"])
 GIRLS_COUNT_RESPONSES = (["fourteen", "thousand", "two hundred", "and", "ninety six"], ["14", "2", "9", "6"])
 
 BANAL_2_PROMPTS = (["how's", "the", "weather"], ["hows", "the", "weather"], ["what's", "the", "weather"], ["whats", "the", "weather"])
