@@ -43,9 +43,9 @@ IMAGE_MIN_DISPLAY_SECS = 0.2
 INITIAL_WAKEUP_GREETING = ["I'm", "awake"]
 
 servoPin = 18
-ARM_RELAXED_POSITION = 10.5
-ARM_DOWN_POSITION = 12.5
-ARM_UP_POSITION = 7.5
+ARM_RELAXED_POSITION = 9.5
+ARM_DOWN_POSITION = 8.5
+ARM_UP_POSITION = 11.5
 ARM_WAVE_LOWER_SECS = 0.5
 ARM_WAVE_RAISE_SECS = 2
 ARM_WAVE_DELAY_SECS = 1
@@ -108,6 +108,15 @@ def speak(speech_queue):
             recognition_worker.resumeListening()
     logging.debug("Speaker stopping")
 
+def waveArm():
+    raiseArm()
+    time.sleep(ARM_WAVE_RAISE_SECS)
+    lowerArm()
+    time.sleep(ARM_WAVE_LOWER_SECS)
+    relaxArm()
+    time.sleep(0.5)
+    arm.ChangeDutyCycle(0)
+
 def wave():
     global waving
     global STOP
@@ -115,13 +124,7 @@ def wave():
         while not waving:
             time.sleep(ARM_WAVE_DELAY_SECS)
         logging.debug("Wave")
-        raiseArm()
-        time.sleep(ARM_WAVE_RAISE_SECS)
-        lowerArm()
-        time.sleep(ARM_WAVE_LOWER_SECS)
-        relaxArm()
-        time.sleep(0.5)
-        arm.ChangeDutyCycle(0)
+        waveArm()
         waving = False
 
 def receiveLanguageResults(nl_results, search_queue):
@@ -358,6 +361,10 @@ if __name__ == '__main__':
     led.setColor(rgbled.OFF)
 
     GPIO.setup(servoPin, GPIO.OUT)
+    arm = GPIO.PWM(servoPin, 50)
+    arm.start(0)
+
+    waveArm()
 
     log_stream = sys.stderr
     log_queue = multiprocessing.Queue(100)
@@ -387,8 +394,6 @@ if __name__ == '__main__':
     unused.close()
 
     try:
-        arm = GPIO.PWM(servoPin, 50)
-        arm.start(0)
         waver = threading.Thread(target = wave, args=())
         waver.start()
 
