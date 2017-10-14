@@ -45,7 +45,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -101,20 +101,20 @@
     <circle
        style="fill:#dedded;fill-opacity:1"
        id="path4495"
-       cx="215.43307"
+       cx="397.43307"
        cy="227.79449"
        r="35.433071" />
     <circle
        r="35.433071"
        cy="405.20789"
-       cx="215.43307"
+       cx="397.43307"
        id="circle4497"
        style="fill:#dedded;fill-opacity:1" />
     <circle
-       cy="884.36218"
-       cx="395.72552"
+       cy="316.30313"
+       cx="219.78458"
        id="circle4499"
        style="fill:#dedded;fill-opacity:1"
-       r="97.440948" />
+       r="97.5" />
   </g>
 </svg>
