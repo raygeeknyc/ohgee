@@ -49,6 +49,7 @@ ARM_UP_POSITION = 11.5
 ARM_WAVE_LOWER_SECS = 0.5
 ARM_WAVE_RAISE_SECS = 2
 ARM_WAVE_DELAY_SECS = 1
+MIN_FACE_WAVE_DELAY_SECS = 10
 
 GREETING_INTERVAL_SECS = 30
 SEARCH_INTERVAL_SECS = 10
@@ -170,6 +171,7 @@ def watchForVisionResults(vision_results_queue, image_queue):
     
     last_greeting_at = 0.0
     extended_mood_reported = False
+    last_wave_at = 0l
     while True:
         try:
             high_priority_greeting = False
@@ -236,9 +238,11 @@ def watchForVisionResults(vision_results_queue, image_queue):
             if recent_face_counts[0] > recent_face_counts[1] and recent_face_counts[0] > recent_face_counts[2]:
                 logging.debug("Arrival")
                 greeting = phraseresponder.getGreeting()
+                wave_flag = True
             if recent_face_counts[0] < recent_face_counts[1] and recent_face_counts[0] < recent_face_counts[2] :
                 logging.debug("Departure")
                 greeting = phraseresponder.getFarewell()
+                wave_flag = True
 
             if greeting:
                 since_greeted = time.time() - last_greeting_at
@@ -247,7 +251,9 @@ def watchForVisionResults(vision_results_queue, image_queue):
                     logging.debug("Greeting %s (%d)" % (" ".join(greeting), len(greeting)))
                     speech_queue.put(greeting)
             if wave_flag:
-                startWaving()
+                if time.time() - last_wave_at > MIN_FACE_WAVE_DELAY_SECS:
+                    last_wave_at = time.time()
+                    startWaving()
         except EOFError:
             logging.debug("End of vision queue")
             break
