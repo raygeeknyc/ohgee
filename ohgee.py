@@ -234,11 +234,9 @@ def watchForVisionResults(vision_results_queue, image_queue):
                 high_priority_greeting = True
                 
             if recent_face_counts[0] > recent_face_counts[1] and recent_face_counts[0] > recent_face_counts[2]:
-                wave_flag = True
                 logging.debug("Arrival")
                 greeting = phraseresponder.getGreeting()
             if recent_face_counts[0] < recent_face_counts[1] and recent_face_counts[0] < recent_face_counts[2] :
-                wave_flag = True
                 logging.debug("Departure")
                 greeting = phraseresponder.getFarewell()
 
