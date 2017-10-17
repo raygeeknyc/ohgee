@@ -242,7 +242,6 @@ def watchForVisionResults(vision_results_queue, image_queue):
             if recent_face_counts[0] < recent_face_counts[1] and recent_face_counts[0] < recent_face_counts[2] :
                 logging.debug("Departure")
                 greeting = phraseresponder.getFarewell()
-                wave_flag = True
 
             if greeting:
                 since_greeted = time.time() - last_greeting_at
