@@ -43,12 +43,13 @@ IMAGE_MIN_DISPLAY_SECS = 0.2
 INITIAL_WAKEUP_GREETING = ["I'm", "awake"]
 
 servoPin = 18
-ARM_RELAXED_POSITION = 10.5
-ARM_DOWN_POSITION = 12.5
-ARM_UP_POSITION = 7.5
+ARM_RELAXED_POSITION = 9.5
+ARM_DOWN_POSITION = 8.5
+ARM_UP_POSITION = 11.5
 ARM_WAVE_LOWER_SECS = 0.5
 ARM_WAVE_RAISE_SECS = 2
 ARM_WAVE_DELAY_SECS = 1
+MIN_FACE_WAVE_DELAY_SECS = 10
 
 GREETING_INTERVAL_SECS = 30
 SEARCH_INTERVAL_SECS = 10
@@ -108,6 +109,15 @@ def speak(speech_queue):
             recognition_worker.resumeListening()
     logging.debug("Speaker stopping")
 
+def waveArm():
+    raiseArm()
+    time.sleep(ARM_WAVE_RAISE_SECS)
+    lowerArm()
+    time.sleep(ARM_WAVE_LOWER_SECS)
+    relaxArm()
+    time.sleep(0.5)
+    arm.ChangeDutyCycle(0)
+
 def wave():
     global waving
     global STOP
@@ -115,13 +125,7 @@ def wave():
         while not waving:
             time.sleep(ARM_WAVE_DELAY_SECS)
         logging.debug("Wave")
-        raiseArm()
-        time.sleep(ARM_WAVE_RAISE_SECS)
-        lowerArm()
-        time.sleep(ARM_WAVE_LOWER_SECS)
-        relaxArm()
-        time.sleep(0.5)
-        arm.ChangeDutyCycle(0)
+        waveArm()
         waving = False
 
 def receiveLanguageResults(nl_results, search_queue):
@@ -167,6 +171,7 @@ def watchForVisionResults(vision_results_queue, image_queue):
     
     last_greeting_at = 0.0
     extended_mood_reported = False
+    last_wave_at = 0l
     while True:
         try:
             high_priority_greeting = False
@@ -231,11 +236,10 @@ def watchForVisionResults(vision_results_queue, image_queue):
                 high_priority_greeting = True
                 
             if recent_face_counts[0] > recent_face_counts[1] and recent_face_counts[0] > recent_face_counts[2]:
-                wave_flag = True
                 logging.debug("Arrival")
                 greeting = phraseresponder.getGreeting()
-            if recent_face_counts[0] < recent_face_counts[1] and recent_face_counts[0] < recent_face_counts[2] :
                 wave_flag = True
+            if recent_face_counts[0] < recent_face_counts[1] and recent_face_counts[0] < recent_face_counts[2] :
                 logging.debug("Departure")
                 greeting = phraseresponder.getFarewell()
 
@@ -246,7 +250,9 @@ def watchForVisionResults(vision_results_queue, image_queue):
                     logging.debug("Greeting %s (%d)" % (" ".join(greeting), len(greeting)))
                     speech_queue.put(greeting)
             if wave_flag:
-                startWaving()
+                if time.time() - last_wave_at > MIN_FACE_WAVE_DELAY_SECS:
+                    last_wave_at = time.time()
+                    startWaving()
         except EOFError:
             logging.debug("End of vision queue")
             break
@@ -351,13 +357,19 @@ def maintainDisplay(root_window, image_queue):
     
 if __name__ == '__main__':
     root = Tkinter.Tk()
+    root.wm_attributes('-fullscreen','true')
     root.wm_attributes('-type', 'splash')
-    root.geometry("%dx%d+%d+%d" % (root.winfo_screenwidth(), root.winfo_screenheight(), 0, 0))
+    root.overrideredirect(True)
+    #root.geometry("%dx%d+%d+%d" % (root.winfo_screenwidth(), root.winfo_screenheight(), 0, 0))
 
     led = rgbled.RgbLed(rgbled.redPin, rgbled.greenPin, rgbled.bluePin)
     led.setColor(rgbled.OFF)
 
     GPIO.setup(servoPin, GPIO.OUT)
+    arm = GPIO.PWM(servoPin, 50)
+    arm.start(0)
+
+    waveArm()
 
     log_stream = sys.stderr
     log_queue = multiprocessing.Queue(100)
@@ -387,8 +399,6 @@ if __name__ == '__main__':
     unused.close()
 
     try:
-        arm = GPIO.PWM(servoPin, 50)
-        arm.start(0)
         waver = threading.Thread(target = wave, args=())
         waver.start()
 

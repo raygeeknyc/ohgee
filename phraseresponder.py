@@ -25,6 +25,9 @@ NEWS_1_RESPONSES = (["Trump", "is", "a", "chump"], ["donald", "chump"])
 BANAL_1_PROMPTS = (["you", "know", "what"], ["guess", "what"])
 BANAL_1_RESPONSES = (["what?"],["no", "what?"])
 
+GIRLS_COUNT_PROMPTS = (["what's", "the", "number"], ["the", "number", "is", "what", "now"], ["the", "numbers", "what", "now"])
+GIRLS_COUNT_RESPONSES = (["fourteen", "thousand", "two hundred", "and", "ninety six"], ["14", "2", "9", "6"])
+
 BANAL_2_PROMPTS = (["how's", "the", "weather"], ["hows", "the", "weather"], ["what's", "the", "weather"], ["whats", "the", "weather"])
 BANAL_2_RESPONSES = (["chili", "today", "hot", "ta-ma-lay"], ["chili", "today", "but", "hot", "ta-ma-lay"])
 
@@ -120,6 +123,9 @@ def news1Prompts():
 def banal1Prompts():
     return BANAL_1_PROMPTS
 
+def girlsCountPrompts():
+    return GIRLS_COUNT_PROMPTS
+
 def banal2Prompts():
     return BANAL_2_PROMPTS
 
@@ -137,6 +143,9 @@ def pop4Responses():
 
 def news1Responses():
     return NEWS_1_RESPONSES
+
+def girlsCountResponses():
+    return GIRLS_COUNT_RESPONSES
 
 def banal1Responses():
     return BANAL_1_RESPONSES
@@ -188,7 +197,7 @@ PROMPTS_RESPONSES = [(greetings, greetings, inKindSuffixes, True),
   (fixedGreetings, greetings, inKindSuffixes, True),
   (farewells, farewells, inKindSuffixes, True),
   (affections, affectionResponses, inKindSuffixes, False),
-  (thanks, welcomes, None, False),
+  (thanks, welcomes, None, True),
   (pings, acks, None, False),
   (hates, sadnesses, None, False),
   (timePrompts, timeResponses, None, False),
@@ -198,6 +207,7 @@ PROMPTS_RESPONSES = [(greetings, greetings, inKindSuffixes, True),
   (pop3Prompts, pop3Responses, None, True),
   (pop4Prompts, pop4Responses, None, False),
   (news1Prompts, news1Responses, None, False),
+  (girlsCountPrompts, girlsCountResponses, None, False),
   (banal1Prompts, banal1Responses, None, False),
   (banal2Prompts, banal2Responses, None, False),
   (otherProducts, productRecs, None, False)]
