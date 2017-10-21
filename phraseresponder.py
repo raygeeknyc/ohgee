@@ -40,6 +40,8 @@ THANKS = (["thank", "you"], ["thanks"])
 WELCOMES = (["you're", "welcome"], ["don't", "mention", "it"], ["day", "nada"], ["my", "pleasure"], ["no", "worries"])
 HATES = (["I", "hate", "you"], ["I", "don't", "like", "you"], ["you", "suck"], ["you're", "stupid"], ["you're", "awful"], ["stupid", "robot"], ["dumb", "robot"], ["you", "stink"])
 SADNESSES = (["sniff"], ["you", "break", "my", "heart"], ["that", "makes", "me", "sad"], ["I'm", "sorry"], ["ouch"], ["that", "hurts"], ["I'm", "so", "sorry"])
+JOKE_PROMPTS = (["knock", "knock"], ["knock", "knock"])
+JOKE_RESPONSES = (["I", "really", "don't", "know", "who's", "there"], ["you", "get", "it"], ["it's", "for", "you"])
 PINGS = (["ping", "me"], ["pinging", "you"])
 ACKS = (["pong"], ["ack"], ["right", "back", "at", "you"])
 TIME_PROMPTS = (["what", "time", "is", "it"], ["what's", "the", "time"])
@@ -159,6 +161,12 @@ def timePrompts():
 def datePrompts():
     return DATE_PROMPTS
 
+def jokePrompts():
+    return JOKE_PROMPTS
+
+def jokeResponses():
+    return JOKE_RESPONSES
+
 def pings():
     return PINGS
 
@@ -199,6 +207,7 @@ PROMPTS_RESPONSES = [(greetings, greetings, inKindSuffixes, True),
   (affections, affectionResponses, inKindSuffixes, False),
   (thanks, welcomes, None, True),
   (pings, acks, None, False),
+  (jokePrompts, jokeResponses, None, True),
   (hates, sadnesses, None, False),
   (timePrompts, timeResponses, None, False),
   (datePrompts, dateResponses, None, False),
