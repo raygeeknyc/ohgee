@@ -40,12 +40,31 @@ THANKS = (["thank", "you"], ["thanks"])
 WELCOMES = (["you're", "welcome"], ["don't", "mention", "it"], ["day", "nada"], ["my", "pleasure"], ["no", "worries"])
 HATES = (["I", "hate", "you"], ["I", "don't", "like", "you"], ["you", "suck"], ["you're", "stupid"], ["you're", "awful"], ["stupid", "robot"], ["dumb", "robot"], ["you", "stink"])
 SADNESSES = (["sniff"], ["you", "break", "my", "heart"], ["that", "makes", "me", "sad"], ["I'm", "sorry"], ["ouch"], ["that", "hurts"], ["I'm", "so", "sorry"])
+JOKE_PROMPTS = (["knock", "knock"], ["knock", "knock"])
+JOKE_RESPONSES = (["I", "really", "don't", "know", "who's", "there"], ["you", "get", "it"], ["it's", "for", "you"])
 PINGS = (["ping", "me"], ["pinging", "you"])
 ACKS = (["pong"], ["ack"], ["right", "back", "at", "you"])
+TIME_PROMPTS = (["what", "time", "is", "it"], ["what's", "the", "time"])
+DATE_PROMPTS = (["what", "day", "is", "it"], ["what's", "today's", "date"], ["what's", "the", "date"])
 OTHER_PRODUCTS = (["bing", "sucks"], ["use", "bing"])
 PRODUCT_RECS = (["go", "chrome"], ["make", "mine", "chrome"], ["go", "google"])
 # Add in empty lists to weigh the random selection from the tuple towards null responses
 IN_KIND_SUFFIXES=(["to","you"], ["as","well"], ["too"], ["also"], ["to","you","as","well"], [], [], [], [], [], [], [], [], [], [])
+
+MONTH = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+
+DOW = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+
+def timeResponses():
+    hour = datetime.now().hour
+    minute = datetime.now().minute
+    return (["its", "now", str(hour), str(minute)],)
+    
+def dateResponses():
+    month = MONTH[datetime.now().month-1]
+    day = datetime.now().day
+    dow = DOW[datetime.weekday(datetime.now())]
+    return (["It's", dow, month, str(day)],)
 
 def timeGreetings():
     hour = datetime.now().hour
@@ -136,6 +155,18 @@ def banal1Responses():
 def banal2Responses():
     return BANAL_2_RESPONSES
 
+def timePrompts():
+    return TIME_PROMPTS
+
+def datePrompts():
+    return DATE_PROMPTS
+
+def jokePrompts():
+    return JOKE_PROMPTS
+
+def jokeResponses():
+    return JOKE_RESPONSES
+
 def pings():
     return PINGS
 
@@ -176,7 +207,10 @@ PROMPTS_RESPONSES = [(greetings, greetings, inKindSuffixes, True),
   (affections, affectionResponses, inKindSuffixes, False),
   (thanks, welcomes, None, True),
   (pings, acks, None, False),
+  (jokePrompts, jokeResponses, None, True),
   (hates, sadnesses, None, False),
+  (timePrompts, timeResponses, None, False),
+  (datePrompts, dateResponses, None, False),
   (pop1Prompts, pop1Responses, None, False),
   (pop2Prompts, pop2Responses, None, True),
   (pop3Prompts, pop3Responses, None, True),
