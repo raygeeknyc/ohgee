@@ -72,7 +72,7 @@ HAT_GREETINGS = (["that's", "a", "nice", "hat"], ["nice", "hat"], ["nice", "cap"
 EYEGLASS_LABELS = ["glasses", "eyewear"]
 EYEGLASS_GREETINGS = (["those", "are", "nice", "eye", "glasses"], ["I", "like", "your", "glasses"], ["nice", "glasses"], ["nice", "eye", "glasses"], [], [], [])
 
-FLOWER_LABELS = ["flowers", "floral"]
+FLOWER_LABELS = ["flowers", "flower", "floral"]
 FLOWER_GREETINGS = (["what", "a", "pretty", "flower"], ["nice", "flowers"], [])
 
 # Only first first label found in tags will be used, so prioritize them in this list
