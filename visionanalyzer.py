@@ -61,10 +61,10 @@ BAD_MOOD_GREETINGS = (["I'm", "sorry", "that", "you're", "not", "feeling", "happ
 GOOD_MOOD_GREETINGS = (["I'm", "glad", "that", "you", "are", "happy"], ["You", "look", "happy"], ["You", "cheer", "me", "up"], ["It's", "great", "to", "see", "you", "happy"], ["Great", "day"])
 
 DOG_LABELS = ["dog", "canine"]
-DOG_GREETINGS = (["here", "doggie"], ["hi","puppy"],  ["hello", "puppy"], ["woof", "woof"], ["bark"], ["good", "puppy"], ["nice", "doggie"])
+DOG_GREETINGS = (["here", "doggie"], ["hi","puppy"],  ["hello", "puppy"], ["woof", "woof"], ["bark", "bark"], ["good", "puppy"], ["good", "puppy"], ["nice", "doggie"])
 
 CAT_LABELS = ["cat", "feline"]
-CAT_GREETINGS = (["meow"], ["meow", "meow"], ["nice", "kitty"])
+CAT_GREETINGS = (["meow"], ["meow", "meow"], ["nice", "kitty"], ["what", "a", "nice", "cat"])
 
 HAT_LABELS = ["hat", "cap", "headgear"]
 HAT_GREETINGS = (["that's", "a", "nice", "hat"], ["nice", "hat"], ["nice", "cap"], ["I", "like", "your", "hat"])
@@ -72,10 +72,14 @@ HAT_GREETINGS = (["that's", "a", "nice", "hat"], ["nice", "hat"], ["nice", "cap"
 EYEGLASS_LABELS = ["glasses", "eyewear"]
 EYEGLASS_GREETINGS = (["those", "are", "nice", "eye", "glasses"], ["I", "like", "your", "glasses"], ["nice", "glasses"], ["nice", "eye", "glasses"], [], [], [])
 
+FLOWER_LABELS = ["flowers", "floral"]
+FLOWER_GREETINGS = (["what", "a", "pretty", "flower"], ["nice", "flowers"], [])
+
 # Only first first label found in tags will be used, so prioritize them in this list
 LABELS_GREETINGS = [(DOG_LABELS, DOG_GREETINGS, True),
   (CAT_LABELS, CAT_GREETINGS, False),
   (HAT_LABELS, HAT_GREETINGS, False),
+  (FLOWER_LABELS, FLOWER_GREETINGS, False)]
   (EYEGLASS_LABELS, EYEGLASS_GREETINGS, False)]
 
 def randomGreetingFrom(phrases):
