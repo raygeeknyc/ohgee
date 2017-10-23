@@ -79,7 +79,7 @@ FLOWER_GREETINGS = (["what", "a", "pretty", "flower"], ["nice", "flowers"], [])
 LABELS_GREETINGS = [(DOG_LABELS, DOG_GREETINGS, True),
   (CAT_LABELS, CAT_GREETINGS, False),
   (HAT_LABELS, HAT_GREETINGS, False),
-  (FLOWER_LABELS, FLOWER_GREETINGS, False)]
+  (FLOWER_LABELS, FLOWER_GREETINGS, False),
   (EYEGLASS_LABELS, EYEGLASS_GREETINGS, False)]
 
 def randomGreetingFrom(phrases):
