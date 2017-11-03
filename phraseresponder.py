@@ -28,7 +28,7 @@ BANAL_1_RESPONSES = (["what?"],["no", "what?"])
 GIRLS_COUNT_PROMPTS = (["what's", "the", "number"], ["the", "number", "is", "what", "now"], ["the", "numbers", "what", "now"])
 GIRLS_COUNT_RESPONSES = (["fourteen", "thousand", "two hundred", "and", "ninety six"], ["14", "2", "9", "6"])
 
-BANAL_2_PROMPTS = (["how's", "the", "weather"], ["hows", "the", "weather"], ["what's", "the", "weather"], ["whats", "the", "weather"])
+BANAL_2_PROMPTS = (["how's", "the", "weather"], ["hows", "the", "weather"], ["what's", "the", "weather"], ["whats", "the", "weather"], ["how", "is", "the", "weather"], ["what", "is", "the", "weather"])
 BANAL_2_RESPONSES = (["chili", "today", "hot", "ta-ma-lay"], ["chili", "today", "but", "hot", "ta-ma-lay"])
 
 GREETINGS = (["hello"],["hi"], ["hey", "there"], ["nice", "to", "see", "you"], ["good", "to", "see", "you"], ["welcome"], ["good", "day"])
@@ -41,11 +41,11 @@ WELCOMES = (["you're", "welcome"], ["don't", "mention", "it"], ["day", "nada"], 
 HATES = (["I", "hate", "you"], ["I", "don't", "like", "you"], ["you", "suck"], ["you're", "stupid"], ["you're", "awful"], ["stupid", "robot"], ["dumb", "robot"], ["you", "stink"])
 SADNESSES = (["sniff"], ["you", "break", "my", "heart"], ["that", "makes", "me", "sad"], ["I'm", "sorry"], ["ouch"], ["that", "hurts"], ["I'm", "so", "sorry"])
 JOKE_PROMPTS = (["knock", "knock"], ["knock", "knock"])
-JOKE_RESPONSES = (["I", "really", "don't", "know", "who's", "there"], ["you", "get", "it"], ["it's", "for", "you"])
+JOKE_RESPONSES = (["I", "don't", "know", "who's", "there"], ["you", "get", "it"], ["it's", "for", "you"])
 PINGS = (["ping", "me"], ["pinging", "you"])
 ACKS = (["pong"], ["ack"], ["right", "back", "at", "you"])
 TIME_PROMPTS = (["what", "time", "is", "it"], ["what's", "the", "time"])
-DATE_PROMPTS = (["what", "day", "is", "it"], ["what's", "today's", "date"], ["what's", "the", "date"])
+DATE_PROMPTS = (["what", "day", "is", "it"], ["what's", "today's", "date"], ["what's", "the", "date"], ["what", "day", "is", "today"], ["what", "is", "today"], ["what's", "today"])
 OTHER_PRODUCTS = (["bing", "sucks"], ["use", "bing"])
 PRODUCT_RECS = (["go", "chrome"], ["make", "mine", "chrome"], ["go", "google"])
 # Add in empty lists to weigh the random selection from the tuple towards null responses
@@ -64,7 +64,7 @@ def dateResponses():
     month = MONTH[datetime.now().month-1]
     day = datetime.now().day
     dow = DOW[datetime.weekday(datetime.now())]
-    return (["It's", dow, month, str(day)],)
+    return (["today", "is", dow, month, str(day)],)
 
 def timeGreetings():
     hour = datetime.now().hour
