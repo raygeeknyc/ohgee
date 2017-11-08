@@ -357,10 +357,11 @@ def maintainDisplay(root_window, image_queue):
     
 if __name__ == '__main__':
     root = Tkinter.Tk()
+    #root.geometry("%dx%d+%d+%d" % (root.winfo_screenwidth(), root.winfo_screenheight(), 0, 0))
     root.wm_attributes('-fullscreen','true')
     root.wm_attributes('-type', 'splash')
     root.overrideredirect(True)
-    #root.geometry("%dx%d+%d+%d" % (root.winfo_screenwidth(), root.winfo_screenheight(), 0, 0))
+    root.config(cursor='none')
 
     led = rgbled.RgbLed(rgbled.redPin, rgbled.greenPin, rgbled.bluePin)
     led.setColor(rgbled.OFF)
