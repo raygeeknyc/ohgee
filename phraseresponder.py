@@ -22,6 +22,12 @@ POP_4_RESPONSES = (["hey", "I'm", "talking", "about", "shaft"], ["hey", "I'm", "
 NEWS_1_PROMPTS = (["president" ,"trump"], ["donald", "trump"])
 NEWS_1_RESPONSES = (["Trump", "is", "a", "chump"], ["donald", "chump"])
 
+FRIENDS_1_PROMPTS = (["I'm", "diana"], ["I", "am", "diana"], ["this", "is", "diana"])
+FRIENDS_1_RESPONSES = (["I'm", "so", "glad", "to", "meet", "you", "diana"], ["I've", "heard", "so", "much", "about", "you", "diana"], ["Raymond", "says", "such", "good", "things", "about", "you", "diana"])
+
+FRIENDS_2_PROMPTS = (["I'm", "jillian"], ["I", "am", "jillian"], ["this", "is", "jillian"])
+FRIENDS_2_RESPONSES = (["what", "a", "pleasure", "to", "meet", "you", "jillian"], ["set", "the", "world", "on", "fire", "jillian"], ["I'm", "so", "happy", "to", "finally", "meet", "jillian"])
+
 BANAL_1_PROMPTS = (["you", "know", "what"], ["guess", "what"])
 BANAL_1_RESPONSES = (["what?"],["no", "what?"])
 
@@ -122,6 +128,12 @@ def pop4Prompts():
 def news1Prompts():
     return NEWS_1_PROMPTS
 
+def friends1Prompts():
+    return FRIENDS_1_PROMPTS
+
+def friends2Prompts():
+    return FRIENDS_2_PROMPTS
+
 def banal1Prompts():
     return BANAL_1_PROMPTS
 
@@ -148,6 +160,12 @@ def news1Responses():
 
 def girlsCountResponses():
     return GIRLS_COUNT_RESPONSES
+
+def friends1Responses():
+    return FRIENDS_1_RESPONSES
+
+def friends2Responses():
+    return FRIENDS_2_RESPONSES
 
 def banal1Responses():
     return BANAL_1_RESPONSES
@@ -219,6 +237,8 @@ PROMPTS_RESPONSES = [(greetings, greetings, inKindSuffixes, True),
   (girlsCountPrompts, girlsCountResponses, None, False),
   (banal1Prompts, banal1Responses, None, False),
   (banal2Prompts, banal2Responses, None, False),
+  (friends1Prompts, friends1Responses, None, True),
+  (friends2Prompts, friends2Responses, None, True),
   (otherProducts, productRecs, None, False)]
 
 def phraseMatch(phrase, candidate_phrase_generator):
