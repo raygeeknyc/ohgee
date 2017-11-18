@@ -29,6 +29,7 @@ chmod a+x *.sh
 # git reset --hard FETCH_head
 ####
 
+./update setaudio.sh
 ./update.sh 2>&1
 if [[ -z "$DISPLAY" ]];then
   export DISPLAY=":0.0"
