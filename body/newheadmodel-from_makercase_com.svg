@@ -1,30 +1,30 @@
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="396.7mm" height="153.7mm" viewBox = " 0 0 1405.631077 544.6067469999999" >
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="376.7mm" height="153.7mm" viewBox = " 0 0 1334.7648769999998 544.6067469999999" >
 <!-- Front--> 
 <g transform="translate(22.5000185, 22.5000185) " > 
- <circle cx="365.4282474706257" cy="70.45289783359588" r="26.574825" style="stroke:#000000;stroke-width:0.90000074;fill:none" /> 
- <circle cx="141.73239999999998" cy="70.86619999999999" r="26.574825" style="stroke:#000000;stroke-width:0.90000074;fill:none" /> 
-<polygon style="stroke:#000000; fill:none; stroke-width:0.90000074" points="0, 0 0, 159.44895 510.23663999999997, 159.44895 510.23663999999997, 0" /> 
+ <circle cx="333.07114" cy="70.44100279999999" r="31.889789999999998" style="stroke:#000000;stroke-width:0.90000074;fill:none" /> 
+ <circle cx="141.73239999999998" cy="70.86619999999999" r="31.889789999999998" style="stroke:#000000;stroke-width:0.90000074;fill:none" /> 
+<polygon style="stroke:#000000; fill:none; stroke-width:0.90000074" points="0, 0 0, 159.44895 474.80354, 159.44895 474.80354, 0" /> 
 </g>
 <!-- Back--> 
-<g transform="translate(532.7366585, 22.5000185) " > 
-<polyline style="stroke:#000000; fill:none; stroke-width:0.90000074" points="0, 0 510.23663999999997, 0 510.23663999999997, 159.44895 0, 159.44895" /> 
+<g transform="translate(497.30355849999995, 22.5000185) " > 
+<polyline style="stroke:#000000; fill:none; stroke-width:0.90000074" points="0, 0 474.80354, 0 474.80354, 159.44895 0, 159.44895" /> 
 </g>
 <!-- Left--> 
-<g transform="translate(1041.2016435, 24.2716735) " > 
+<g transform="translate(970.3354435000001, 24.2716735) " > 
 <polyline style="stroke:#000000; fill:none; stroke-width:0.90000074" points="1.771655, 1.771655 338.386105, 1.771655 338.386105, 157.677295 1.771655, 157.677295" /> 
 </g>
 <!-- Right--> 
-<g transform="translate(1041.2016435, 180.1773135) " > 
+<g transform="translate(970.3354435000001, 180.1773135) " > 
 <polyline style="stroke:#000000; fill:none; stroke-width:0.90000074" points="338.386105, 1.771655 338.386105, 157.677295 1.771655, 157.677295" /> 
 </g>
 <!-- Top--> 
 <g transform="translate(22.5000185, 180.1773135) " > 
-<polyline style="stroke:#000000; fill:none; stroke-width:0.90000074" points="0, 1.771655 0, 338.386105 510.23663999999997, 338.386105 510.23663999999997, 1.771655" /> 
+<polyline style="stroke:#000000; fill:none; stroke-width:0.90000074" points="0, 1.771655 0, 338.386105 474.80354, 338.386105 474.80354, 1.771655" /> 
 </g>
 <!-- Bottom--> 
-<g transform="translate(532.7366585, 180.1773135) " > 
- <circle cx="244.48839" cy="131.10247" r="116.92923" style="stroke:#000000;stroke-width:0.90000074;fill:none" /> 
- <circle cx="244.48839" cy="205.51198" r="116.92923" style="stroke:#000000;stroke-width:0.90000074;fill:none" /> 
- <rect x="127.55915999999999" y="127.55915999999999" width="233.85846" height="92.12606" rx="0.8858275" ry="0.8858275" style="stroke:#000000;stroke-width:0.90000074;fill:none" /> 
-<polyline style="stroke:#000000; fill:none; stroke-width:0.90000074" points="0, 338.386105 510.23663999999997, 338.386105 510.23663999999997, 1.771655" /> 
+<g transform="translate(497.30355849999995, 180.1773135) " > 
+ <circle cx="262.20494" cy="131.10247" r="116.92923" style="stroke:#000000;stroke-width:0.90000074;fill:none" /> 
+ <circle cx="262.20494" cy="205.51198" r="116.92923" style="stroke:#000000;stroke-width:0.90000074;fill:none" /> 
+ <rect x="145.27571" y="127.55915999999999" width="233.85846" height="92.12606" rx="0.8858275" ry="0.8858275" style="stroke:#000000;stroke-width:0.90000074;fill:none" /> 
+<polyline style="stroke:#000000; fill:none; stroke-width:0.90000074" points="0, 338.386105 474.80354, 338.386105 474.80354, 1.771655" /> 
 </g></svg>
