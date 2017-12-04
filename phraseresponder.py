@@ -32,6 +32,13 @@ FRIENDS_2_RESPONSES = (["what", "a", "pleasure", "to", "meet", "you", "jillian"]
 INTRO_PROMPTS = (["hello", "my", "name", "is"], ["I'm"], ["I", "am"], ["my", "name", "is"], ["hello", "i'm"], ["hi", "my", "name", "is"])
 INTRO_RESPONSES = (["hi"], ["hey"], ["hello"], ["it's", "good", "to", "see", "you"], ["i'm", "glad", "to", "know", "you"], ["hey", "there"])
 
+
+CANINE_PROMPTS = (["nice", "puppy"], ["nice", "doggy"], ["nice", "doggie"], ["Who's", "a", "good", "doggy"]["Who's", "a", "good", "girl"], ["Who's", "a", "good", "boy"])
+CANINE_RESPONSES = (["woof", "woof"], ["I'm", "a", "very", "good", "one"])
+
+FELINE_PROMPTS = (["nice", "kitty"], ["nice", "kitten"], ["nice", "cat"])
+FELINE_RESPONSES = (["meow"], ["meow", "meow"], ["purr", "purr", "purr"], ["petunia", "is", "a", "good", "girl"])
+
 BANAL_1_PROMPTS = (["you", "know", "what"], ["guess", "what"])
 BANAL_1_RESPONSES = (["what?"],["no", "what?"])
 
@@ -142,6 +149,12 @@ def friends1Prompts(_):
 def friends2Prompts(_):
     return FRIENDS_2_PROMPTS
 
+def caninePrompts(_):
+    return CANINE_PROMPTS
+
+def felinePrompts(_):
+    return FELINE_PROMPTS
+
 def banal1Prompts(_):
     return BANAL_1_PROMPTS
 
@@ -177,6 +190,12 @@ def friends1Responses(_):
 
 def friends2Responses(_):
     return FRIENDS_2_RESPONSES
+
+def canineResponses(_):
+    return CANINE_RESPONSES
+
+def felineResponses(_):
+    return FELINE_RESPONSES
 
 def banal1Responses(_):
     return BANAL_1_RESPONSES
@@ -243,6 +262,8 @@ def getResponse(phrase, entities):
     return None
 
 PROMPTS_RESPONSES = [
+  (felinePrompts, felineResponses, None, True),
+  (caninePrompts, canineResponses, None, True),
   (friends1Prompts, friends1Responses, None, True),
   (friends2Prompts, friends2Responses, None, True),
   (introPrompts, introResponses, None, False), # This should follow specific intros
