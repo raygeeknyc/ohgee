@@ -6,6 +6,7 @@ _DEBUG=logging.DEBUG
 import os
 from random import randint
 from datetime import datetime
+from google.cloud.language.entity import EntityType
 
 POP_1_PROMPTS = (["who", "is", "the", "man"], ["who", "would", "risk", "his", "neck"], ["his", "neck", "for", "his", "brother", "man"], ["the", "cat", "that", "won't", "cop", "out", "when"], ["danger", "all", "about"] )
 POP_1_RESPONSES = (["SHAFT"], ["that's", "shaft"], ["john", "shaft"])
@@ -27,6 +28,9 @@ FRIENDS_1_RESPONSES = (["I'm", "so", "glad", "to", "meet", "you", "diana"], ["I'
 
 FRIENDS_2_PROMPTS = (["I'm", "jillian"], ["I", "am", "jillian"], ["this", "is", "jillian"])
 FRIENDS_2_RESPONSES = (["what", "a", "pleasure", "to", "meet", "you", "jillian"], ["set", "the", "world", "on", "fire", "jillian"], ["I'm", "so", "happy", "to", "finally", "meet", "jillian"])
+
+INTRO_PROMPTS = (["hello", "my", "name", "is"], ["I'm"], ["I", "am"], ["my", "name", "is"], ["hello", "i'm"], ["hi", "my", "name", "is"])
+INTRO_RESPONSES = (["hi"], ["hey"], ["hello"], ["it's", "good", "to", "see", "you"], ["i'm", "glad", "to", "know", "you"], ["hey", "there"])
 
 BANAL_1_PROMPTS = (["you", "know", "what"], ["guess", "what"])
 BANAL_1_RESPONSES = (["what?"],["no", "what?"])
@@ -61,18 +65,22 @@ MONTH = ["January", "February", "March", "April", "May", "June", "July", "August
 
 DOW = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
-def timeResponses():
+def introResponses(entities):
+    address = randomPhraseFrom(INTRO_RESPONSES)
+    return (address + getPerson(entities),)
+
+def timeResponses(_):
     hour = datetime.now().hour
     minute = datetime.now().minute
     return (["its", "now", str(hour), str(minute)],)
     
-def dateResponses():
+def dateResponses(_):
     month = MONTH[datetime.now().month-1]
     day = datetime.now().day
     dow = DOW[datetime.weekday(datetime.now())]
     return (["today", "is", dow, month, str(day)],)
 
-def timeGreetings():
+def timeGreetings(_):
     hour = datetime.now().hour
     if hour > 11 and hour < 18:
         return (["good", "afternoon"],)
@@ -83,143 +91,162 @@ def timeGreetings():
     else:
         return (["good", "night"],)
 
-def timeFarewells():
-    return timeGreetings()
+def timeFarewells(_):
+    return timeGreetings(None)
 
-def fixedGreetings():
+def fixedGreetings(_):
     return ALL_DAY_GREETINGS
 
-def greetings():
-    return GREETINGS+timeGreetings()
+def greetings(_):
+    return GREETINGS+timeGreetings(None)
 
-def farewells():
-    return FAREWELLS+timeFarewells()
+def farewells(_):
+    return FAREWELLS+timeFarewells(None)
 
-def affections():
+def affections(_):
     return AFFECTIONS
 
-def affections():
+def affections(_):
     return AFFECTIONS
 
-def thanks():
+def thanks(_):
     return THANKS
 
-def welcomes():
+def welcomes(_):
     return WELCOMES
 
-def hates():
+def hates(_):
     return HATES
 
-def sadnesses():
+def sadnesses(_):
     return SADNESSES
 
-def pop1Prompts():
+def pop1Prompts(_):
     return POP_1_PROMPTS
 
-def pop2Prompts():
+def pop2Prompts(_):
     return POP_2_PROMPTS
 
-def pop3Prompts():
+def pop3Prompts(_):
     return POP_3_PROMPTS
 
-def pop4Prompts():
+def pop4Prompts(_):
     return POP_4_PROMPTS
 
-def news1Prompts():
+def news1Prompts(_):
     return NEWS_1_PROMPTS
 
-def friends1Prompts():
+def friends1Prompts(_):
     return FRIENDS_1_PROMPTS
 
-def friends2Prompts():
+def friends2Prompts(_):
     return FRIENDS_2_PROMPTS
 
-def banal1Prompts():
+def banal1Prompts(_):
     return BANAL_1_PROMPTS
 
-def girlsCountPrompts():
+def introPrompts(_):
+    return INTRO_PROMPTS
+
+def girlsCountPrompts(_):
     return GIRLS_COUNT_PROMPTS
 
-def banal2Prompts():
+def banal2Prompts(_):
     return BANAL_2_PROMPTS
 
-def pop1Responses():
+def pop1Responses(_):
     return POP_1_RESPONSES
 
-def pop2Responses():
+def pop2Responses(_):
     return POP_2_RESPONSES
 
-def pop3Responses():
+def pop3Responses(_):
     return POP_3_RESPONSES
 
-def pop4Responses():
+def pop4Responses(_):
     return POP_4_RESPONSES
 
-def news1Responses():
+def news1Responses(_):
     return NEWS_1_RESPONSES
 
-def girlsCountResponses():
+def girlsCountResponses(_):
     return GIRLS_COUNT_RESPONSES
 
-def friends1Responses():
+def friends1Responses(_):
     return FRIENDS_1_RESPONSES
 
-def friends2Responses():
+def friends2Responses(_):
     return FRIENDS_2_RESPONSES
 
-def banal1Responses():
+def banal1Responses(_):
     return BANAL_1_RESPONSES
 
-def banal2Responses():
+def banal2Responses(_):
     return BANAL_2_RESPONSES
 
-def timePrompts():
+def timePrompts(_):
     return TIME_PROMPTS
 
-def datePrompts():
+def datePrompts(_):
     return DATE_PROMPTS
 
-def jokePrompts():
+def jokePrompts(_):
     return JOKE_PROMPTS
 
-def jokeResponses():
+def jokeResponses(_):
     return JOKE_RESPONSES
 
-def pings():
+def pings(_):
     return PINGS
 
-def acks():
+def acks(_):
     return ACKS
 
-def otherProducts():
+def otherProducts(_):
     return OTHER_PRODUCTS
 
-def productRecs():
+def productRecs(_):
     return PRODUCT_RECS
 
-def inKindSuffixes():
+def inKindSuffixes(_):
     return IN_KIND_SUFFIXES
 
-def affectionResponses():
+def affectionResponses(_):
     return AFFECTIONS + ME_TOOS
 
 def randomPhraseFrom(phrases):
     if not phrases: return []
     return phrases[randint(0,len(phrases)-1)]
 
-def getResponse(phrase):
+def getPerson(entities):
+    if not entities:
+        return [""]
+    salience = 0
+    person = None
+    for entity in entities:
+        if entity.entity_type == EntityType.PERSON:
+          if entity.salience > salience:
+            salience = entity.salience
+            person = entity.name
+    return [person]
+
+def getResponse(phrase, entities):
     logging.debug("Looking to match phrase {}".format(phrase))
     for prompt_generator, response_generator, suffix_generator, wave_flag in PROMPTS_RESPONSES:
-        if phraseMatch(phrase, prompt_generator):
-            responses = eval('response_generator()')
+        if phraseMatch(phrase, entities, prompt_generator):
+            responses = eval('response_generator(entities)')
             if suffix_generator:
-                suffixes = eval('suffix_generator()')
+                suffixes = eval('suffix_generator(entities)')
             else:
                 suffixes = None
             return (randomPhraseFrom(responses)+randomPhraseFrom(suffixes), wave_flag)
     return None
 
-PROMPTS_RESPONSES = [(greetings, greetings, inKindSuffixes, True), 
+PROMPTS_RESPONSES = [
+  (friends1Prompts, friends1Responses, None, True),
+  (friends2Prompts, friends2Responses, None, True),
+  (introPrompts, introResponses, None, False), # This should follow specific intros
+  (greetings, greetings, inKindSuffixes, True), 
   (fixedGreetings, greetings, inKindSuffixes, True),
   (farewells, farewells, inKindSuffixes, True),
   (affections, affectionResponses, inKindSuffixes, False),
@@ -237,12 +264,10 @@ PROMPTS_RESPONSES = [(greetings, greetings, inKindSuffixes, True),
   (girlsCountPrompts, girlsCountResponses, None, False),
   (banal1Prompts, banal1Responses, None, False),
   (banal2Prompts, banal2Responses, None, False),
-  (friends1Prompts, friends1Responses, None, True),
-  (friends2Prompts, friends2Responses, None, True),
   (otherProducts, productRecs, None, False)]
 
-def phraseMatch(phrase, candidate_phrase_generator):
-    candidate_phrases = eval('candidate_phrase_generator()')
+def phraseMatch(phrase, entities, candidate_phrase_generator):
+    candidate_phrases = eval('candidate_phrase_generator(entities)')
     logging.debug("Candidate phrases: {}".format(candidate_phrases))
     for candidate_phrase in candidate_phrases:
         logging.debug("Matching with {}".format(candidate_phrase))
@@ -267,16 +292,16 @@ def phraseInTokens(phrase, candidate_phrase):
     return []
 
 def getFarewell():
-    return randomPhraseFrom(FAREWELLS+timeFarewells())
+    return randomPhraseFrom(FAREWELLS+timeFarewells(None))
 
 def getGreeting():
-    return randomPhraseFrom(GREETINGS+timeGreetings())
+    return randomPhraseFrom(GREETINGS+timeGreetings(None))
 
 def greeted(phrase):
-    return phraseMatch(phrase, GREETINGS+timeGreetings())
+    return phraseMatch(phrase, GREETINGS+timeGreetings(None))
 
 def departed(phrase):
-    return phraseMatch(phrase, FAREWELLS+timeFarewells())
+    return phraseMatch(phrase, FAREWELLS+timeFarewells(None))
 
 if __name__ == '__main__':
     logging.getLogger('').setLevel(_DEBUG)
@@ -285,4 +310,4 @@ if __name__ == '__main__':
         phrase = raw_input("Enter a phrase to match: ")
         if not phrase:
             break
-        print getResponse(phrase)
+        print getResponse(phrase, None)
