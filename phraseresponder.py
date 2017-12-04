@@ -33,7 +33,7 @@ INTRO_PROMPTS = (["hello", "my", "name", "is"], ["I'm"], ["I", "am"], ["my", "na
 INTRO_RESPONSES = (["hi"], ["hey"], ["hello"], ["it's", "good", "to", "see", "you"], ["i'm", "glad", "to", "know", "you"], ["hey", "there"])
 
 
-CANINE_PROMPTS = (["nice", "puppy"], ["nice", "doggy"], ["nice", "doggie"], ["Who's", "a", "good", "doggy"]["Who's", "a", "good", "girl"], ["Who's", "a", "good", "boy"])
+CANINE_PROMPTS = (["nice", "puppy"], ["nice", "doggy"], ["nice", "doggie"], ["Who's", "a", "good", "doggy"], ["Who's", "a", "good", "girl"], ["Who's", "a", "good", "boy"])
 CANINE_RESPONSES = (["woof", "woof"], ["I'm", "a", "very", "good", "one"])
 
 FELINE_PROMPTS = (["nice", "kitty"], ["nice", "kitten"], ["nice", "cat"])
