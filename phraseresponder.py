@@ -222,7 +222,7 @@ def getPerson(entities):
     if not entities:
         return [""]
     salience = 0
-    person = None
+    person = ""
     for entity in entities:
         if entity.entity_type == EntityType.PERSON:
           if entity.salience > salience:
