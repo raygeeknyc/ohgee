@@ -1,4 +1,9 @@
 #!/bin/bash
+if [[ -z "$DISPLAY" ]];then
+  export DISPLAY=":0.0"
+fi
+echo "Setting up audio"
+./setaudio.sh
 echo "Waiting for connectivity"
 timeout_secs=90
 endTime=$(( $(date +%s) + timeout_secs )) # Calculate end time.
@@ -29,11 +34,7 @@ chmod a+x *.sh
 # git reset --hard FETCH_head
 ####
 
-./setaudio.sh
 ./update.sh 2>&1
-if [[ -z "$DISPLAY" ]];then
-  export DISPLAY=":0.0"
-fi
 eval `./setup_auth.sh` # sets rc
 if [[ $rc -ne 0 ]]; then
   pico2wave -l en-US --wave "/tmp/ohgee_help.wav" "HELP!  Error authenticating cloud services";aplay "/tmp/ohgee_help.wav"
