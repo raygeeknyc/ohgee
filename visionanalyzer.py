@@ -56,7 +56,7 @@ def signal_handler(sig, frame):
     STOP = True
 signal.signal(signal.SIGINT, signal_handler)
 
-BAD_MOOD_GREETINGS = (["I'm", "sorry", "that", "you're", "not", "feeling", "happy"], ["You", "look", "down"], ["I", "hope", "that", "I", "can", "cheer", "you", "up"], ["I", "hope", "that", "you", "feel", "better", "soon"], ["Smile!"])
+BAD_MOOD_GREETINGS = (["don't", "worry", "be", "happy"], ["I'm", "sorry", "that", "you're", "not", "feeling", "happy"], ["You", "look", "down"], ["I", "hope", "that", "I", "can", "cheer", "you", "up"], ["I", "hope", "that", "you", "feel", "better", "soon"], ["Smile!"])
 
 GOOD_MOOD_GREETINGS = (["I'm", "glad", "that", "you", "are", "happy"], ["You", "look", "happy"], ["You", "cheer", "me", "up"], ["It's", "great", "to", "see", "you", "happy"], ["Great", "day"])
 
@@ -70,7 +70,7 @@ HAT_LABELS = ["hat", "cap", "headgear"]
 HAT_GREETINGS = (["that's", "a", "nice", "hat"], ["nice", "hat"], ["nice", "cap"], ["I", "like", "your", "hat"])
 
 EYEGLASS_LABELS = ["glasses", "eyewear"]
-EYEGLASS_GREETINGS = (["those", "are", "nice", "eye", "glasses"], ["I", "like", "your", "glasses"], ["nice", "glasses"], ["nice", "eye", "glasses"], [], [], [])
+EYEGLASS_GREETINGS = (["those", "are", "nice", "eye", "glasses"], ["I", "like", "your", "glasses"], ["nice", "glasses"], ["nice", "eye", "glasses"], [], [], [], [])
 
 FLOWER_LABELS = ["flowers", "flower", "floral"]
 FLOWER_GREETINGS = (["what", "a", "pretty", "flower"], ["nice", "flowers"], [])
