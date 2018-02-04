@@ -36,7 +36,7 @@ INTRO_RESPONSES = (["hi"], ["hey"], ["hello"], ["it's", "good", "to", "see", "yo
 CANINE_PROMPTS = (["good", "puppy"], ["nice", "puppy"], ["good", "dog"], ["nice", "doggy"], ["nice", "doggie"], ["Who's", "a", "good", "doggy"], ["Who's", "a", "good", "dog"], ["Who's", "a", "good", "girl"], ["Who's", "a", "good", "boy"])
 CANINE_RESPONSES = (["woof", "woof"], ["you're", "a", "very", "good", "dog"])
 
-FELINE_PROMPTS = (["good", "kitty"], ["nice", "kitty"], ["nice", "kitten"], ["good", "cat"], ["nice", "cat"])
+FELINE_PROMPTS = (["good", "kitty"], ["nice", "kitty"], ["good", "kitten"], ["nice", "kitten"], ["good", "cat"], ["nice", "cat"])
 FELINE_RESPONSES = (["meow"], ["meow", "meow"], ["purr", "purr", "purr"], ["petunia", "is", "a", "good", "girl"])
 
 BANAL_1_PROMPTS = (["you", "know", "what"], ["guess", "what"])
@@ -48,12 +48,12 @@ GIRLS_COUNT_RESPONSES = (["fourteen", "thousand", "two hundred", "and", "ninety 
 BANAL_2_PROMPTS = (["how's", "the", "weather"], ["hows", "the", "weather"], ["what's", "the", "weather"], ["whats", "the", "weather"], ["how", "is", "the", "weather"], ["what", "is", "the", "weather"])
 BANAL_2_RESPONSES = (["chili", "today", "hot", "ta-ma-lay"], ["chili", "today", "but", "hot", "ta-ma-lay"])
 
-GREETINGS = (["hello"],["hi"], ["hey", "there"], ["nice", "to", "see", "you"], ["good", "to", "see", "you"], ["welcome"], ["good", "day"])
+GREETINGS = (["hello"],["hi"], ["hey", "there"], ["nice", "to", "see", "you"], ["good", "to", "see", "you"], ["welcome"], ["good", "day"], ["good", "day", "to", "you"])
 ALL_DAY_GREETINGS = (["good", "morning"], ["good", "afternoon"], ["good", "evening"], ["good", "night"])
-FAREWELLS = (["goodbye"], ["bye"], ["farewell"], ["see","you"], ["talk", "to", "you", "later"], ["take", "care"], ["bye", "bye"], ["see", "you", "later"])
-AFFECTIONS = (["you're", "adorable"], ["I", "adore", "you"], ["I", "love", "you"], ["I", "like", "you"], ["you're", "the", "best"], ["you're", "cute"], ["you're", "so", "cute"], ["you're", "sweet"], ["you're", "so", "sweet"], ["you're", "cool"], ["you're", "great"], ["cute", "robot"], ["you're", "awesome"], ["you're", "amazing"])
+FAREWELLS = (["goodbye"], ["bye"], ["farewell"], ["see","you"], ["talk", "to", "you", "later"], ["take", "care"], ["bye", "bye"], ["see", "you", "later"], ["later"])
+AFFECTIONS = (["you're", "adorable"], ["I", "adore", "you"], ["I", "love", "you"], ["I", "like", "you"], ["you're", "the", "best"], ["you're", "cute"], ["you're", "so", "cute"], ["you're", "sweet"], ["you're", "so", "sweet"], ["you're", "cool"], ["you're", "great"], ["cute", "robot"], ["you're", "awesome"], ["you're", "amazing"], ["I", "really", "like", "you"], ["I", "think", "you're", "fantastic"])
 ME_TOOS = (["I", "feel", "the", "same"], ["that", "makes", "two", "of", "us"], ["I", "feel", "the", "same", "way"], ["same", "here"])
-THANKS = (["thank", "you"], ["thanks"])
+THANKS = (["thank", "you"], ["thanks"], ["why", "thank", "you"], ["thank", "you", "so", "much"])
 WELCOMES = (["you're", "welcome"], ["don't", "mention", "it"], ["day", "nada"], ["my", "pleasure"], ["no", "worries"])
 HATES = (["I", "hate", "you"], ["I", "don't", "like", "you"], ["you", "suck"], ["you're", "stupid"], ["you're", "awful"], ["stupid", "robot"], ["dumb", "robot"], ["you", "stink"])
 SADNESSES = (["sniff"], ["you", "break", "my", "heart"], ["that", "makes", "me", "sad"], ["I'm", "sorry"], ["ouch"], ["that", "hurts"], ["I'm", "so", "sorry"])
@@ -109,9 +109,6 @@ def greetings(_):
 
 def farewells(_):
     return FAREWELLS+timeFarewells(None)
-
-def affections(_):
-    return AFFECTIONS
 
 def affections(_):
     return AFFECTIONS
