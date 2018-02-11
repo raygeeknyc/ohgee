@@ -21,8 +21,8 @@ if [[ $rc -eq 0 ]]; then
   pico2wave -l en-US --wave "/tmp/ohgee_online.wav" "My address is $MY_ADDRESS";aplay "/tmp/ohgee_online.wav"
 else
   pico2wave -l en-US --wave "/tmp/ohgee_help.wav" "help!  no network";aplay "/tmp/ohgee_help.wav"
-  echo "sudo reboot" | at now + 30 minutes
-  pico2wave -l en-US --wave "/tmp/ohgee_help.wav" "Reboot in 30 minutes";aplay "/tmp/ohgee_help.wav"
+  echo "sudo reboot" | at now + 1 minutes
+  pico2wave -l en-US --wave "/tmp/ohgee_help.wav" "Reboot in 1 minute";aplay "/tmp/ohgee_help.wav"
   exit 255
 fi
 pico2wave -l en-US --wave "/tmp/ohgee_help.wav" "updating";aplay "/tmp/ohgee_help.wav"
