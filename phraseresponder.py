@@ -261,6 +261,8 @@ def getResponse(phrase, entities):
 PROMPTS_RESPONSES = [
   (felinePrompts, felineResponses, None, True),
   (caninePrompts, canineResponses, None, True),
+  (pop1Prompts, pop1Responses, None, False),
+  (pop2Prompts, pop2Responses, None, True),
   (friends1Prompts, friends1Responses, None, True),
   (friends2Prompts, friends2Responses, None, True),
   (introPrompts, introResponses, None, False), # This should follow specific intros
@@ -274,8 +276,6 @@ PROMPTS_RESPONSES = [
   (hates, sadnesses, None, False),
   (timePrompts, timeResponses, None, False),
   (datePrompts, dateResponses, None, False),
-  (pop1Prompts, pop1Responses, None, False),
-  (pop2Prompts, pop2Responses, None, True),
   (pop3Prompts, pop3Responses, None, True),
   (pop4Prompts, pop4Responses, None, False),
   (news1Prompts, news1Responses, None, False),
