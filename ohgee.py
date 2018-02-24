@@ -184,7 +184,7 @@ def watchForVisionResults(vision_results_queue, image_queue):
     last_greeting_at = 0.0
     last_wave_at = 0l
     dominant_sentiment = -999
-    prev_label_text = []
+    prev_recognized_label_text = []
     while True:
         try:
             greeting = None
@@ -198,19 +198,7 @@ def watchForVisionResults(vision_results_queue, image_queue):
             processed_image, labels, faces, sentiment = processed_image_results
             logging.debug("{} faces detected".format(len(faces)))
             logging.debug("{} sentiment detected".format(sentiment))
-            label_text = [label.description for label in labels]
-            for label in label_text:
-                logging.debug("Label: {}".format(label))
-            if set(label_text) != set(prev_label_text):
-                logging.info("l: {}  pl: {}".format(set(labels), set(prev_labels)))
-                specific_greeting = visionanalyzer.getGreeting(labels)
-            else:
-                specific_greeting = None
-            if specific_greeting:
-                logging.debug("Greeting label matched")
-                greeting, wave_flag = specific_greeting
-            prev_label_text = label_text
-  
+
             if sentiment < 0: sentiment = -1
             if sentiment > 0: sentiment = 1
             image_queue.put((processed_image, False))
@@ -241,6 +229,20 @@ def watchForVisionResults(vision_results_queue, image_queue):
             if recent_face_counts[0] < recent_face_counts[1] and recent_face_counts[0] < recent_face_counts[2] :
                 logging.debug("Departure")
                 greeting = phraseresponder.getFarewell()
+
+            # Issue a response the first time we see a set of labels that we know a response to
+            label_text = [label.description for label in labels]
+            specific_greeting = visionanalyzer.getGreeting(labels)
+            if specific_greeting and specific_greeting[0]:
+                logging.debug("l: {}  pl: {}".format(set(label_text), set(prev_recognized_label_text)))
+                if len(set(label_text).intersection(set(prev_recognized_label_text))) > 0:
+                    logging.debug("repeated greeting skipped")
+                    specific_greeting = None
+                prev_recognized_label_text = label_text
+            if specific_greeting:
+                logging.debug("New greeting label matched")
+                greeting, wave_flag = specific_greeting
+  
             if greeting:
                 since_greeted = time.time() - last_greeting_at
                 if since_greeted > GREETING_INTERVAL_SECS: 
