@@ -54,8 +54,20 @@ MIN_FACE_WAVE_DELAY_SECS = 10
 GREETING_INTERVAL_SECS = 30
 SEARCH_INTERVAL_SECS = 10
 
+SENTIMENT_DURATION_STIMULUS_FRAMES_THRESHOLD = 3
+SENTIMENT_DURATION_STIMULUS_INCREMENT_FACTOR - 2.5
+
 SPEECH_TMP_FILE="/tmp/speech.wav"
 PICO_CMD='pico2wave -l en-US --wave "%s" "%s";aplay "%s"'
+
+def getPhraseForSentiment(dominant_sentiment):
+  if dominant_sentiment > 0:
+    phrase = visionanalyzer.getGoodMoodGreeting()
+  elif dominant_sentiment < 0:
+    phrase = visionanalyzer.getBadMoodGreeting()
+  else:
+    phrase = None
+  return phrase
 
 def expireMood():
     global mood_set_until
@@ -170,8 +182,8 @@ def watchForVisionResults(vision_results_queue, image_queue):
     recent_face_counts = collections.deque([0.0, 0.0, 0.0], maxlen=3)
     
     last_greeting_at = 0.0
-    extended_mood_reported = False
     last_wave_at = 0l
+    dominant_sentiment = -999
     while True:
         try:
             high_priority_greeting = False
@@ -188,53 +200,31 @@ def watchForVisionResults(vision_results_queue, image_queue):
             logging.debug("Put a processed image %s" % id(processed_image))
             recent_sentiments.appendleft(sentiment)
             recent_face_counts.appendleft(len(faces))
+            if recent_face_counts[0] == 0 and len(recent_face_counts) > 1 and recent_face_counts[1] > 0:
+              logging.debug("Skipping one frame dropout of faces for sentiment tracking")
+            else:
+              if dominant_sentiment != sentiment:
+                sentiment_duration = 0
+            dominant_sentiment = sentiment
+            sentiment_duration += 1
+
+            if sentiment_duration == SENTIMENT_DURATION_STIMULUS_FRAMES_THRESHOLD:
+              greeting = getPhraseForSentiment(dominant_sentiment)
+              sentiment_reminder_delay = SENTIMENT_DURATION_STIMULUS_FRAMES_THRESHOLD
+            if ((sentiment_duration - SENTIMENT_DURATION_STIMULUS_FRAMES_THRESHOLD) %  sentiment_reminder_delay) == 0:
+              greeting = getForSentiment(dominant_sentiment)
+              sentiment_reminder_delay = int(SENTIMENT_DURATION_STIMULUS_INCREMENT_FACTOR * sentiment_reminder_delay)
+
+            
             logging.debug("{} faces detected".format(len(faces)))
             logging.debug("{} sentiment detected".format(sentiment))
             for label in labels:
                 logging.debug("Label: {}".format(label.description))
   
-            # Two consecutive frames without strong sentiment means that we're ready to report the next extended sentiment
-            if recent_sentiments[0] > visionanalyzer.BAD_SENTIMENT_THRESHOLD and recent_sentiments[0] < visionanalyzer.GOOD_SENTIMENT_THRESHOLD and recent_sentiments[1] > visionanalyzer.BAD_SENTIMENT_THRESHOLD and recent_sentiments[1] < visionanalyzer.GOOD_SENTIMENT_THRESHOLD:
-                extended_mood_reported = False
- 
-            if recent_sentiments[0] <= visionanalyzer.BAD_SENTIMENT_THRESHOLD and recent_sentiments[1] <= visionanalyzer.BAD_SENTIMENT_THRESHOLD and recent_sentiments[0] < recent_sentiments[2]:
-                logging.debug("feeling bad")
-                feeling_bad = True
-            if recent_sentiments[0] >= visionanalyzer.GOOD_SENTIMENT_THRESHOLD and recent_sentiments[1] >= visionanalyzer.GOOD_SENTIMENT_THRESHOLD and recent_sentiments[0] > recent_sentiments[2]:
-                logging.debug("feeling good")
-                feeling_good = True
-
-            if recent_sentiments[0] <= visionanalyzer.BAD_SENTIMENT_THRESHOLD and recent_sentiments[1] <= visionanalyzer.BAD_SENTIMENT_THRESHOLD and recent_sentiments[2] <= visionanalyzer.BAD_SENTIMENT_THRESHOLD:
-                logging.debug("Feeling bad for a while")
-                feeling_bad_extended = True
-            if recent_sentiments[0] >= visionanalyzer.GOOD_SENTIMENT_THRESHOLD and recent_sentiments[1] >= visionanalyzer.GOOD_SENTIMENT_THRESHOLD and recent_sentiments[2] >= visionanalyzer.GOOD_SENTIMENT_THRESHOLD:
-                logging.debug("Feeling good for a while")
-                feeling_good_extended = True
-
-            if feeling_good:
-                showGoodMood(recent_sentiments[0])
-            if feeling_bad:
-                showBadMood(recent_sentiments[0])
-
             specific_greeting = visionanalyzer.getGreeting(labels)
             if specific_greeting:
                 logging.debug("Greeting label matched")
                 greeting, wave_flag = specific_greeting
-
-            if feeling_good_extended and not extended_mood_reported:
-                logging.debug("Talking about feeling good")
-                showGoodMood(recent_sentiments[0])
-                greeting, wave_flag = visionanalyzer.getGoodMoodGreeting()
-                extended_mood_reported = True
-                high_priority_greeting = True
-                
-            if feeling_bad_extended and not extended_mood_reported:
-                logging.debug("Talking about feeling bad")
-                showBadMood(recent_sentiments[0])
-                greeting, wave_flag = visionanalyzer.getBadMoodGreeting()
-                extended_mood_reported = True
-                high_priority_greeting = True
-                
             if recent_face_counts[0] > recent_face_counts[1] and recent_face_counts[0] > recent_face_counts[2]:
                 logging.debug("Arrival")
                 greeting = phraseresponder.getGreeting()
@@ -242,7 +232,6 @@ def watchForVisionResults(vision_results_queue, image_queue):
             if recent_face_counts[0] < recent_face_counts[1] and recent_face_counts[0] < recent_face_counts[2] :
                 logging.debug("Departure")
                 greeting = phraseresponder.getFarewell()
-
             if greeting:
                 since_greeted = time.time() - last_greeting_at
                 if since_greeted > GREETING_INTERVAL_SECS or high_priority_greeting: 
@@ -253,6 +242,7 @@ def watchForVisionResults(vision_results_queue, image_queue):
                 if time.time() - last_wave_at > MIN_FACE_WAVE_DELAY_SECS:
                     last_wave_at = time.time()
                     startWaving()
+
         except EOFError:
             logging.debug("End of vision queue")
             break
