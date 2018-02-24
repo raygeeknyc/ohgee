@@ -184,6 +184,7 @@ def watchForVisionResults(vision_results_queue, image_queue):
     last_greeting_at = 0.0
     last_wave_at = 0l
     dominant_sentiment = -999
+    prev_label_text = []
     while True:
         try:
             greeting = None
@@ -197,12 +198,18 @@ def watchForVisionResults(vision_results_queue, image_queue):
             processed_image, labels, faces, sentiment = processed_image_results
             logging.debug("{} faces detected".format(len(faces)))
             logging.debug("{} sentiment detected".format(sentiment))
-            for label in labels:
-                logging.debug("Label: {}".format(label.description))
-            specific_greeting = visionanalyzer.getGreeting(labels)
+            label_text = [label.description for label in labels]
+            for label in label_text:
+                logging.debug("Label: {}".format(label))
+            if set(label_text) != set(prev_label_text):
+                logging.info("l: {}  pl: {}".format(set(labels), set(prev_labels)))
+                specific_greeting = visionanalyzer.getGreeting(labels)
+            else:
+                specific_greeting = None
             if specific_greeting:
                 logging.debug("Greeting label matched")
                 greeting, wave_flag = specific_greeting
+            prev_label_text = label_text
   
             if sentiment < 0: sentiment = -1
             if sentiment > 0: sentiment = 1
