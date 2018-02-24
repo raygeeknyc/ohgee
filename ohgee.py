@@ -196,6 +196,8 @@ def watchForVisionResults(vision_results_queue, image_queue):
    
             processed_image_results = vision_results_queue.recv()
             processed_image, labels, faces, sentiment = processed_image_results
+            if sentiment < 0: sentiment = -1
+            if sentiment > 0: sentiment = 1
             image_queue.put((processed_image, False))
             logging.debug("Put a processed image %s" % id(processed_image))
             recent_sentiments.appendleft(sentiment)
