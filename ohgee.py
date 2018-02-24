@@ -51,7 +51,7 @@ ARM_WAVE_RAISE_SECS = 2
 ARM_WAVE_DELAY_SECS = 1
 MIN_FACE_WAVE_DELAY_SECS = 10
 
-GREETING_INTERVAL_SECS = 30
+GREETING_INTERVAL_SECS = 5
 SEARCH_INTERVAL_SECS = 10
 
 SENTIMENT_DURATION_STIMULUS_FRAMES_THRESHOLD = 3
@@ -62,9 +62,9 @@ PICO_CMD='pico2wave -l en-US --wave "%s" "%s";aplay "%s"'
 
 def getPhraseForSentiment(dominant_sentiment):
   if dominant_sentiment > 0:
-    phrase = visionanalyzer.getGoodMoodGreeting()
+    phrase,_ = visionanalyzer.getGoodMoodGreeting()
   elif dominant_sentiment < 0:
-    phrase = visionanalyzer.getBadMoodGreeting()
+    phrase,_ = visionanalyzer.getBadMoodGreeting()
   else:
     phrase = None
   return phrase
@@ -186,7 +186,6 @@ def watchForVisionResults(vision_results_queue, image_queue):
     dominant_sentiment = -999
     while True:
         try:
-            high_priority_greeting = False
             greeting = None
             wave_flag = False
             feeling_good = False
@@ -196,6 +195,15 @@ def watchForVisionResults(vision_results_queue, image_queue):
    
             processed_image_results = vision_results_queue.recv()
             processed_image, labels, faces, sentiment = processed_image_results
+            logging.debug("{} faces detected".format(len(faces)))
+            logging.debug("{} sentiment detected".format(sentiment))
+            for label in labels:
+                logging.debug("Label: {}".format(label.description))
+            specific_greeting = visionanalyzer.getGreeting(labels)
+            if specific_greeting:
+                logging.debug("Greeting label matched")
+                greeting, wave_flag = specific_greeting
+  
             if sentiment < 0: sentiment = -1
             if sentiment > 0: sentiment = 1
             image_queue.put((processed_image, False))
@@ -212,21 +220,13 @@ def watchForVisionResults(vision_results_queue, image_queue):
 
             if sentiment_duration == SENTIMENT_DURATION_STIMULUS_FRAMES_THRESHOLD:
               greeting = getPhraseForSentiment(dominant_sentiment)
+              logging.debug("Got phrase {} for sentiment {}".format(greeting, dominant_sentiment))
               sentiment_reminder_delay = SENTIMENT_DURATION_STIMULUS_FRAMES_THRESHOLD
-            if ((sentiment_duration - SENTIMENT_DURATION_STIMULUS_FRAMES_THRESHOLD) %  sentiment_reminder_delay) == 0:
-              greeting = getForSentiment(dominant_sentiment)
+            elif sentiment_duration > SENTIMENT_DURATION_STIMULUS_FRAMES_THRESHOLD and ((sentiment_duration - SENTIMENT_DURATION_STIMULUS_FRAMES_THRESHOLD) %  sentiment_reminder_delay) == 0:
+              greeting = getPhraseForSentiment(dominant_sentiment)
+              logging.debug("Got additional phrase {} for sentiment {}".format(greeting, dominant_sentiment))
               sentiment_reminder_delay = int(SENTIMENT_DURATION_STIMULUS_INCREMENT_FACTOR * sentiment_reminder_delay)
 
-            
-            logging.debug("{} faces detected".format(len(faces)))
-            logging.debug("{} sentiment detected".format(sentiment))
-            for label in labels:
-                logging.debug("Label: {}".format(label.description))
-  
-            specific_greeting = visionanalyzer.getGreeting(labels)
-            if specific_greeting:
-                logging.debug("Greeting label matched")
-                greeting, wave_flag = specific_greeting
             if recent_face_counts[0] > recent_face_counts[1] and recent_face_counts[0] > recent_face_counts[2]:
                 logging.debug("Arrival")
                 greeting = phraseresponder.getGreeting()
@@ -236,9 +236,9 @@ def watchForVisionResults(vision_results_queue, image_queue):
                 greeting = phraseresponder.getFarewell()
             if greeting:
                 since_greeted = time.time() - last_greeting_at
-                if since_greeted > GREETING_INTERVAL_SECS or high_priority_greeting: 
+                if since_greeted > GREETING_INTERVAL_SECS: 
                     last_greeting_at = time.time()
-                    logging.debug("Greeting %s (%d)" % (" ".join(greeting), len(greeting)))
+                    logging.debug("Greeting {} ({})".format(" ".join(greeting), len(greeting)))
                     speech_queue.put(greeting)
             if wave_flag:
                 if time.time() - last_wave_at > MIN_FACE_WAVE_DELAY_SECS:
