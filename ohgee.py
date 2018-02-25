@@ -234,7 +234,7 @@ def watchForVisionResults(vision_results_queue, image_queue):
             label_text = [label.description for label in labels]
             image_label_greeting = visionanalyzer.getGreetingForLabels(labels)
             if image_label_greeting and image_label_greeting[0]:
-                logging.info("l: {}  pl: {}".format(image_label_greeting[2], prev_recognized_label_text))
+                logging.debug("l: {}  pl: {}".format(image_label_greeting[2], prev_recognized_label_text))
                 if image_label_greeting[2] == prev_recognized_label_text:
                     logging.debug("repeated greeting skipped")
                     image_label_greeting = None
