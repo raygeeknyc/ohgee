@@ -92,10 +92,11 @@ def getBadMoodGreeting():
 def getGoodMoodGreeting():
     return (randomGreetingFrom(GOOD_MOOD_GREETINGS), False)
 
-def getGreeting(labels):
+def getGreetingForLabels(labels):
     for tags, greetings, wave_flag in LABELS_GREETINGS:
-        if labelMatch(labels, tags):
-            return (randomGreetingFrom(greetings), wave_flag)
+        matched_label = labelMatch(labels, tags)
+        if matched_label:
+            return (randomGreetingFrom(greetings), wave_flag, matched_label)
     return None
 
 def labelMatch(labels,tags):
