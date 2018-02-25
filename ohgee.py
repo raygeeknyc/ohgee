@@ -232,16 +232,17 @@ def watchForVisionResults(vision_results_queue, image_queue):
 
             # Issue a response the first time we see a set of labels that we know a response to
             label_text = [label.description for label in labels]
-            specific_greeting = visionanalyzer.getGreetingForLabels(labels)
-            if specific_greeting and specific_greeting[0]:
-                logging.debug("l: {}  pl: {}".format(specific_greeting[2], prev_recognized_label_text))
-                if specific_greeting[2] == prev_recognized_label_text:
+            image_label_greeting = visionanalyzer.getGreetingForLabels(labels)
+            if image_label_greeting and image_label_greeting[0]:
+                logging.info("l: {}  pl: {}".format(image_label_greeting[2], prev_recognized_label_text))
+                if image_label_greeting[2] == prev_recognized_label_text:
                     logging.debug("repeated greeting skipped")
-                    specific_greeting = None
-                prev_recognized_label_text = specific_greeting[2]
-            if specific_greeting:
+                    image_label_greeting = None
+                else:
+                    prev_recognized_label_text = image_label_greeting[2]
+            if image_label_greeting:
                 logging.debug("New greeting label matched")
-                greeting, wave_flag = specific_greeting
+                greeting, wave_flag, _ = image_label_greeting
   
             if greeting:
                 since_greeted = time.time() - last_greeting_at

@@ -94,15 +94,15 @@ def getGoodMoodGreeting():
 
 def getGreetingForLabels(labels):
     for tags, greetings, wave_flag in LABELS_GREETINGS:
-        matched_label = labelMatch(labels, tags)
-        if matched_label:
-            return (randomGreetingFrom(greetings), wave_flag, matched_label)
+        matched_label_text = labelMatch(labels, tags)
+        if matched_label_text:
+            return (randomGreetingFrom(greetings), wave_flag, matched_label_text)
     return None
 
 def labelMatch(labels,tags):
     for candidate_label in labels:
         if candidate_label.description in tags:	
-            return candidate_label
+            return candidate_label.description
     return None
 
 # Sentiment is -1, 0 or +1 for this sentiment and level
