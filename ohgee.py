@@ -244,6 +244,7 @@ def watchForVisionResults(vision_results_queue, image_queue):
                     image_label_greeting = None
                 else:
                     prev_recognized_label_text = image_label_greeting[2]
+                    last_label_response_at = time.time()
             if image_label_greeting:
                 logging.debug("New greeting label matched")
                 greeting, wave_flag, _ = image_label_greeting
