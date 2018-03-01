@@ -21,7 +21,10 @@ POP_4_PROMPTS = (["shut", "your", "mouth"], ["shut", "your", "mouth"])
 POP_4_RESPONSES = (["hey", "I'm", "talking", "about", "shaft"], ["hey", "I'm", "talkin", "bout", "shaft"])
 
 NEWS_1_PROMPTS = (["president" ,"trump"], ["donald", "trump"])
-NEWS_1_RESPONSES = (["Trump", "is", "a", "chump"], ["donald", "chump"])
+NEWS_1_RESPONSES = (["Trump", "is", "a", "chump"], ["donald", "chump"], ["dump", "trump"])
+
+FRIENDS_3_PROMPTS = (["I'm", "nilma"], ["I", "am", "nilma"], ["this", "is", "nilma"])
+FRIENDS_3_RESPONSES = (["I'm", "so", "glad", "to", "meet", "you", "nilma"], ["I've", "heard", "so", "much", "about", "you", "nilma"], ["Raymond", "says", "such", "good", "things", "about", "you", "nilma"])
 
 FRIENDS_1_PROMPTS = (["I'm", "diana"], ["I", "am", "diana"], ["this", "is", "diana"])
 FRIENDS_1_RESPONSES = (["I'm", "so", "glad", "to", "meet", "you", "diana"], ["I've", "heard", "so", "much", "about", "you", "diana"], ["Raymond", "says", "such", "good", "things", "about", "you", "diana"])
@@ -29,9 +32,8 @@ FRIENDS_1_RESPONSES = (["I'm", "so", "glad", "to", "meet", "you", "diana"], ["I'
 FRIENDS_2_PROMPTS = (["I'm", "jillian"], ["I", "am", "jillian"], ["this", "is", "jillian"])
 FRIENDS_2_RESPONSES = (["what", "a", "pleasure", "to", "meet", "you", "jillian"], ["set", "the", "world", "on", "fire", "jillian"], ["I'm", "so", "happy", "to", "finally", "meet", "jillian"])
 
-INTRO_PROMPTS = (["hello", "my", "name", "is"], ["I", "am"], ["my", "name", "is"], ["hello", "i'm"], ["hi", "my", "name", "is"])
+INTRO_PROMPTS = (["hello", "my", "name", "is"], ["I", "am"], ["my", "name", "is"], ["hello", "i'm"], ["hi", "my", "name", "is"], ["this", "is"])
 INTRO_RESPONSES = (["hi"], ["hello"], ["it's", "good", "to", "see", "you"], ["i'm", "glad", "to", "know", "you"], ["hey", "there"])
-
 
 CANINE_PROMPTS = (["good", "puppy"], ["nice", "puppy"], ["good", "dog"], ["nice", "doggy"], ["nice", "doggie"], ["Who's", "a", "good", "doggy"], ["Who's", "a", "good", "dog"], ["Who's", "a", "good", "girl"], ["Who's", "a", "good", "boy"])
 CANINE_RESPONSES = (["woof", "woof"], ["you're", "a", "very", "good", "dog"])
@@ -59,6 +61,9 @@ HATES = (["I", "hate", "you"], ["I", "don't", "like", "you"], ["you", "suck"], [
 SADNESSES = (["sniff"], ["you", "break", "my", "heart"], ["that", "makes", "me", "sad"], ["I'm", "sorry"], ["ouch"], ["that", "hurts"], ["I'm", "so", "sorry"])
 JOKE_PROMPTS = (["knock", "knock"], ["knock", "knock"])
 JOKE_RESPONSES = (["I", "don't", "know", "who's", "there"], ["you", "get", "it"], ["it's", "for", "you"])
+JOKE_2_PROMPTS = (["why", "did", "the", "chicken", "cross", "the", "road"], 
+["why", "did", "the", "chicken", "cross", "the", "road"])
+JOKE_2_RESPONSES = (["to", "get", "david", "hasselhoff's", "autograph"], ["because", "maybe", "she", "was", "on", "the", "wrong", "side"])
 PINGS = (["ping", "me"], ["pinging", "you"])
 ACKS = (["pong"], ["ack"], ["right", "back", "at", "you"])
 TIME_PROMPTS = (["what", "time", "is", "it"], ["what's", "the", "time"])
@@ -146,6 +151,9 @@ def friends1Prompts(_):
 def friends2Prompts(_):
     return FRIENDS_2_PROMPTS
 
+def friends3Prompts(_):
+    return FRIENDS_3_PROMPTS
+
 def caninePrompts(_):
     return CANINE_PROMPTS
 
@@ -188,6 +196,9 @@ def friends1Responses(_):
 def friends2Responses(_):
     return FRIENDS_2_RESPONSES
 
+def friends3Responses(_):
+    return FRIENDS_3_RESPONSES
+
 def canineResponses(_):
     return CANINE_RESPONSES
 
@@ -211,6 +222,12 @@ def jokePrompts(_):
 
 def jokeResponses(_):
     return JOKE_RESPONSES
+
+def joke2Prompts(_):
+    return JOKE_2_PROMPTS
+
+def joke2Responses(_):
+    return JOKE_2_RESPONSES
 
 def pings(_):
     return PINGS
@@ -265,6 +282,7 @@ PROMPTS_RESPONSES = [
   (pop2Prompts, pop2Responses, None, True),
   (friends1Prompts, friends1Responses, None, True),
   (friends2Prompts, friends2Responses, None, True),
+  (friends3Prompts, friends3Responses, None, True),
   (introPrompts, introResponses, None, False), # This should follow specific intros
   (greetings, greetings, inKindSuffixes, True), 
   (fixedGreetings, greetings, inKindSuffixes, True),
@@ -273,6 +291,7 @@ PROMPTS_RESPONSES = [
   (thanks, welcomes, None, True),
   (pings, acks, None, False),
   (jokePrompts, jokeResponses, None, True),
+  (joke2Prompts, joke2Responses, None, True),
   (hates, sadnesses, None, False),
   (timePrompts, timeResponses, None, False),
   (datePrompts, dateResponses, None, False),
