@@ -39,6 +39,7 @@ SEARCH_POLL_DELAY_SECS = 0.5
 IMAGE_POLL_DELAY_SECS = 0.1
 IMAGE_STICKY_DISPLAY_SECS = 3
 IMAGE_MIN_DISPLAY_SECS = 0.2
+LABEL_RESPONSE_DELAY_SECS = 60.0 * 60
 
 INITIAL_WAKEUP_GREETING = ["I'm", "awake"]
 
@@ -184,9 +185,12 @@ def watchForVisionResults(vision_results_queue, image_queue):
     last_greeting_at = 0.0
     last_wave_at = 0l
     dominant_sentiment = -999
+    last_label_response_at = 0L
     prev_recognized_label_text = None
     while True:
         try:
+            if time.time() > last_label_response_at + LABEL_RESPONSE_DELAY_SECS:
+                prev_recognized_label_text = None
             greeting = None
             wave_flag = False
             feeling_good = False
