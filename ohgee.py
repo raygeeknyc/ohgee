@@ -185,11 +185,11 @@ def watchForVisionResults(vision_results_queue, image_queue):
     last_greeting_at = 0.0
     last_wave_at = 0l
     dominant_sentiment = -999
-    last_label_response_at = 0L
+    last_label_response_at = time.time()
     prev_recognized_label_text = None
     while True:
         try:
-            if time.time() > last_label_response_at + LABEL_RESPONSE_DELAY_SECS:
+            if time.time() > (last_label_response_at + LABEL_RESPONSE_DELAY_SECS):
                 prev_recognized_label_text = None
             greeting = None
             wave_flag = False
