@@ -63,7 +63,7 @@ JOKE_PROMPTS = (["knock", "knock"], ["knock", "knock"])
 JOKE_RESPONSES = (["I", "don't", "know", "who's", "there"], ["you", "get", "it"], ["it's", "for", "you"])
 JOKE_2_PROMPTS = (["why", "did", "the", "chicken", "cross", "the", "road"], 
 ["why", "did", "the", "chicken", "cross", "the", "road"])
-JOKE_2_RESPONSES = (["to", "get", "david", "hasselhoff's", "autograph"], ["because", "maybe", "she", "was", "on", "the", "wrong", "side"])
+JOKE_2_RESPONSES = (["to", "get", "david", "hassle", "hoff's", "autograph"], ["because", "she", "was", "on", "the", "wrong", "side"])
 PINGS = (["ping", "me"], ["pinging", "you"])
 ACKS = (["pong"], ["ack"], ["right", "back", "at", "you"])
 TIME_PROMPTS = (["what", "time", "is", "it"], ["what's", "the", "time"])
