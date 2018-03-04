@@ -1,3 +1,4 @@
+VERSION_ID = "version two"
 import logging
 
 # reorder as appropriate
@@ -41,7 +42,7 @@ IMAGE_STICKY_DISPLAY_SECS = 3
 IMAGE_MIN_DISPLAY_SECS = 0.2
 LABEL_RESPONSE_DELAY_SECS = 60.0 * 60
 
-INITIAL_WAKEUP_GREETING = ["I'm", "awake"]
+INITIAL_WAKEUP_GREETING = ["I'm", "awake", VERSION_ID]
 
 servoPin = 18
 ARM_RELAXED_POSITION = 12.0
