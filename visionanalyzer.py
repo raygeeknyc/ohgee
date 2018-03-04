@@ -69,6 +69,9 @@ CAT_GREETINGS = (["meow"], ["meow", "meow"], ["nice", "kitty"], ["what", "a", "n
 HAT_LABELS = ["hat", "cap", "headgear"]
 HAT_GREETINGS = (["that's", "a", "nice", "hat"], ["nice", "hat"], ["nice", "cap"], ["I", "like", "your", "hat"])
 
+COFFEE_LABELS = ["cup", "mug", "coffee"]
+COFFEE_GREETINGS = (["is", "that", "a", "cup", "of", "good", "coffee"], ["I", "love", "coffee", "too"], ["I", "hope", "that", "you", "enjoy", "your", "coffee"])
+
 EYEGLASS_LABELS = ["glasses", "eyewear"]
 EYEGLASS_GREETINGS = (["those", "are", "nice", "eye", "glasses"], ["I", "like", "your", "glasses"], ["nice", "glasses"], ["nice", "eye", "glasses"], [], [], [], [])
 
@@ -80,6 +83,7 @@ LABELS_GREETINGS = [(DOG_LABELS, DOG_GREETINGS, True),
   (CAT_LABELS, CAT_GREETINGS, False),
   (HAT_LABELS, HAT_GREETINGS, False),
   (FLOWER_LABELS, FLOWER_GREETINGS, False),
+  (COFFEE_LABELS, COFFEE_GREETINGS, False),
   (EYEGLASS_LABELS, EYEGLASS_GREETINGS, False)]
 
 def randomGreetingFrom(phrases):
