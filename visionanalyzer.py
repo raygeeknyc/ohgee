@@ -69,7 +69,7 @@ CAT_GREETINGS = (["meow"], ["meow", "meow"], ["nice", "kitty"], ["what", "a", "n
 HAT_LABELS = ["hat", "cap", "headgear"]
 HAT_GREETINGS = (["that's", "a", "nice", "hat"], ["nice", "hat"], ["nice", "cap"], ["I", "like", "your", "hat"])
 
-COFFEE_LABELS = ["cup", "mug", "coffee"]
+COFFEE_LABELS = ["glass", "cup", "mug", "coffee"]
 COFFEE_GREETINGS = (["is", "that", "a", "cup", "of", "good", "coffee"], ["I", "love", "coffee", "too"], ["I", "hope", "that", "you", "enjoy", "your", "coffee"])
 
 EYEGLASS_LABELS = ["glasses", "eyewear"]
@@ -98,6 +98,8 @@ def getGoodMoodGreeting():
 
 def getGreetingForLabels(labels):
     for tags, greetings, wave_flag in LABELS_GREETINGS:
+        for label in labels:
+         logging.debug("label: {}".format(label.description))
         matched_label_text = labelMatch(labels, tags)
         if matched_label_text:
             return (randomGreetingFrom(greetings), wave_flag, matched_label_text)
