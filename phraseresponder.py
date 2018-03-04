@@ -32,7 +32,7 @@ FRIENDS_1_RESPONSES = (["I'm", "so", "glad", "to", "meet", "you", "diana"], ["I'
 FRIENDS_2_PROMPTS = (["I'm", "jillian"], ["I", "am", "jillian"], ["this", "is", "jillian"])
 FRIENDS_2_RESPONSES = (["what", "a", "pleasure", "to", "meet", "you", "jillian"], ["set", "the", "world", "on", "fire", "jillian"], ["I'm", "so", "happy", "to", "finally", "meet", "jillian"])
 
-INTRO_PROMPTS = (["hello", "my", "name", "is"], ["I", "am"], ["my", "name", "is"], ["hello", "i'm"], ["hi", "my", "name", "is"], ["this", "is"])
+INTRO_PROMPTS = (["I", "am"], ["my", "name", "is"], ["hello", "i'm"], ["this", "is"])
 INTRO_RESPONSES = (["hi"], ["hello"], ["it's", "good", "to", "see", "you"], ["i'm", "glad", "to", "know", "you"], ["hey", "there"])
 
 CANINE_PROMPTS = (["good", "puppy"], ["nice", "puppy"], ["good", "dog"], ["nice", "doggy"], ["nice", "doggie"], ["Who's", "a", "good", "doggy"], ["Who's", "a", "good", "dog"], ["Who's", "a", "good", "girl"], ["Who's", "a", "good", "boy"])
@@ -63,7 +63,7 @@ JOKE_PROMPTS = (["knock", "knock"], ["knock", "knock"])
 JOKE_RESPONSES = (["I", "don't", "know", "who's", "there"], ["you", "get", "it"], ["it's", "for", "you"])
 JOKE_2_PROMPTS = (["why", "did", "the", "chicken", "cross", "the", "road"], 
 ["why", "did", "the", "chicken", "cross", "the", "road"])
-JOKE_2_RESPONSES = (["to", "get", "david", "hassle", "hoff's", "autograph"], ["because", "she", "was", "on", "the", "wrong", "side"])
+JOKE_2_RESPONSES = (["to", "get", "david", "hassle", "hoff's", "autograph"], ["because", ",", "she", "was", "on", "the", "wrong", "side"])
 PINGS = (["ping", "me"], ["pinging", "you"])
 ACKS = (["pong"], ["ack"], ["right", "back", "at", "you"])
 TIME_PROMPTS = (["what", "time", "is", "it"], ["what's", "the", "time"])
