@@ -78,7 +78,7 @@ EYEGLASS_GREETINGS = (["those", "are", "nice", "eye", "glasses"], ["I", "like", 
 FLOWER_LABELS = ["flowers", "flower", "floral"]
 FLOWER_GREETINGS = (["what", "a", "pretty", "flower"], ["nice", "flowers"], [])
 
-# Only first first label found in tags will be used, so prioritize them in this list
+# Only the first label found in tags will be used, so prioritize them in this list
 LABELS_GREETINGS = [(DOG_LABELS, DOG_GREETINGS, True),
   (CAT_LABELS, CAT_GREETINGS, False),
   (HAT_LABELS, HAT_GREETINGS, False),
@@ -96,13 +96,14 @@ def getBadMoodGreeting():
 def getGoodMoodGreeting():
     return (randomGreetingFrom(GOOD_MOOD_GREETINGS), False)
 
+# Return the first label of the set that a match was found in
 def getGreetingForLabels(labels):
     for tags, greetings, wave_flag in LABELS_GREETINGS:
         for label in labels:
          logging.debug("label: {}".format(label.description))
         matched_label_text = labelMatch(labels, tags)
         if matched_label_text:
-            return (randomGreetingFrom(greetings), wave_flag, matched_label_text)
+            return (randomGreetingFrom(greetings), wave_flag, tags[0])
     return None
 
 def labelMatch(labels,tags):

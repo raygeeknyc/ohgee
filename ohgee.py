@@ -1,4 +1,4 @@
-VERSION_ID = ", version four"
+VERSION_ID = ", , version four"
 import logging
 
 # reorder as appropriate
@@ -40,7 +40,7 @@ SEARCH_POLL_DELAY_SECS = 0.5
 IMAGE_POLL_DELAY_SECS = 0.1
 IMAGE_STICKY_DISPLAY_SECS = 3
 IMAGE_MIN_DISPLAY_SECS = 0.2
-LABEL_RESPONSE_DELAY_SECS = 60.0 * 15
+LABEL_RESPONSE_DELAY_SECS = 60.0 * 10
 
 INITIAL_WAKEUP_GREETING = ["I'm", "awake", VERSION_ID]
 
@@ -240,7 +240,7 @@ def watchForVisionResults(vision_results_queue, image_queue):
             label_text = [label.description for label in labels]
             image_label_greeting = visionanalyzer.getGreetingForLabels(labels)
             if image_label_greeting and image_label_greeting[0]:
-                logging.debug("l: {}  pl: {}".format(image_label_greeting[2], prev_recognized_label_text))
+                logging.debug("l: {}  pl: {} g: {}".format(image_label_greeting[2], prev_recognized_label_text, image_label_greeting[0]))
                 if image_label_greeting[2] == prev_recognized_label_text:
                     logging.debug("repeated greeting skipped")
                     image_label_greeting = None
@@ -367,10 +367,10 @@ def maintainDisplay(root_window, image_queue):
 if __name__ == '__main__':
     root = Tkinter.Tk()
     #root.geometry("%dx%d+%d+%d" % (root.winfo_screenwidth(), root.winfo_screenheight(), 0, 0))
-    root.wm_attributes('-fullscreen','true')
-    root.wm_attributes('-type', 'splash')
-    root.overrideredirect(True)
-    root.config(cursor='none')
+    #root.wm_attributes('-fullscreen','true')
+    #root.wm_attributes('-type', 'splash')
+    #root.overrideredirect(True)
+    #root.config(cursor='none')
 
     led = rgbled.RgbLed(rgbled.redPin, rgbled.greenPin, rgbled.bluePin)
     led.setColor(rgbled.OFF)
