@@ -1,4 +1,4 @@
-VERSION_ID = ", version three"
+VERSION_ID = ", version four"
 import logging
 
 # reorder as appropriate
@@ -40,7 +40,7 @@ SEARCH_POLL_DELAY_SECS = 0.5
 IMAGE_POLL_DELAY_SECS = 0.1
 IMAGE_STICKY_DISPLAY_SECS = 3
 IMAGE_MIN_DISPLAY_SECS = 0.2
-LABEL_RESPONSE_DELAY_SECS = 60.0 * 60
+LABEL_RESPONSE_DELAY_SECS = 60.0 * 15
 
 INITIAL_WAKEUP_GREETING = ["I'm", "awake", VERSION_ID]
 
@@ -190,6 +190,7 @@ def watchForVisionResults(vision_results_queue, image_queue):
     prev_recognized_label_text = None
     while True:
         try:
+            # Expire memory of the last image label we responded to
             if time.time() > (last_label_response_at + LABEL_RESPONSE_DELAY_SECS):
                 prev_recognized_label_text = None
             greeting = None
