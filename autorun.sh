@@ -40,5 +40,6 @@ if [[ $rc -ne 0 ]]; then
   pico2wave -l en-US --wave "/tmp/ohgee_help.wav" "HELP!  Error authenticating cloud services";aplay "/tmp/ohgee_help.wav"
   exit 255
 fi
+./pre_launch_hook.sh 2>&1
 nohup python ohgee.py &
 exit 0

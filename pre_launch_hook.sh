@@ -1,2 +1,3 @@
 #!/bin/bash
-sleep 5
+echo "pre launch"
+sleep 6
