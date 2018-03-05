@@ -72,7 +72,7 @@ HAT_LABELS = ["hat", "cap", "headgear"]
 HAT_GREETINGS = (["that's", "a", "nice", "hat"], ["nice", "hat"], ["nice", "cap"], ["I", "like", "your", "hat"])
 
 COFFEE_LABELS = ["glass", "cup", "mug", "coffee"]
-COFFEE_EXCLUDE_LABELS = ["windshield", "window"]
+COFFEE_EXCLUDE_LABELS = ["windshield", "window", "interior design", "ceiling"]
 COFFEE_GREETINGS = (["is", "that", "a", "cup", "of", "good", "coffee"], ["I", "love", "coffee", "too"], ["I", "hope", "that", "you", "enjoy", "your", "coffee"])
 
 EYEGLASS_LABELS = ["glasses", "eyewear"]
