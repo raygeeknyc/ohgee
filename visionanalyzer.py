@@ -56,6 +56,8 @@ def signal_handler(sig, frame):
     STOP = True
 signal.signal(signal.SIGINT, signal_handler)
 
+EMPTY_LABELS = []
+
 BAD_MOOD_GREETINGS = (["don't", "worry", "be", "happy"], ["I'm", "sorry", "that", "you're", "not", "feeling", "happy"], ["You", "look", "down"], ["I", "hope", "that", "I", "can", "cheer", "you", "up"], ["I", "hope", "that", "you", "feel", "better", "soon"], ["Smile!"])
 
 GOOD_MOOD_GREETINGS = (["I'm", "glad", "that", "you", "are", "happy"], ["You", "look", "happy"], ["You", "cheer", "me", "up"], ["It's", "great", "to", "see", "you", "happy"], ["Great", "day"])
@@ -70,6 +72,7 @@ HAT_LABELS = ["hat", "cap", "headgear"]
 HAT_GREETINGS = (["that's", "a", "nice", "hat"], ["nice", "hat"], ["nice", "cap"], ["I", "like", "your", "hat"])
 
 COFFEE_LABELS = ["glass", "cup", "mug", "coffee"]
+COFFEE_EXCLUDE_LABELS = ["windshield", "window"]
 COFFEE_GREETINGS = (["is", "that", "a", "cup", "of", "good", "coffee"], ["I", "love", "coffee", "too"], ["I", "hope", "that", "you", "enjoy", "your", "coffee"])
 
 EYEGLASS_LABELS = ["glasses", "eyewear"]
@@ -79,12 +82,12 @@ FLOWER_LABELS = ["flowers", "flower", "floral"]
 FLOWER_GREETINGS = (["what", "a", "pretty", "flower"], ["nice", "flowers"], [])
 
 # Only the first label found in tags will be used, so prioritize them in this list
-LABELS_GREETINGS = [(DOG_LABELS, DOG_GREETINGS, True),
-  (CAT_LABELS, CAT_GREETINGS, False),
-  (HAT_LABELS, HAT_GREETINGS, False),
-  (FLOWER_LABELS, FLOWER_GREETINGS, False),
-  (COFFEE_LABELS, COFFEE_GREETINGS, False),
-  (EYEGLASS_LABELS, EYEGLASS_GREETINGS, False)]
+LABELS_GREETINGS = [(DOG_LABELS, DOG_GREETINGS, EMPTY_LABELS, True),
+  (CAT_LABELS, CAT_GREETINGS, EMPTY_LABELS, False),
+  (HAT_LABELS, HAT_GREETINGS, EMPTY_LABELS, False),
+  (FLOWER_LABELS, FLOWER_GREETINGS, EMPTY_LABELS, False),
+  (COFFEE_LABELS, COFFEE_GREETINGS, COFFEE_EXCLUDE_LABELS, False),
+  (EYEGLASS_LABELS, EYEGLASS_GREETINGS, EMPTY_LABELS, False)]
 
 def randomGreetingFrom(phrases):
     if not phrases: return []
@@ -97,13 +100,16 @@ def getGoodMoodGreeting():
     return (randomGreetingFrom(GOOD_MOOD_GREETINGS), False)
 
 # Return the first label of the set that a match was found in
+# but a match was not found in excludes
 def getGreetingForLabels(labels):
-    for tags, greetings, wave_flag in LABELS_GREETINGS:
+    for tags, greetings, excludes, wave_flag in LABELS_GREETINGS:
         for label in labels:
-         logging.debug("label: {}".format(label.description))
+            logging.debug("label: {}".format(label.description))
         matched_label_text = labelMatch(labels, tags)
         if matched_label_text:
-            return (randomGreetingFrom(greetings), wave_flag, tags[0])
+            matched_exclude = labelMatch(labels, excludes)
+            if not matched_exclude:
+                return (randomGreetingFrom(greetings), wave_flag, tags[0])
     return None
 
 def labelMatch(labels,tags):
