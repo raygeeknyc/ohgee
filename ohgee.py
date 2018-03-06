@@ -236,7 +236,7 @@ def watchForVisionResults(vision_results_queue, image_queue):
                 logging.debug("Departure")
                 greeting = phraseresponder.getFarewell()
 
-            # Issue a response the first time we see a set of labels that we know a response to
+            # Issue a response the first consecutive time we see a set of labels that we know a response to
             label_text = [label.description for label in labels]
             image_label_greeting = visionanalyzer.getGreetingForLabels(labels)
             if image_label_greeting and image_label_greeting[0]:
@@ -252,8 +252,7 @@ def watchForVisionResults(vision_results_queue, image_queue):
                 greeting, wave_flag, _ = image_label_greeting
   
             if greeting:
-                since_greeted = time.time() - last_greeting_at
-                if since_greeted > GREETING_INTERVAL_SECS: 
+                if time.time() - last_greeting_at > GREETING_INTERVAL_SECS: 
                     last_greeting_at = time.time()
                     logging.debug("Greeting {} ({})".format(" ".join(greeting), len(greeting)))
                     speech_queue.put(greeting)
