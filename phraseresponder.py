@@ -53,6 +53,8 @@ BANAL_2_RESPONSES = (["chili", "today", "hot", "ta-ma-lay"], ["chili", "today", 
 GREETINGS = (["ho", "la"], ["always", "a", "pleasure"], ["Its", "good", "to", "see", "you"], ["hello"], ["hi"], ["hey", "there"], ["nice", "to", "see", "you"], ["good", "to", "see", "you"], ["welcome"], ["good", "day"], ["good", "day", "to", "you"], ["oh", "hello"], ["yay", ",", "it's", "you"])
 ALL_DAY_GREETINGS = (["good", "morning"], ["good", "afternoon"], ["good", "evening"], ["good", "night"])
 FAREWELLS = (["goodbye"], ["bye"], ["farewell"], ["see","you"], ["talk", "to", "you", "later"], ["take", "care"], ["bye", "bye"], ["see", "you", "later"], ["later"], ["call", "me"], ["did", "you", "just", "sign", "out?"], ["come", "back","soon"])
+SMUGS = (["I'm", "the", "best"], ["I", "am", "the", "best"], ["Who's", "better", "than", "me"], ["I", "love", "me"])
+SMUG_RESPONSES = (["that", "makes", "one", "of", "you"], ["Who", "are", "you", "again"], ["oh", "you", "snowflake"])
 AFFECTIONS = (["you're", "adorable"], ["I", "adore", "you"], ["I", "love", "you"], ["I", "like", "you"], ["you're", "the", "best"], ["you're", "cute"], ["you're", "so", "cute"], ["you're", "sweet"], ["you're", "so", "sweet"], ["you're", "cool"], ["you're", "great"], ["cute", "robot"], ["you're", "awesome"], ["you're", "amazing"], ["I", "really", "like", "you"], ["I", "think", "you're", "fantastic"])
 ME_TOOS = (["I", "feel", "the", "same"], ["that", "makes", "two", "of", "us"], ["I", "feel", "the", "same", "way"], ["same", "here"])
 THANKS = (["thank", "you"], ["thanks"], ["why", "thank", "you"], ["thank", "you", "so", "much"])
@@ -160,6 +162,9 @@ def caninePrompts(_):
 def felinePrompts(_):
     return FELINE_PROMPTS
 
+def smugPrompts(_):
+    return SMUGS
+
 def banal1Prompts(_):
     return BANAL_1_PROMPTS
 
@@ -204,6 +209,9 @@ def canineResponses(_):
 
 def felineResponses(_):
     return FELINE_RESPONSES
+
+def smugResponses(_):
+    return SMUG_RESPONSES
 
 def banal1Responses(_):
     return BANAL_1_RESPONSES
@@ -301,6 +309,7 @@ PROMPTS_RESPONSES = [
   (girlsCountPrompts, girlsCountResponses, None, False),
   (banal1Prompts, banal1Responses, None, False),
   (banal2Prompts, banal2Responses, None, False),
+  (smugPrompts, smugResponses, None, False),
   (otherProducts, productRecs, None, False)]
 
 def phraseMatch(phrase, entities, candidate_phrase_generator):
