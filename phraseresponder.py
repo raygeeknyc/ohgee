@@ -32,6 +32,9 @@ FRIENDS_1_RESPONSES = (["I'm", "so", "glad", "to", "meet", "you", "diana"], ["I'
 FRIENDS_2_PROMPTS = (["I'm", "jillian"], ["I", "am", "jillian"], ["this", "is", "jillian"])
 FRIENDS_2_RESPONSES = (["what", "a", "pleasure", "to", "meet", "you", "jillian"], ["set", "the", "world", "on", "fire", "jillian"], ["I'm", "so", "happy", "to", "finally", "meet", "jillian"])
 
+ID_PROMPTS = (["who", "are", "you"], ["what", "is", "your", "name"], ["what", "are", "you"])
+ID_RESPONSES = (["I", "am", "oh", "gee", ",", "a", "desktop", "robot", "friend"], ["my", "name", "is", "oh", "gee"], ["I", "am", "oh", "gee"], ["hello", "I'm", "oh", "gee"])
+
 INTRO_PROMPTS = (["I", "am"], ["my", "name", "is"], ["hello", "i'm"], ["this", "is"])
 INTRO_RESPONSES = (["hi"], ["hello"], ["it's", "good", "to", "see", "you"], ["i'm", "glad", "to", "know", "you"], ["hey", "there"])
 
@@ -50,7 +53,7 @@ GIRLS_COUNT_RESPONSES = (["fourteen", "thousand", "two hundred", "and", "ninety 
 BANAL_2_PROMPTS = (["how's", "the", "weather"], ["hows", "the", "weather"], ["what's", "the", "weather"], ["whats", "the", "weather"], ["how", "is", "the", "weather"], ["what", "is", "the", "weather"])
 BANAL_2_RESPONSES = (["chili", "today", "hot", "ta-ma-lay"], ["chili", "today", "but", "hot", "ta-ma-lay"])
 
-GREETINGS = (["ho", "la"], ["always", "a", "pleasure"], ["Its", "good", "to", "see", "you"], ["hello"], ["hi"], ["hey", "there"], ["nice", "to", "see", "you"], ["good", "to", "see", "you"], ["welcome"], ["good", "day"], ["good", "day", "to", "you"], ["oh", "hello"], ["yay", ",", "it's", "you"])
+GREETINGS = (["o", "la"], ["always", "a", "pleasure"], ["Its", "good", "to", "see", "you"], ["hello"], ["hi"], ["hey", "there"], ["nice", "to", "see", "you"], ["good", "to", "see", "you"], ["welcome"], ["good", "day"], ["good", "day", "to", "you"], ["oh", "hello"], ["yay", ",", "it's", "you"])
 ALL_DAY_GREETINGS = (["good", "morning"], ["good", "afternoon"], ["good", "evening"], ["good", "night"])
 FAREWELLS = (["goodbye"], ["bye"], ["farewell"], ["see","you"], ["talk", "to", "you", "later"], ["take", "care"], ["bye", "bye"], ["see", "you", "later"], ["later"], ["call", "me"], ["did", "you", "just", "sign", "out?"], ["come", "back","soon"])
 SMUGS = (["I'm", "the", "best"], ["I", "am", "the", "best"], ["Who's", "better", "than", "me"], ["I", "love", "me"])
@@ -73,11 +76,14 @@ DATE_PROMPTS = (["what", "day", "is", "it"], ["what's", "today's", "date"], ["wh
 OTHER_PRODUCTS = (["bing", "sucks"], ["use", "bing"])
 PRODUCT_RECS = (["go", "chrome"], ["make", "mine", "chrome"], ["go", "google"])
 # Add in empty lists to weigh the random selection from the tuple towards null responses
-IN_KIND_SUFFIXES=(["to","you"], ["as","well"], ["too"], ["also"], ["to","you","as","well"], [], [], [], [], [], [], [], [], [], [])
+IN_KIND_SUFFIXES=(["to","you"], ["as","well"], ["too"], ["also"], ["to","you","as","well"], ["yourself"], [], [], [], [], [], [], [], [], [], [])
 
 MONTH = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 
 DOW = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+
+def idResponses(entities):
+    return ID_RESPONSES
 
 def introResponses(entities):
     address = randomPhraseFrom(INTRO_RESPONSES)
@@ -167,6 +173,9 @@ def smugPrompts(_):
 
 def banal1Prompts(_):
     return BANAL_1_PROMPTS
+
+def idPrompts(_):
+    return ID_PROMPTS
 
 def introPrompts(_):
     return INTRO_PROMPTS
@@ -291,6 +300,7 @@ PROMPTS_RESPONSES = [
   (friends1Prompts, friends1Responses, None, True),
   (friends2Prompts, friends2Responses, None, True),
   (friends3Prompts, friends3Responses, None, True),
+  (idPrompts, idResponses, None, False),
   (introPrompts, introResponses, None, False), # This should follow specific intros
   (greetings, greetings, inKindSuffixes, True), 
   (fixedGreetings, greetings, inKindSuffixes, True),
