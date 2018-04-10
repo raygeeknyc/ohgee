@@ -293,6 +293,7 @@ def getResponse(phrase, entities):
     return None
 
 PROMPTS_RESPONSES = [
+  (smugPrompts, smugResponses, None, False),
   (felinePrompts, felineResponses, None, True),
   (caninePrompts, canineResponses, None, True),
   (pop1Prompts, pop1Responses, None, False),
@@ -319,7 +320,6 @@ PROMPTS_RESPONSES = [
   (girlsCountPrompts, girlsCountResponses, None, False),
   (banal1Prompts, banal1Responses, None, False),
   (banal2Prompts, banal2Responses, None, False),
-  (smugPrompts, smugResponses, None, False),
   (otherProducts, productRecs, None, False)]
 
 def phraseMatch(phrase, entities, candidate_phrase_generator):
