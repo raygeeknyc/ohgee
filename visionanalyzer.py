@@ -362,8 +362,7 @@ def watchForResults(vision_results_queue):
     _, incoming_results = vision_results_queue
     try:
         while True:
-            processed_image_results = incoming_results.recv()
-            image, labels, faces = processed_image_results
+            image, labels, faces = incoming_results.recv()
             logging.debug("{} faces detected".format(len(faces)))
             for label in labels:
                 logging.debug("label: {}".format(label.description))
