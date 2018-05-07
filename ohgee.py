@@ -59,6 +59,7 @@ SEARCH_INTERVAL_SECS = 10
 SENTIMENT_DURATION_STIMULUS_FRAMES_THRESHOLD = 3
 SENTIMENT_DURATION_STIMULUS_INCREMENT_FACTOR = 2.5
 
+FACE_CLOSENESS_AREA_THRESHOLD = 1.0/10  # A face must be this portion of the frane for us to greet it
 SPEECH_TMP_FILE="/tmp/speech.wav"
 PICO_CMD='pico2wave -l en-US --wave "%s" "%s";aplay "%s"'
 
@@ -201,16 +202,24 @@ def watchForVisionResults(vision_results_queue, image_queue):
             feeling_bad_extended = False
    
             processed_image_results = vision_results_queue.recv()
-            processed_image, labels, faces, sentiment = processed_image_results
+            processed_image, labels, faces, sentiment, area = processed_image_results
             logging.debug("{} faces detected".format(len(faces)))
             logging.debug("{} sentiment detected".format(sentiment))
+            logging.debug("{} largest face".format(area))
 
-            if sentiment < 0: sentiment = -1
-            if sentiment > 0: sentiment = 1
             image_queue.put((processed_image, False))
             logging.debug("Put a processed image %s" % id(processed_image))
+
+            if area >= FACE_CLOSENESS_AREA_THRESHOLD:
+                if sentiment < 0: sentiment = -1
+                if sentiment > 0: sentiment = 1
+                face_count = len(faces)
+            else:
+                sentiment = 0
+                face_count = 0
             recent_sentiments.appendleft(sentiment)
-            recent_face_counts.appendleft(len(faces))
+            recent_face_counts.appendleft(face_count)
+               
             if recent_face_counts[0] == 0 and len(recent_face_counts) > 1 and recent_face_counts[1] > 0:
               logging.debug("Skipping one frame dropout of faces for sentiment tracking")
             else:

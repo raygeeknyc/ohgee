@@ -273,7 +273,7 @@ class ImageAnalyzer(multiprocessing.Process):
                         buffer.seek(0)
                         img_bytes = buffer.getvalue()
                         logging.debug("send image %s" % id(img_bytes))
-                        self._vision_queue.send((img_bytes, results[1], results[2], results[3]))
+                        self._vision_queue.send((img_bytes, results[1], results[2], results[3], results[4]))
                     except Exception, e:
                         logging.exception("error reading image")
                     finally:
@@ -287,20 +287,25 @@ class ImageAnalyzer(multiprocessing.Process):
         remote_image = self._vision_client.image(content=frame[0])
         labels = remote_image.detect_labels()
         faces = remote_image.detect_faces(limit=5)
-        details = findFacesDetails(faces)
+        faces_details = findFacesDetails(faces)
         im = Image.open(io.BytesIO(frame[0]))
+        size = im.size[0] * im.size[1]
         canvas = ImageDraw.Draw(im)
-        obscureFacesWithSentiments(canvas, details)
+        obscureFacesWithSentiments(canvas, faces_details)
 
         strongest_sentiment = 0.0
         max_confidence = 0.0
-        for face in faces:
-            if face.detection_confidence > max_confidence:
-                strongest_sentiment = getSentimentWeightedByLevel(face)
+        max_area = 0.0
+        for face_detail in faces_details:
+            if face_detail[3] > max_area:
+                max_area = face_detail[3]
+            if face_detail[2] > max_confidence:
+                max_confidence = face_detail[2]
+                strongest_sentiment = face_detail[0]
                 logging.debug("sentiment:{}".format(strongest_sentiment))
-                max_confidence = face.detection_confidence
         logging.debug("_analyzeFrame took {}".format(time.time()-s))
-        return (im, labels, faces, strongest_sentiment)
+        max_area_portion = (max_area * 1.0) / size
+        return (im, labels, faces, strongest_sentiment, max_area_portion)
 
     def captureFrames(self):
         self._image_buffer = io.BytesIO()
@@ -340,7 +345,8 @@ def findFacesDetails(faces):
                 bottom = max(bottom, point.y_coordinate)
                 right = max(right, point.x_coordinate)
             sentiment = getSentimentWeightedByLevel(face)
-            face_details.append((sentiment, ((left, top), (right, bottom))))
+            area = abs(bottom - top) * abs(right - left)
+            face_details.append((sentiment, ((left, top), (right, bottom)), face.confidence, area))
     return face_details
 
 def getColorForSentiment(sentiment):
@@ -365,7 +371,7 @@ def watchForResults(vision_results_queue):
         logging.debug("Done watching")
 
 def obscureFacesWithSentiments(canvas, face_details):
-   for face_sentiment, face_boundary in face_details:
+   for face_sentiment, face_boundary, _, _ in face_details:
         sentiment_color = getColorForSentiment(face_sentiment)
         canvas.ellipse(face_boundary, fill=sentiment_color, outline=None)
         eye_size = max(1, (face_boundary[1][0] - face_boundary[0][0]) / 50)
@@ -374,7 +380,7 @@ def obscureFacesWithSentiments(canvas, face_details):
         nose_level = face_boundary[0][1] + (face_boundary[1][1] - face_boundary[0][1])/2.0
         mouth_size_h = (face_boundary[1][0] - face_boundary[0][0])/2.0
         mouth_size_v = (face_boundary[1][1] - nose_level)/2.0
-        mouth_size=min(mouth_size_v, mouth_size_h)
+        mouth_size = min(mouth_size_v, mouth_size_h)
         mouth_inset = ((face_boundary[1][0]-face_boundary[0][0])-mouth_size)/2
         canvas.ellipse((face_boundary[0][0]+((face_boundary[1][0] - face_boundary[0][0])/3.0)-eye_size, eye_level-eye_size, face_boundary[0][0]+((face_boundary[1][0]-face_boundary[0][0])/3.0)+eye_size, eye_level + eye_size), None, outline=COLOR_FEATURES)
         canvas.ellipse((face_boundary[0][0]+((face_boundary[1][0] - face_boundary[0][0])/3.0)*2-eye_size, eye_level-eye_size, face_boundary[0][0]+((face_boundary[1][0] - face_boundary[0][0])/3.0)*2+eye_size, eye_level+eye_size), None, outline=COLOR_FEATURES)
