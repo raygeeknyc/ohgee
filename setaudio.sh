@@ -14,5 +14,5 @@ gpio -g mode 19 Alt5
 # Lower the volume on the default audio output device
 VOLUME_DEVICE=$(amixer controls | grep 'Playback Volume' | sed 's/numid=//' | sed 's/,.*//')
 if [[ -n "$VOLUME_DEVICE" ]]; then
-  sudo amixer cset numid=$VOLUME_DEVICE 85%
+  sudo amixer cset numid=$VOLUME_DEVICE 90%
 fi
