@@ -205,7 +205,7 @@ def watchForVisionResults(vision_results_queue, image_queue):
             processed_image, labels, faces, sentiment, area = processed_image_results
             logging.debug("{} faces detected".format(len(faces)))
             logging.debug("{} sentiment detected".format(sentiment))
-            logging.info("{} largest face".format(area))
+            logging.debug("{} largest face".format(area))
 
             image_queue.put((processed_image, False))
             logging.debug("Put a processed image %s" % id(processed_image))
