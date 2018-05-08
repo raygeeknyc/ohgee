@@ -346,7 +346,7 @@ def findFacesDetails(faces):
                 right = max(right, point.x_coordinate)
             sentiment = getSentimentWeightedByLevel(face)
             area = abs(bottom - top) * abs(right - left)
-            face_details.append((sentiment, ((left, top), (right, bottom)), face.confidence, area))
+            face_details.append((sentiment, ((left, top), (right, bottom)), face.detection_confidence, area))
     return face_details
 
 def getColorForSentiment(sentiment):
