@@ -307,7 +307,7 @@ PROMPTS_RESPONSES = [
   (affections, affectionResponses, inKindSuffixes, False),
   (thanks, welcomes, None, True),
   (pings, acks, None, False),
-  (humorPrompts, humorResponses, None, True),
+  (humorPrompts, humorResponses, None, False),
   (jokePrompts, jokeResponses, None, True),
   (joke2Prompts, joke2Responses, None, True),
   (hates, sadnesses, None, False),
