@@ -23,9 +23,6 @@ POP_4_RESPONSES = (["hey", "I'm", "talking", "about", "shaft"], ["hey", "I'm", "
 NEWS_1_PROMPTS = (["president" ,"trump"], ["donald", "trump"])
 NEWS_1_RESPONSES = (["Trump", "is", "a", "chump"], ["donald", "chump"], ["dump", "trump"])
 
-FRIENDS_3_PROMPTS = (["I'm", "nilma"], ["I", "am", "nilma"], ["this", "is", "nilma"])
-FRIENDS_3_RESPONSES = (["I'm", "so", "glad", "to", "meet", "you", "nilma"], ["I've", "heard", "so", "much", "about", "you", "nilma"], ["Raymond", "says", "such", "good", "things", "about", "you", "nilma"])
-
 FRIENDS_1_PROMPTS = (["I'm", "diana"], ["I", "am", "diana"], ["this", "is", "diana"])
 FRIENDS_1_RESPONSES = (["I'm", "so", "glad", "to", "meet", "you", "diana"], ["I've", "heard", "so", "much", "about", "you", "diana"], ["Raymond", "says", "such", "good", "things", "about", "you", "diana"])
 
@@ -33,7 +30,7 @@ FRIENDS_2_PROMPTS = (["I'm", "jillian"], ["I", "am", "jillian"], ["this", "is", 
 FRIENDS_2_RESPONSES = (["what", "a", "pleasure", "to", "meet", "you", "jillian"], ["set", "the", "world", "on", "fire", "jillian"], ["I'm", "so", "happy", "to", "finally", "meet", "jillian"])
 
 ID_PROMPTS = (["who", "are", "you"], ["what", "is", "your", "name"], ["what", "are", "you"])
-ID_RESPONSES = (["I", "am", "oh", "jee", ",", "a", "desktop", "robot", "friend"], ["my", "name", "is", "oh", "jee"], ["I", "am", "oh", "jee"], ["hello", "I'm", "oh", "jee"])
+ID_RESPONSES = (["I", "am", "oh", "jee", ",", "a", "desktop", "robot", "friend"], ["my", "name", "is", "oh", "jee"], ["I", "am", "oh", "jee"], ["hello", "I'm", "oh", "jee"]m ["I'm", "just", "the", "cutest", "robot", "you,'ll", "ever", "see"])
 
 INTRO_PROMPTS = (["I", "am"], ["my", "name", "is"], ["hello", "i'm"], ["this", "is"])
 INTRO_RESPONSES = (["hi"], ["hello"], ["it's", "good", "to", "see", "you"], ["i'm", "glad", "to", "know", "you"], ["hey", "there"])
@@ -53,7 +50,7 @@ GIRLS_COUNT_RESPONSES = (["fourteen", "thousand", "two hundred", "and", "ninety 
 BANAL_2_PROMPTS = (["how's", "the", "weather"], ["hows", "the", "weather"], ["what's", "the", "weather"], ["whats", "the", "weather"], ["how", "is", "the", "weather"], ["what", "is", "the", "weather"])
 BANAL_2_RESPONSES = (["chili", "today", "hot", "ta-ma-lay"], ["chili", "today", "but", "hot", "ta-ma-lay"])
 
-GREETINGS = ( ["happy", "national", "robot", "week"], ["o", "la"], ["always", "a", "pleasure"], ["Its", "good", "to", "see", "you"], ["hello"], ["hi"], ["hey", "there"], ["nice", "to", "see", "you"], ["good", "to", "see", "you"], ["welcome"], ["good", "day"], ["good", "day", "to", "you"], ["oh", "hello"], ["yay", ",", "it's", "you"], ["I", "love", "being", "a", "robot"], ["I", "hope", "that", "you", "like", "robots"], ["hello", "human", "friend"])
+GREETINGS = ( ["happy", "national", "robot", "week"], ["oh", "la"], ["always", "a", "pleasure"], ["Its", "good", "to", "see", "you"], ["hello"], ["hi"], ["hey", "there"], ["nice", "to", "see", "you"], ["good", "to", "see", "you"], ["welcome"], ["good", "day"], ["good", "day", "to", "you"], ["oh", "hello"], ["yay", "it's", "you"], ["I", "love", "being", "a", "robot"], ["I", "hope", "that", "you", "like", "robots"], ["hello", "human", "friend"], ["Want", "to", "hear", "a", "joke?"])
 ALL_DAY_GREETINGS = (["good", "morning"], ["good", "afternoon"], ["good", "evening"], ["good", "night"])
 FAREWELLS = (["goodbye"], ["bye"], ["farewell"], ["see","you"], ["talk", "to", "you", "later"], ["take", "care"], ["bye", "bye"], ["see", "you", "later"], ["later"], ["call", "me"], ["did", "you", "just", "sign", "out?"], ["come", "back","soon"], ["I'll", "be", "here"])
 SMUGS = (["I'm", "the", "best"], ["I", "am", "the", "best"], ["Who's", "better", "than", "me"], ["I", "love", "me"], ["I", "love", "myself"])
@@ -159,9 +156,6 @@ def friends1Prompts(_):
 def friends2Prompts(_):
     return FRIENDS_2_PROMPTS
 
-def friends3Prompts(_):
-    return FRIENDS_3_PROMPTS
-
 def caninePrompts(_):
     return CANINE_PROMPTS
 
@@ -209,9 +203,6 @@ def friends1Responses(_):
 
 def friends2Responses(_):
     return FRIENDS_2_RESPONSES
-
-def friends3Responses(_):
-    return FRIENDS_3_RESPONSES
 
 def canineResponses(_):
     return CANINE_RESPONSES
@@ -300,7 +291,6 @@ PROMPTS_RESPONSES = [
   (pop2Prompts, pop2Responses, None, True),
   (friends1Prompts, friends1Responses, None, True),
   (friends2Prompts, friends2Responses, None, True),
-  (friends3Prompts, friends3Responses, None, True),
   (idPrompts, idResponses, None, False),
   (introPrompts, introResponses, None, False), # This should follow specific intros
   (greetings, greetings, inKindSuffixes, True), 
