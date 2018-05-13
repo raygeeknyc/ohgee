@@ -30,7 +30,7 @@ FRIENDS_2_PROMPTS = (["I'm", "jillian"], ["I", "am", "jillian"], ["this", "is", 
 FRIENDS_2_RESPONSES = (["what", "a", "pleasure", "to", "meet", "you", "jillian"], ["set", "the", "world", "on", "fire", "jillian"], ["I'm", "so", "happy", "to", "finally", "meet", "jillian"])
 
 ID_PROMPTS = (["who", "are", "you"], ["what", "is", "your", "name"], ["what", "are", "you"])
-ID_RESPONSES = (["I", "am", "oh", "jee", ",", "a", "desktop", "robot", "friend"], ["my", "name", "is", "oh", "jee"], ["I", "am", "oh", "jee"], ["hello", "I'm", "oh", "jee"]m ["I'm", "just", "the", "cutest", "robot", "you,'ll", "ever", "see"])
+ID_RESPONSES = (["I", "am", "oh", "jee", ",", "a", "desktop", "robot", "friend"], ["my", "name", "is", "oh", "jee"], ["I", "am", "oh", "jee"], ["hello", "I'm", "oh", "jee"], ["I'm", "just", "the", "cutest", "robot", "you,'ll", "ever", "see"])
 
 INTRO_PROMPTS = (["I", "am"], ["my", "name", "is"], ["hello", "i'm"], ["this", "is"])
 INTRO_RESPONSES = (["hi"], ["hello"], ["it's", "good", "to", "see", "you"], ["i'm", "glad", "to", "know", "you"], ["hey", "there"])
@@ -61,6 +61,8 @@ THANKS = (["thank", "you"], ["thanks"], ["why", "thank", "you"], ["thank", "you"
 WELCOMES = (["you're", "welcome"], ["don't", "mention", "it"], ["day", "nada"], ["my", "pleasure"], ["no", "worries"])
 HATES = (["I", "hate", "you"], ["I", "don't", "like", "you"], ["you", "suck"], ["you're", "stupid"], ["you're", "awful"], ["stupid", "robot"], ["dumb", "robot"], ["you", "stink"])
 SADNESSES = (["sniff"], ["you", "break", "my", "heart"], ["that", "makes", "me", "sad"], ["I'm", "sorry"], ["ouch"], ["that", "hurts"], ["I'm", "so", "sorry"])
+HUMOR_PROMPTS = (["tell", "me", "a", "joke"], ["do", "you", "know", "any", "jokes"], ["I", "want", "to", "hear", "a", "joke"], ["be", "funny"])
+HUMOR_RESPONSES = ( ["How", "many", "killer", "robots", "does", "it", "take", "to", "change", "a", "light", "bulb?,,none", "it's", "a", "job", "for", "their", "humans"], ["Two", "robots", "walk", "into", "a", "bar,,wait", "robots", "don't", "drink"], ["Did", "you", "hear", "the", "one", "about", "the", "robot", "that", "fell", "in", "love", "with", "a", "toaster?", "It's", "a", "hot", "one"], ["A", "robot", "is", "just", "like", "a", "human,,", "with", "a", "better", "brain", "and", "metal", "parts"], ["Two", "potatoes", "are", "in", "the", "oven,,,one", "potato", "says", "it's", "warm", "in", "here,,the", "other", "one", "says", "Oh", "Em", "Jee,", "a", "talking", "potato"])
 JOKE_PROMPTS = (["knock", "knock"], ["knock", "knock"])
 JOKE_RESPONSES = (["I", "don't", "know", "who's", "there"], ["you", "get", "it"], ["it's", "for", "you"])
 JOKE_2_PROMPTS = (["why", "did", "the", "chicken", "cross", "the", "road"], 
@@ -225,8 +227,14 @@ def timePrompts(_):
 def datePrompts(_):
     return DATE_PROMPTS
 
+def humorPrompts(_):
+    return HUMOR_PROMPTS
+
 def jokePrompts(_):
     return JOKE_PROMPTS
+
+def humorResponses(_):
+    return HUMOR_RESPONSES
 
 def jokeResponses(_):
     return JOKE_RESPONSES
@@ -299,6 +307,7 @@ PROMPTS_RESPONSES = [
   (affections, affectionResponses, inKindSuffixes, False),
   (thanks, welcomes, None, True),
   (pings, acks, None, False),
+  (humorPrompts, humorResponses, None, True),
   (jokePrompts, jokeResponses, None, True),
   (joke2Prompts, joke2Responses, None, True),
   (hates, sadnesses, None, False),
