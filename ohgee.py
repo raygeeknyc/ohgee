@@ -63,6 +63,8 @@ SENTIMENT_DURATION_STIMULUS_INCREMENT_FACTOR = 2.5
 FACE_CLOSENESS_AREA_THRESHOLD = 1.0/10  # A face must be this portion of the frane for us to greet it
 SPEECH_TMP_FILE="/tmp/speech.wav"
 PICO_CMD='pico2wave -l en-US --wave "%s" "%s";aplay "%s"'
+SCREEN_SLEEP_CMD='./screen_sleep.sh'
+SCREEN_WAKE_CMD='./screen_wake.sh'
 
 def getPhraseForSentiment(dominant_sentiment):
   if dominant_sentiment > 0:
@@ -321,10 +323,16 @@ def searchForObjects(search_queue, image_queue):
     logging.debug("done searching")
 
 def sleepDisplay():
-    pass
+    try {
+        os.system(SCREEN_SLEEP_CMD)
+    except Exception, e:
+        logging.exception("Error putting display to sleep")
 
 def wakeDisplay():
-    pass
+    try {
+        os.system(SCREEN_WAKE_CMD)
+    except Exception, e:
+        logging.exception("Error waking display from sleep")
 
 def maintainDisplay(root_window, image_queue):
     last_image_at = time.time()
