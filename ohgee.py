@@ -1,4 +1,4 @@
-VERSION_ID = ", , version seventeen"
+VERSION_ID = ", , version eighteen"
 import logging
 
 # reorder as appropriate
@@ -33,6 +33,7 @@ STOP = False
 global waving
 waving = False
 
+DISPLAY_SLEEP_DELAY_SECS = 5 * 60
 global mood_set_until
 mood_set_until = 0
 MOOD_SET_DURATION_SECS = 3
@@ -319,7 +320,15 @@ def searchForObjects(search_queue, image_queue):
             logging.exception("error searching")
     logging.debug("done searching")
 
+def sleepDisplay():
+    pass
+
+def wakeDisplay():
+    pass
+
 def maintainDisplay(root_window, image_queue):
+    last_image_at = time.time()
+    display_off = False
     canvas = Tkinter.Canvas(root_window, width=root_window.winfo_screenwidth(), height=root_window.winfo_screenheight())
     canvas.pack()
     logged = False
@@ -330,6 +339,9 @@ def maintainDisplay(root_window, image_queue):
         try:
             try:
                 show_image = False
+                if time.time() - last_image_at > DISPLAY_SLEEP_SECS:
+                    display_off = True
+                    sleepDisplay()
                 t = image_queue.get(False)
                 logging.debug("Image queue had an entry")
                 image, sticky = t
@@ -351,6 +363,10 @@ def maintainDisplay(root_window, image_queue):
                     image_display_min_secs = IMAGE_MIN_DISPLAY_SECS
                     logging.debug("got the most recent image, skipped over {} images".format(skipped_images))
             if show_image:
+                if display_off:
+                    wakeDisplay()
+                    display_off = False
+                last_image_at = time.time()
                 logging.debug("displaying image %s" % id(image))
                 buffer = io.BytesIO(image)
                 buffer.seek(0)
