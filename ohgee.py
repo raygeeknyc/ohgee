@@ -323,13 +323,13 @@ def searchForObjects(search_queue, image_queue):
     logging.debug("done searching")
 
 def sleepDisplay():
-    try {
+    try:
         os.system(SCREEN_SLEEP_CMD)
     except Exception, e:
         logging.exception("Error putting display to sleep")
 
 def wakeDisplay():
-    try {
+    try:
         os.system(SCREEN_WAKE_CMD)
     except Exception, e:
         logging.exception("Error waking display from sleep")
