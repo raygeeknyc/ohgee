@@ -1,4 +1,4 @@
 #!/bin/bash
 # Use whatever means to turn the screen on
-logger "$0 display wake"
+vcgencmd display_power 1
 exit 0
