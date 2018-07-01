@@ -347,7 +347,7 @@ def maintainDisplay(root_window, image_queue):
         try:
             try:
                 show_image = False
-                if (not display_off) and (time.time() - last_image_at > DISPLAY_SLEEP_DELAY_SECS):
+                if (not display_off) and ((time.time() - last_image_at) > DISPLAY_SLEEP_DELAY_SECS):
                     display_off = True
                     sleepDisplay()
                 t = image_queue.get(False)
