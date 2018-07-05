@@ -1,7 +1,7 @@
 #!/bin/bash
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 SCRIPT="$( basename $0 )"
-ping -c 1 www.google.com  1>/dev/null 2>&1
+ping -c 5 www.google.com  1>/dev/null 2>&1
 rc=$?
 if [[ $rc -ne 0 ]]; then
   logger "$0 ping failed"
