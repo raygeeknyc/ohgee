@@ -56,5 +56,6 @@ def getTopImage(search_term):
                     return getImage(image_stream)
     except Exception, e:
         logging.exception("Error getting image")
-    logging.debug("No image fetched")
-    return None
+    finally:
+        logging.debug("No image fetched")
+        return None
