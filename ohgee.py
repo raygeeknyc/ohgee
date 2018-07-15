@@ -1,4 +1,4 @@
-VERSION_ID = ", , version twenty one"
+VERSION_ID = ", , version twenty two"
 import logging
 
 # reorder as appropriate
@@ -63,6 +63,7 @@ SENTIMENT_DURATION_STIMULUS_INCREMENT_FACTOR = 2.5
 FACE_CLOSENESS_AREA_THRESHOLD = 1.0/10  # A face must be this portion of the frane for us to greet it
 SPEECH_TMP_FILE="/tmp/speech.wav"
 PICO_CMD='pico2wave -l en-US --wave "%s" "%s";aplay "%s"'
+REBOOT_CMD='./reboot.sh"
 SCREEN_SLEEP_CMD='./screen_sleep.sh'
 SCREEN_WAKE_CMD='./screen_wake.sh'
 
@@ -155,6 +156,8 @@ def receiveLanguageResults(nl_results, search_queue):
         try:
             phrase = nl_results.recv()
             text, tokens, entities, sentiment, decorated_noun = phrase
+            if text = phraseResponder.REBOOT_RESPONSES[0][0]:
+                reboot()
             logging.debug("Got spoken phrase {}".format(text))
             if speechanalyzer.isGood(sentiment):
                 showGoodMood(sentiment.score)
@@ -327,6 +330,12 @@ def sleepDisplay():
         os.system(SCREEN_SLEEP_CMD)
     except Exception, e:
         logging.exception("Error putting display to sleep")
+
+def wakeDisplay():
+    try:
+        os.system(REBOOT_CMD)
+    except Exception, e:
+        logging.exception("Error rebooting on command")
 
 def wakeDisplay():
     try:

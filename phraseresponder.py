@@ -8,6 +8,9 @@ from random import randint
 from datetime import datetime
 from google.cloud.language.entity import EntityType
 
+REBOOT_PROMPTS = (["ohgee", "please", "reboot"], [])
+REBOOT_RESPONSES = (["rebooting"], ["rebooting"])
+
 POP_1_PROMPTS = (["who", "is", "the", "man"], ["who", "would", "risk", "his", "neck"], ["his", "neck", "for", "his", "brother", "man"], ["the", "cat", "that", "won't", "cop", "out", "when"], ["danger", "all", "about"] )
 POP_1_RESPONSES = (["SHAFT"], ["that's", "shaft"], ["john", "shaft"])
 
@@ -137,6 +140,9 @@ def hates(_):
 def sadnesses(_):
     return SADNESSES
 
+def rebootPrompts(_):
+    return REBOOT_PROMPTS
+
 def pop1Prompts(_):
     return POP_1_PROMPTS
 
@@ -181,6 +187,9 @@ def girlsCountPrompts(_):
 
 def banal2Prompts(_):
     return BANAL_2_PROMPTS
+
+def rebootResponses(_):
+    return REBOOT_RESPONSES
 
 def pop1Responses(_):
     return POP_1_RESPONSES
@@ -292,6 +301,7 @@ def getResponse(phrase, entities):
     return None
 
 PROMPTS_RESPONSES = [
+  (rebootPrompts, rebootResponses, None, True),
   (smugPrompts, smugResponses, None, False),
   (felinePrompts, felineResponses, None, True),
   (caninePrompts, canineResponses, None, True),
