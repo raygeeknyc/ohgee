@@ -8,7 +8,7 @@ from random import randint
 from datetime import datetime
 from google.cloud.language.entity import EntityType
 
-REBOOT_PROMPTS = (["ohgee", "please", "reboot"], [])
+REBOOT_PROMPTS = (["og", "please", "reboot"], [])
 REBOOT_RESPONSES = (["rebooting"], ["rebooting"])
 
 POP_1_PROMPTS = (["who", "is", "the", "man"], ["who", "would", "risk", "his", "neck"], ["his", "neck", "for", "his", "brother", "man"], ["the", "cat", "that", "won't", "cop", "out", "when"], ["danger", "all", "about"] )

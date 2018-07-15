@@ -156,8 +156,6 @@ def receiveLanguageResults(nl_results, search_queue):
         try:
             phrase = nl_results.recv()
             text, tokens, entities, sentiment, decorated_noun = phrase
-            if text == phraseresponder.REBOOT_RESPONSES[0][0]:
-                reboot()
             logging.debug("Got spoken phrase {}".format(text))
             if speechanalyzer.isGood(sentiment):
                 showGoodMood(sentiment.score)
@@ -172,6 +170,9 @@ def receiveLanguageResults(nl_results, search_queue):
                 speech_queue.put(comeback)
                 if wave_flag:
                     startWaving()
+                logging.info("comeback {}".format(comeback))
+                if comeback == phraseresponder.REBOOT_RESPONSES[0]:
+                    reboot()
             if decorated_noun:
                 since_searched = time.time() - last_search_at
                 if since_searched > SEARCH_INTERVAL_SECS:
@@ -331,7 +332,7 @@ def sleepDisplay():
     except Exception, e:
         logging.exception("Error putting display to sleep")
 
-def wakeDisplay():
+def reboot():
     try:
         os.system(REBOOT_CMD)
     except Exception, e:
