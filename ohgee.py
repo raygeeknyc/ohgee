@@ -170,7 +170,6 @@ def receiveLanguageResults(nl_results, search_queue):
                 speech_queue.put(comeback)
                 if wave_flag:
                     startWaving()
-                logging.info("comeback {}".format(comeback))
                 if comeback == phraseresponder.REBOOT_RESPONSES[0]:
                     reboot()
             if decorated_noun:
