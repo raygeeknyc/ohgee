@@ -156,7 +156,7 @@ def receiveLanguageResults(nl_results, search_queue):
         try:
             phrase = nl_results.recv()
             text, tokens, entities, sentiment, decorated_noun = phrase
-            if text = phraseResponder.REBOOT_RESPONSES[0][0]:
+            if text == phraseresponder.REBOOT_RESPONSES[0][0]:
                 reboot()
             logging.debug("Got spoken phrase {}".format(text))
             if speechanalyzer.isGood(sentiment):
