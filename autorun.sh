@@ -25,6 +25,7 @@ else
   pico2wave -l en-US --wave "/tmp/ohgee_help.wav" "Reboot in 5 minutes";aplay "/tmp/ohgee_help.wav"
   exit 255
 fi
+sleep 1
 pico2wave -l en-US --wave "/tmp/ohgee_help.wav" "updating";aplay "/tmp/ohgee_help.wav"
 chmod a+x *.sh
 
