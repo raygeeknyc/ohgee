@@ -26,4 +26,4 @@ Since visual and audible "noise" varies widely based on location, Ohgee establis
 
 Ohgee also updates from github at startup and restarts if network connectivity is lost.
 
-Want to know more? Look at the code!
+Want to know more about any of this? Look at the code!
