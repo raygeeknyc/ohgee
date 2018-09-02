@@ -19,4 +19,4 @@ If a face is "close enough" Ohgee greets the person and says farewell when they 
 Click on the image to see a quick demo...
 [![demo](https://lh3.googleusercontent.com/T6kej9_cPDlSEd9RuixM6UfAnxD8Pn4kLtyg_F677h9dnkVcso314qCQtXiW7K5VIEyRATo-EFPbc4WX2Xl8VG_7bPn4D961hQTSD9dbOrtMporHQnpOHncr2e-oLg8B57IDEyb4fTmVGxK8vqjXDnppachEpghAH3_rr-hcVVWqQVJpJ8EI9cqRX13twzbzODYKb2m9ZLa4tdvgnOyym5mPU87Bz098QADv8DqgaEtCTxs4lVOE7mbAZgqv4X3G_z-o5e2ZVGOPvj13gdNQAJrl6GISkuVsPmTK9YQUE7L0rgLOD8FCmX1fvJfK4dMSyxmeDcyErcTAkwCfoN1EfWugtoMkxtkrq2eI3l7nl84x_Xu1XE5umZ1lpVeCL7C8wV6uaERk6ENYklICMdqmGo9Kg4edn3tR7eVIso6LTzdXxLSMMlhiEkCk36c_LmVHes6ZNrX_y9c9IywPydiaWsy7eIxX-x3URVtep3RRoR-y4uibEDoCx00TiWnEA84pk4Yw93SO8c77TGdXiIBbYC4RGvCKaMTD6SxxFg1AHUDhpNNLKqqaquGSkgJS_o8kgZtU542A-lmX8XxZobiCH2Amy83ybtX5pU8XUr0RnzDnPm74WPJFKchbByj6gc3p=s250-k-rw-no)](https://youtu.be/PBYmpuFzArQ "Ohgee demo")
 
-Want to know more? look at the code!
+Want to know more? Look at the code!
