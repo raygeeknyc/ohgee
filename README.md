@@ -14,8 +14,6 @@ Analyzed speech is examined for known key phrases and patterns to which Ohgee se
 
 Analyzed images are examined for faces - if faces are found, Ohgee elides each face with a smiley illustrating their detected sentiment.
 
-[![demo](http://img.youtube.com/vi/nX_inqaAzOI/0.jpg)](https://www.youtube.com/watch?v=nX_inqaAzOI&feature=youtu.be&hd=1 "Ohgee demo video")
-
-Here's a ![quick demo](https://photos.app.goo.gl/vuvbeiLZ1jtlUJki1?raw=true "Demo")
+[![demo](https://photos.google.com/album/AF1QipMfNQqkhoUR_lF3f1hBuJ2SS7PfYtH_veNL3osC/photo/AF1QipO5n6pN81nSSGS08n9GnxT9nkgO6I80iea4qX7g)](https://photos.app.goo.gl/vuvbeiLZ1jtlUJki1?raw=true "Ohgee Demo")
 
 Want to know more... look at the code!
