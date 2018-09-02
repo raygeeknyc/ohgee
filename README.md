@@ -8,11 +8,13 @@ When motion is detected, images are sent to the [Google Cloud Vision service](ht
 
 When sound is detected, the audion stream is sent to the [Google Cloud Speech-to-Text service](https://cloud.google.com/speech-to-text/) for speech recognition.
 
-Any speech transcript returned by the speech service is sent to the [Google Cloud Natural Language service](https://cloud.google.com/natural-language/) service for analysis.
+Any speech transcript returned by the speech service is sent to the [Google Cloud Natural Language service](https://cloud.google.com/natural-language/) for analysis.
 
 Analyzed speech is examined for known key phrases and patterns to which Ohgee selects a random response from an associated set of responses.
 
 Analyzed images are examined for faces - if faces are found, Ohgee elides each face with a smiley illustrating their detected sentiment.
+
+[![demo](http://img.youtube.com/vi/nX_inqaAzOI/0.jpg)](https://www.youtube.com/watch?v=nX_inqaAzOI&feature=youtu.be&hd=1 "Ohgee demo video")
 
 Here's a ![quick demo](https://photos.app.goo.gl/vuvbeiLZ1jtlUJki1?raw=true "Demo")
 
