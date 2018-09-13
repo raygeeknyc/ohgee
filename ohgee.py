@@ -1,4 +1,4 @@
-VERSION_ID = ", , version twenty two"
+VERSION_ID = ", , version twenty three"
 import logging
 
 # reorder as appropriate
@@ -298,7 +298,7 @@ def startWaving():
         waving = True
 
 def searchForTermImage(search_term):
-    logging.debug("search for: {}".format(search_term))
+    logging.info("search for: {}".format(search_term))
     image = imagesearch.getTopImage(search_term)
     return image
 

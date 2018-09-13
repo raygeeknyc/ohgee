@@ -26,7 +26,9 @@ def isSmallContent(url):
     return True
 
 def getImage(image_stream):
-    return image_stream.getvalue()
+    image_data = image_stream.getvalue()
+    logging.debug("image data: {}".format(len(image_data)))
+    return image_data
 
 service = build("customsearch", "v1",
     developerKey=authinfo.developer_key)
@@ -44,7 +46,9 @@ def getTopImage(search_term):
             logging.debug("No result !!\nres is: {}".format(res))
             return None
         else:
+            logging.debug("{} items".format(len(res['items'])))
             for item in res['items']:
+                logging.debug("link: {}".format(item['link']))
                 image_url = item['link']
                 if not image_url or not isSmallContent(image_url):
                     logging.debug("Skipping {}".format(item['link'].encode('utf-8')))
@@ -56,6 +60,5 @@ def getTopImage(search_term):
                     return getImage(image_stream)
     except Exception, e:
         logging.exception("Error getting image")
-    finally:
-        logging.debug("No image fetched")
-        return None
+    logging.debug("No image fetched")
+    return None
