@@ -168,12 +168,10 @@ class ImageAnalyzer(multiprocessing.Process):
 
     def capturePilFrame(self):
         s=time.time()
-        self._image_buffer.seek(0)
         self._camera.capture(self._image_buffer, format="jpeg", use_video_port=True)
         self._image_buffer.seek(0)
         image = Image.open(self._image_buffer)
         image_pixels = image.load()
-        self._image_buffer.seek(0)
         image = self._image_buffer.getvalue()
         self._last_frame_at = time.time()
         logging.debug("capturePilFrame took {}".format(time.time()-s))
@@ -192,7 +190,6 @@ class ImageAnalyzer(multiprocessing.Process):
             for y in xrange(self._camera.resolution[1]):
                 if abs(self._current_frame[1][x,y][1] - self._prev_frame[1][x,y][1]) > PIXEL_SHIFT_SENSITIVITY:
                     changed_pixels += 1
-        self._prev_frame = self._current_frame
         return changed_pixels
 
     def imageDifferenceOverThreshold(self, changed_pixels_threshold):
@@ -205,7 +202,6 @@ class ImageAnalyzer(multiprocessing.Process):
                     changed_pixels += 1
             if changed_pixels >= changed_pixels_threshold:
                 break
-        self._prev_frame = self._current_frame
         logging.debug("imageDifferenceOverThreshold took {}".format(time.time()-s))
         return changed_pixels >= changed_pixels_threshold
 
@@ -216,8 +212,8 @@ class ImageAnalyzer(multiprocessing.Process):
             self._camera.start_preview(fullscreen=False, window=(100,100,self._camera.resolution[0], self._camera.resolution[1]))
             self._motion_threshold = 9999
             self.getNextFrame()
-            self._prev_frame = self.capturePilFrame()
             for i in range(TRAINING_SAMPLES):
+                self._prev_frame = self._current_frame
                 self.getNextFrame()
                 motion = self.calculateImageDifference()
                 self._motion_threshold = min(motion, self._motion_threshold)
@@ -324,8 +320,8 @@ class ImageAnalyzer(multiprocessing.Process):
                 if self.imageDifferenceOverThreshold(self._motion_threshold):
                     logging.debug("Motion detected")
                     self._frames.put(self._current_frame)
-                    self.getNextFrame()
                     self._prev_frame = self._current_frame
+                    self.getNextFrame()
             except Exception, e:
                 logging.error("Error in analysis: {}".format(e))
         logging.debug("Exiting vision capture thread")
