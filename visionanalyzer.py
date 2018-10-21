@@ -201,10 +201,9 @@ class ImageAnalyzer(multiprocessing.Process):
             for y in xrange(self._camera.resolution[1]):
                 if abs(self._current_frame[1][x,y][1] - self._prev_frame[1][x,y][1]) > PIXEL_SHIFT_SENSITIVITY:
                     changed_pixels += 1
-            if changed_pixels >= changed_pixels_threshold:
-                break
-        logging.debug("imageDifferenceOverThreshold took {}".format(time.time()-s))
-        return changed_pixels >= changed_pixels_threshold
+                    if changed_pixels >= changed_pixels_threshold:
+                        return True
+        return False
 
     def trainMotion(self):
         logging.debug("Training motion")
