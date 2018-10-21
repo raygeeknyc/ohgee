@@ -168,6 +168,7 @@ class ImageAnalyzer(multiprocessing.Process):
 
     def capturePilFrame(self):
         s=time.time()
+        self._image_buffer.seek(0)
         self._camera.capture(self._image_buffer, format="jpeg", use_video_port=True)
         self._image_buffer.seek(0)
         image = Image.open(self._image_buffer)

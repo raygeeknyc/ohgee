@@ -1,4 +1,4 @@
-VERSION_ID = ", , version twenty five"
+VERSION_ID = ", , version twenty six"
 import logging
 
 # reorder as appropriate
