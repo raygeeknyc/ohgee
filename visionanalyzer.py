@@ -184,26 +184,24 @@ class ImageAnalyzer(multiprocessing.Process):
             time.sleep(delay)
         self._current_frame = self.capturePilFrame()
 
-    def calculateImageDifference(self):
+    def calculateImageDifference(self, tolerance=None, sample_percentage=MOTION_DETECT_SAMPLE):
         "Detect changes in the green channel."
         changed_pixels = 0
-        for x in xrange(self._camera.resolution[0]):
-            for y in xrange(self._camera.resolution[1]):
-                if abs(self._current_frame[1][x,y][1] - self._prev_frame[1][x,y][1]) > PIXEL_SHIFT_SENSITIVITY:
-                    changed_pixels += 1
+        pixel_step = int((RESOLUTION[0] * RESOLUTION[1])/(MOTION_DETECT_SAMPLE * RESOLUTION[0] * RESOLUTION[1]))
+        current_pixels = self._current_frame.reshape((RESOLUTION[0] * RESOLUTION[1]), 3)
+        prev_pixels = self._prev_frame.reshape((RESOLUTION[0] * RESOLUTION[1]), 3)
+        for pixel_index in xrange(0, RESOLUTION[0]*RESOLUTION[1], pixel_step):
+            if abs(int(current_pixels[pixel_index][1]) - int(prev_pixels[pixel_index][1])) > PIXEL_SHIFT_SENSITIVITY:
+                changed_pixels += 1
+                if tolerance and changed_pixels > tolerance:
+                  logging.debug("Image diff short circuited at: {}".format(time.time() - s))
+                  return changed_pixels
         return changed_pixels
 
+
     def imageDifferenceOverThreshold(self, changed_pixels_threshold):
-        "Detect changes in the green channel."
-        s=time.time()
-        changed_pixels = 0
-        for x in xrange(self._camera.resolution[0]):
-            for y in xrange(self._camera.resolution[1]):
-                if abs(self._current_frame[1][x,y][1] - self._prev_frame[1][x,y][1]) > PIXEL_SHIFT_SENSITIVITY:
-                    changed_pixels += 1
-                    if changed_pixels > changed_pixels_threshold:
-                        return True
-        return False
+        changed_pixels = self.calculate_image_difference(changed_pixels_threshold)
+        return changed_pixels > changed_pixels_threshold
 
     def trainMotion(self):
         logging.debug("Training motion")
