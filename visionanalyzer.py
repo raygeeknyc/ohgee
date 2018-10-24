@@ -6,6 +6,9 @@ SENTIMENT_CONFIDENCE_THRESHOLD = 0.25
 GOOD_SENTIMENT_THRESHOLD = SENTIMENT_CONFIDENCE_THRESHOLD
 BAD_SENTIMENT_THRESHOLD = -1*SENTIMENT_CONFIDENCE_THRESHOLD
 
+# This is the portion of pixels to compare when detecting motion
+MOTION_DETECT_SAMPLE = 1.0/4  # so... 25%? (Kudos to Sarah Cooper)
+
 # Import the packages we need for drawing and displaying images
 from PIL import Image, ImageDraw
 
