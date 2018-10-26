@@ -198,7 +198,7 @@ class ImageAnalyzer(multiprocessing.Process):
         changed_pixels = 0
         sample_size = sample_percentage * self._camera.resolution[0] * self._camera.resolution[1] 
         step_size = self._camera.resolution[0] * self._camera.resolution[1] / sample_size
-        logging.debug("Motion sample pct, size, step: {},{},{}".format(sample_percentage, sample_size,step_size))
+        logging.debug("Motion threshold, pct, size, step: {},{},{},{}".format(change_threshold, sample_percentage, sample_size, step_size))
         if max(step_size, self._camera.resolution[0]) % min(step_size, self._camera.resolution[0]) == 0:
             y_step = int(max(step_size, self._camera.resolution[1]) / min(step_size, self._camera.resolution[1]))
             x_step = int(max(step_size, self._camera.resolution[0]) % min(step_size, self._camera.resolution[0]))
