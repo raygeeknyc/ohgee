@@ -34,6 +34,8 @@ CAPTURE_RATE_FPS = 2
 TRAINING_SAMPLES = 5
 # This is how much the green channel has to change to consider a pixel changed
 PIXEL_SHIFT_SENSITIVITY = 30
+# This is the portion of pixels to compare when detecting motion
+MOTION_DETECT_SAMPLE = 1.0/4  # so... 25%? (Kudos to Sarah Cooper)
 
 # This is how long to sleep in various threads between shutdown checks
 POLL_SECS = 0.1
@@ -184,26 +186,42 @@ class ImageAnalyzer(multiprocessing.Process):
             time.sleep(delay)
         self._current_frame = self.capturePilFrame()
 
-    def calculateImageDifference(self):
-        "Detect changes in the green channel."
+    def calculateImageDifference(self, change_threshold=None, sample_percentage=MOTION_DETECT_SAMPLE):
+        """
+        Detect changes in the green channel.
+        Sample sample_percentage of pixels, evenly distributed throughout
+        the image's pixel map.
+        If change_threshold is specified, exit once it's reached.
+        """
+        
         changed_pixels = 0
-        for x in xrange(self._camera.resolution[0]):
-            for y in xrange(self._camera.resolution[1]):
-                if abs(self._current_frame[1][x,y][1] - self._prev_frame[1][x,y][1]) > PIXEL_SHIFT_SENSITIVITY:
-                    changed_pixels += 1
+        sample_size = self._camera.resolution[0] * self._camera.resolution[1] * sample_percentage
+        step_size = self._camera.resolution[0] * self._camera.resolution[1] / sample_size
+        if max(step_size, w) % min(step_size, w) == 0:
+            y_step = int(max(step_size, h) / min(step_size, h))
+            x_step = int(max(step_size, w) % min(step_size, w))
+        else:
+            y_step = int(max(step_size, w) / min(step_size, w))
+            x_step = int(max(step_size, h) % min(step_size, h))
+        y = 0
+        x = 0
+        samples = 0
+        while samples < sample_size:
+            samples += 1
+            if abs(self._current_frame[1][x,y][1] - self._prev_frame[1][x,y][1]) > PIXEL_SHIFT_SENSITIVITY:
+                changed_pixels += 1
+            if change_threshold and changed_pixels > change_threshold:
+                return changed_pixels 
+            y += y_step
+            x += x_step
+            if y >= h: y -= h
+            if x >= w: x -= w
         return changed_pixels
 
     def imageDifferenceOverThreshold(self, changed_pixels_threshold):
-        "Detect changes in the green channel."
-        s=time.time()
-        changed_pixels = 0
-        for x in xrange(self._camera.resolution[0]):
-            for y in xrange(self._camera.resolution[1]):
-                if abs(self._current_frame[1][x,y][1] - self._prev_frame[1][x,y][1]) > PIXEL_SHIFT_SENSITIVITY:
-                    changed_pixels += 1
-                    if changed_pixels > changed_pixels_threshold:
-                        return True
-        return False
+        "Are there more changed pixels than we've established as a lower bound for motion?"
+        changed_pixels = self.calculateImageDifference(changed_pixels_threshold)
+        return changed_pixels > changed_pixels_threshold
 
     def trainMotion(self):
         logging.debug("Training motion")
