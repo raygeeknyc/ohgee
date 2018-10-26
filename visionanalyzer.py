@@ -197,12 +197,12 @@ class ImageAnalyzer(multiprocessing.Process):
         changed_pixels = 0
         sample_size = self._camera.resolution[0] * self._camera.resolution[1] * sample_percentage
         step_size = self._camera.resolution[0] * self._camera.resolution[1] / sample_size
-        if max(step_size, w) % min(step_size, w) == 0:
-            y_step = int(max(step_size, h) / min(step_size, h))
-            x_step = int(max(step_size, w) % min(step_size, w))
+        if max(step_size, self._camera.resolution[0]) % min(step_size, self._camera.resolution[0]) == 0:
+            y_step = int(max(step_size, self._camera.resolution[1]) / min(step_size, self._camera.resolution[1]))
+            x_step = int(max(step_size, self._camera.resolution[0]) % min(step_size, self._camera.resolution[0]))
         else:
-            y_step = int(max(step_size, w) / min(step_size, w))
-            x_step = int(max(step_size, h) % min(step_size, h))
+            y_step = int(max(step_size, self._camera.resolution[0]) / min(step_size, self._camera.resolution[0]))
+            x_step = int(max(step_size, self._camera.resolution[1]) % min(step_size, self._camera.resolution[1]))
         y = 0
         x = 0
         samples = 0
@@ -214,8 +214,8 @@ class ImageAnalyzer(multiprocessing.Process):
                 return changed_pixels 
             y += y_step
             x += x_step
-            if y >= h: y -= h
-            if x >= w: x -= w
+            if y >= self._camera.resolution[1]: y -= self._camera.resolution[1]
+            if x >= self._camera.resolution[0]: x -= self._camera.resolution[0]
         return changed_pixels
 
     def imageDifferenceOverThreshold(self, changed_pixels_threshold):
