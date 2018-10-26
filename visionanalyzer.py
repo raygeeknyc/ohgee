@@ -194,6 +194,7 @@ class ImageAnalyzer(multiprocessing.Process):
         If change_threshold is specified, exit once it's reached.
         """
         
+        s = time.time()
         changed_pixels = 0
         sample_size = self._camera.resolution[0] * self._camera.resolution[1] * sample_percentage
         step_size = self._camera.resolution[0] * self._camera.resolution[1] / sample_size
@@ -211,11 +212,13 @@ class ImageAnalyzer(multiprocessing.Process):
             if abs(self._current_frame[1][x,y][1] - self._prev_frame[1][x,y][1]) > PIXEL_SHIFT_SENSITIVITY:
                 changed_pixels += 1
             if change_threshold and changed_pixels > change_threshold:
+                logging.debug("reached threshold: {} secs".format(time.time()-s))
                 return changed_pixels 
             y += y_step
             x += x_step
             if y >= self._camera.resolution[1]: y -= self._camera.resolution[1]
             if x >= self._camera.resolution[0]: x -= self._camera.resolution[0]
+        logging.debug("calculated change: {} secs".format(time.time()-s))
         return changed_pixels
 
     def imageDifferenceOverThreshold(self, changed_pixels_threshold):
