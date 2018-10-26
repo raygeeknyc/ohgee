@@ -2,8 +2,8 @@ VERSION_ID = ", , version twenty nine"
 import logging
 
 # reorder as appropriate
-_DEBUG = logging.DEBUG
 _DEBUG = logging.INFO
+_DEBUG = logging.DEBUG
 
 import Tkinter
 import PIL
