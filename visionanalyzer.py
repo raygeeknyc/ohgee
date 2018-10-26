@@ -35,7 +35,7 @@ TRAINING_SAMPLES = 5
 # This is how much the green channel has to change to consider a pixel changed
 PIXEL_SHIFT_SENSITIVITY = 30
 # This is the portion of pixels to compare when detecting motion
-MOTION_DETECT_SAMPLE = 1.0/4  # so... 25%? (Kudos to Sarah Cooper)
+MOTION_DETECT_SAMPLE = 1.0/20  # so... 5%? (Kudos to Sarah Cooper)
 
 # This is how long to sleep in various threads between shutdown checks
 POLL_SECS = 0.1
@@ -198,13 +198,13 @@ class ImageAnalyzer(multiprocessing.Process):
         changed_pixels = 0
         sample_size = sample_percentage * self._camera.resolution[0] * self._camera.resolution[1] 
         step_size = self._camera.resolution[0] * self._camera.resolution[1] / sample_size
-        logging.debug("Motion threshold, pct, size, step: {},{},{},{}".format(change_threshold, sample_percentage, sample_size, step_size))
         if max(step_size, self._camera.resolution[0]) % min(step_size, self._camera.resolution[0]) == 0:
             y_step = int(max(step_size, self._camera.resolution[1]) / min(step_size, self._camera.resolution[1]))
             x_step = int(max(step_size, self._camera.resolution[0]) % min(step_size, self._camera.resolution[0]))
         else:
             y_step = int(max(step_size, self._camera.resolution[0]) / min(step_size, self._camera.resolution[0]))
             x_step = int(max(step_size, self._camera.resolution[1]) % min(step_size, self._camera.resolution[1]))
+        logging.debug("Motion threshold, pct, size, step_size, x_step, y_step: {},{},{},{},{},{}".format(change_threshold, sample_percentage, sample_size, step_size, x_step, y_step))
         y = 0
         x = 0
         samples = 0
@@ -212,9 +212,9 @@ class ImageAnalyzer(multiprocessing.Process):
             samples += 1
             if abs(self._current_frame[1][x,y][1] - self._prev_frame[1][x,y][1]) > PIXEL_SHIFT_SENSITIVITY:
                 changed_pixels += 1
-            if change_threshold and changed_pixels > change_threshold:
-                logging.debug("reached threshold: {} secs".format(time.time()-s))
-                return changed_pixels 
+                if change_threshold and changed_pixels > change_threshold:
+                    logging.debug("reached threshold: {} secs".format(time.time()-s))
+                    return changed_pixels 
             y += y_step
             x += x_step
             if y >= self._camera.resolution[1]: y -= self._camera.resolution[1]
