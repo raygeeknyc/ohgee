@@ -2,8 +2,8 @@ VERSION_ID = ", , version twenty nine"
 import logging
 
 # reorder as appropriate
-_DEBUG = logging.INFO
 _DEBUG = logging.DEBUG
+_DEBUG = logging.INFO
 
 import Tkinter
 import PIL
@@ -298,7 +298,7 @@ def startWaving():
         waving = True
 
 def searchForTermImage(search_term):
-    logging.info("search for: {}".format(search_term))
+    logging.debug("search for: {}".format(search_term))
     image = imagesearch.getTopImage(search_term)
     return image
 
