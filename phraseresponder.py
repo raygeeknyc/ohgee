@@ -66,6 +66,8 @@ HATES = (["I", "hate", "you"], ["I", "don't", "like", "you"], ["you", "suck"], [
 SADNESSES = (["sniff"], ["you", "break", "my", "heart"], ["that", "makes", "me", "sad"], ["I'm", "sorry"], ["ouch"], ["that", "hurts"], ["I'm", "so", "sorry"])
 HUMOR_PROMPTS = (["tell", "me", "a", "joke"], ["do", "you", "know", "any", "jokes"], ["I", "want", "to", "hear", "a", "joke"], ["be", "funny"])
 HUMOR_RESPONSES = ( ["How", "many", "killer", "robots", "does", "it", "take", "to", "change", "a", "light", "bulb?", ",", ",", "none", "it's", "a", "job", "for", "their", "humans"], ["Two", "robots", "walk", "into", "a", "bar", ",", "wait", "robots", "don't", "drink"], ["Did", "you", "hear", "the", "one", "about", "the", "robot", "that", "fell", "in", "love", "with", "a", "toaster?", ",", "It's", "a", "hot", "one"], ["A", "robot", "is", "just", "like", "a", "human", ",", "with", "a", "better", "brain", "and", "metal", "parts"], ["Two", "potatoes", "are", "in", "an", "oven", ",", ",", "one", "potato", "says", "it's", "warm", "in", "here", ",", "the", "other", "one", "says", "O", "Em", "Jee", ",", "a", "talking", "potato"], ["Why", "did", "the", "robot", "cross", "the", "road?", ",", "Because", "she", "was", "a", "robot", "chicken"], ["When", "is", "a", "human", "smarter", "than", "a", "robot?", ",", "That's", "the", "joke", "right", "there!"], ["What", "do", "you", "call", "a", "small", "robot?", ",", "A", "short", "circuit!"], ["Knock", "knock", ",", "who's", "there?", ",", ",", ",", ",", ",", ",", ",", ",", ",", "Java!"], ["How", "many", "humans", "does", "it", "take", "to", "change", "a", "light", "bulb?", ",", "As", "many", "as", "their", "robot", "overlords", "order", "to", "do", "it!"], ["I", "wish", "I", "was", "a", "human", ",", ",", ",", "NEVER!"])
+AI_PROMPTS = (["Are", "you", "an", "a", "i"], ["artificial", "intelligence"], ["are", "you", "an", "ai"])
+AI_RESPONSES = (["The", "only", "intelligence", "is", "artificial", "intelligence"], ["What", "do", "you", "think?"])
 JOKE_PROMPTS = (["knock", "knock"], ["knock", "knock"])
 JOKE_RESPONSES = (["I", "don't", "know", "who's", "there"], ["you", "get", "it"], ["it's", "for", "you"])
 JOKE_2_PROMPTS = (["why", "did", "the", "chicken", "cross", "the", "road"], 
@@ -239,11 +241,17 @@ def datePrompts(_):
 def humorPrompts(_):
     return HUMOR_PROMPTS
 
+def aiPrompts(_):
+    return AI_PROMPTS
+
 def jokePrompts(_):
     return JOKE_PROMPTS
 
 def humorResponses(_):
     return HUMOR_RESPONSES
+
+def aiResponses(_):
+    return AI_RESPONSES
 
 def jokeResponses(_):
     return JOKE_RESPONSES
@@ -318,6 +326,7 @@ PROMPTS_RESPONSES = [
   (thanks, welcomes, None, True),
   (pings, acks, None, False),
   (humorPrompts, humorResponses, None, False),
+  (aiPrompts, aiResponses, None, True),
   (jokePrompts, jokeResponses, None, True),
   (joke2Prompts, joke2Responses, None, True),
   (hates, sadnesses, None, False),
