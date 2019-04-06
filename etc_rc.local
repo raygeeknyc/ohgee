@@ -18,12 +18,12 @@ if [ "$_IP" ]; then
 fi
 /sbin/swapoff -a
 
-/bin/mkdir /boot/files
+set clobber
+/bin/mkdir -p /boot/files
 /usr/bin/touch /boot/files/networks_list.txt
 /usr/bin/python /home/pi/Documents/workspace/ohgee/generate_wpa_conf.py  /boot/files/networks_list.txt /etc/wpa_supplicant/wpa_supplicant.conf
 
 /usr/bin/touch /var/log/ohgee.out
-set clobber
 /bin/mv /var/log/ohgee.out /var/log/last-ohgee.out
 
 /usr/bin/touch /var/log/ohgee.out
