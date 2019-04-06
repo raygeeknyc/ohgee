@@ -1,0 +1,13 @@
+#############################
+# MAKE THE FOLLOWING CHANGES FOR YOUR OWN NETWORKS
+# ONE LINE PER NETWORK, SSID, PASSWORD - DON'T ADD QUOTES
+# YOU CAN HAVE AS MANY NETWORKS AS YOU WANT
+# THE DEVICE WILL CONNECT TO THE FIRST ONE THAT IT FINDS
+#############################
+
+# here is a network that requires a passsword
+thetardis,100cloudy
+# here is an open network
+GoogleGuest-Legacy
+# here is another network that requires a passsword
+mycafe,brooklyncoffee
