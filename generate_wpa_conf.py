@@ -19,7 +19,7 @@ country=US
 ###############
                 ''')
 
-idef generate_conf_footer(conf_file):
+def generate_conf_footer(conf_file):
         conf_file.write(
                 '''
 ###############
