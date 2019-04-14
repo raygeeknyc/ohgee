@@ -9,5 +9,5 @@
 thetardis,100cloudy
 # here is an open network
 GoogleGuest-Legacy
-# here is another network that requires a passsword
+# here is another network that requires a password
 mycafe,brooklyncoffee
