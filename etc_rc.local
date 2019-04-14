@@ -28,7 +28,7 @@ set clobber
 
 /usr/bin/touch /var/log/ohgee.out
 /bin/chmod 777 /var/log/ohgee.out
-# move to LXDE-pi/autostart
+# Startup has been moved to LXDE-pi/autostart
 # su - pi -c "cd Documents/workspace/ohgee;pwd;./autorun.sh" > /var/log/ohgee.out 2>&1
 
 exit 0
