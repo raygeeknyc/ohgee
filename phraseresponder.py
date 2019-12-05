@@ -32,6 +32,9 @@ FRIENDS_1_RESPONSES = (["I'm", "so", "glad", "to", "meet", "you", "diana"], ["I'
 FRIENDS_2_PROMPTS = (["I'm", "jillian"], ["I", "am", "jillian"], ["this", "is", "jillian"])
 FRIENDS_2_RESPONSES = (["what", "a", "pleasure", "to", "meet", "you", "jillian"], ["set", "the", "world", "on", "fire", "jillian"], ["I'm", "so", "happy", "to", "finally", "meet", "jillian"])
 
+FRIENDS_3_PROMPTS = (["I'm", "Daniela"], ["I", "am", "Daniela"], ["this", "is", "Daniela"])
+FRIENDS_3_RESPONSES = (["ola", "Daniela"],["nice", "to", "meet", "you", "Daniela"])
+
 ID_PROMPTS = (["who", "are", "you"], ["what", "is", "your", "name"], ["what", "are", "you"])
 ID_RESPONSES = (["I", "am", "oh", "jee", ",", "a", "desktop", "robot", "friend"], ["my", "name", "is", "oh", "jee"], ["I", "am", "oh", "jee"], ["hello", "I'm", "oh", "jee"], ["I'm", "just", "the", "cutest", "robot", "you,'ll", "ever", "see"])
 
@@ -166,6 +169,9 @@ def friends1Prompts(_):
 def friends2Prompts(_):
     return FRIENDS_2_PROMPTS
 
+def friends3Prompts(_):
+    return FRIENDS_3_PROMPTS
+
 def caninePrompts(_):
     return CANINE_PROMPTS
 
@@ -216,6 +222,9 @@ def friends1Responses(_):
 
 def friends2Responses(_):
     return FRIENDS_2_RESPONSES
+
+def friends3Responses(_):
+    return FRIENDS_3_RESPONSES
 
 def canineResponses(_):
     return CANINE_RESPONSES
@@ -317,6 +326,7 @@ PROMPTS_RESPONSES = [
   (pop2Prompts, pop2Responses, None, True),
   (friends1Prompts, friends1Responses, None, True),
   (friends2Prompts, friends2Responses, None, True),
+  (friends3Prompts, friends3Responses, None, True),
   (idPrompts, idResponses, None, False),
   (introPrompts, introResponses, None, False), # This should follow specific intros
   (greetings, greetings, inKindSuffixes, True), 
