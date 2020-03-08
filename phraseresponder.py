@@ -29,8 +29,8 @@ NEWS_1_RESPONSES = (["Trump", "is", "a", "chump"], ["donald", "chump"], ["dump",
 FRIENDS_1_PROMPTS = (["I'm", "diana"], ["I", "am", "diana"], ["this", "is", "diana"])
 FRIENDS_1_RESPONSES = (["I'm", "so", "glad", "to", "meet", "you", "diana"], ["I've", "heard", "so", "much", "about", "you", "diana"], ["Raymond", "says", "such", "good", "things", "about", "you", "diana"])
 
-FRIENDS_2_PROMPTS = (["I'm", "jillian"], ["I", "am", "jillian"], ["this", "is", "jillian"])
-FRIENDS_2_RESPONSES = (["what", "a", "pleasure", "to", "meet", "you", "jillian"], ["set", "the", "world", "on", "fire", "jillian"], ["I'm", "so", "happy", "to", "finally", "meet", "jillian"])
+FRIENDS_2_PROMPTS = (["I'm", "Nicole"], ["I", "am", "Nicole"], ["this", "is", "Nicole"], ["It's Nicole"])
+FRIENDS_2_RESPONSES = (["" ,"Nicole!"], ["New", "York", "misses", "you", "Nicole"], ["I", "thought", "you", "are", "Judy", "Jetson"], ["I'm", "so", "happy", "to", "see", "you", "Nicole"])
 
 FRIENDS_3_PROMPTS = (["I'm", "Daniela"], ["I", "am", "Daniela"], ["this", "is", "Daniela"])
 FRIENDS_3_RESPONSES = (["ola", "Daniela"],["nice", "to", "meet", "you", "Daniela"])
