@@ -8,3 +8,8 @@ Screen connections
    * SCK : SCLK
    * LED : GPIO23 # default was 18 but that PWM is needed for the Servo
    
+Servo connections
+   * Gnd : ground
+   * VCC : 5V
+   * Signal : GPIO18
+   
