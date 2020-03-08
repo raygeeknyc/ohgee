@@ -13,3 +13,8 @@ Servo connections
    * VCC : 5V
    * Signal : GPIO18
    
+LED connections
+   * Anode : 3.3V
+   * Red cathode : GPIO2
+   * Green cathode : GPIO3
+   * Blue cathode : GPIO4
