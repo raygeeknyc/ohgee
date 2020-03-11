@@ -170,7 +170,7 @@ def receiveLanguageResults(nl_results, search_queue):
                 speech_queue.put(comeback)
                 if wave_flag:
                     startWaving()
-                if comeback == phraseresponder.REBOOT_RESPONSES[0]:
+                if comeback in phraseresponder.REBOOT_RESPONSES:
                     reboot()
             if decorated_noun:
                 since_searched = time.time() - last_search_at
