@@ -1,4 +1,4 @@
-VERSION_ID = ", , version thirty six"
+VERSION_ID = ", , version thirty seven
 import logging
 
 # reorder as appropriate
@@ -46,7 +46,7 @@ LABEL_RESPONSE_DELAY_SECS = 60.0 * 10
 INITIAL_WAKEUP_GREETING = ["I'm", "awake", VERSION_ID]
 
 servoPin = 18
-ARM_RELAXED_POSITION = 12.0
+ARM_RELAXED_POSITION = 13.0
 ARM_DOWN_POSITION = 9.0
 ARM_UP_POSITION = 13.0
 ARM_WAVE_LOWER_SECS = 0.5
