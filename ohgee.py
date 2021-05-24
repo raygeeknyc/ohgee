@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 VERSION_ID = ", , version thirty nine"
 import logging
 

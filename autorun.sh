@@ -17,7 +17,8 @@ while [ $(date +%s) -lt $endTime ]; do  # Loop until interval has elapsed.
   fi
 done
 if [[ $rc -eq 0 ]]; then
-  MY_ADDRESS=$(ifconfig | grep "inet addr" | grep -v "127.0.0.1" | awk '{print $2}' | awk 'BEGIN { FS = ":" } ; { print $2 }')
+  MY_ADDRESS=$(ifconfig | grep "inet " | grep -v "127.0.0.1" | awk '{print $2}')
+  echo "ADDRESS $MY_ADDRESS"
   pico2wave -l en-US --wave "/tmp/ohgee_online.wav" "My address is $MY_ADDRESS";aplay "/tmp/ohgee_online.wav"
 else
   pico2wave -l en-US --wave "/tmp/ohgee_help.wav" "help!  no network";aplay "/tmp/ohgee_help.wav"

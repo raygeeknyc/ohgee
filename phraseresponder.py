@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 # BUG - single list tuples below raise an error in getResponse()
 import logging
 _DEBUG=logging.INFO

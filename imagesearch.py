@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import PIL
 import sys
 from PIL import Image

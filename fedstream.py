@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 from multiprocessingloghandler import ChildMultiProcessingLogHandler
 import logging
 import Queue

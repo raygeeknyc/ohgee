@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import multiprocessing, logging, sys, os, threading, time, Queue
 
 class MultiProcessingLogHandler(logging.Handler):

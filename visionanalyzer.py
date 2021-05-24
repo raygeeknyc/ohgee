@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import logging
 # Used only if this is run as main
 _DEBUG = logging.DEBUG

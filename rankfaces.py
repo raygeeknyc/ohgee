@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 # Import the packages we need for drawing and displaying images
 from PIL import Image, ImageDraw
 import logging
