@@ -1,4 +1,5 @@
 #!/bin/bash
+PYTHON=$(which python3)
 if [[ -z "$DISPLAY" ]];then
   export DISPLAY=":0.0"
 fi
@@ -43,5 +44,5 @@ if [[ $rc -ne 0 ]]; then
   exit 255
 fi
 ./pre_launch_hook.sh 2>&1
-nohup python ohgee.py &
+nohup $PYTHON ohgee.py &
 exit 0
