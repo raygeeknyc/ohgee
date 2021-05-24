@@ -9,7 +9,7 @@ import threading
 from fedstream import FedStream
 import pyaudio
 import array
-import Queue
+import queue
 import io
 import os
 import sys
@@ -39,7 +39,7 @@ class SpeechRecognizer(multiprocessing.Process):
         self._transcript, _ = transcript
         self._stop_capturing = False
         self._stop_recognizing = False
-        self._audio_buffer = Queue.Queue()
+        self._audio_buffer = queue.Queue()
 
     def resumeListening(self):
         logging.debug("***background received resume")
@@ -70,7 +70,7 @@ class SpeechRecognizer(multiprocessing.Process):
             self._suspend_listening.clear()
             self._capturer.start()
             self._exit.wait()
-        except Exception, e:
+        except Exception:
             logging.exception("recognizer process exception")
         finally:
             self._stopCapturing()
@@ -104,7 +104,7 @@ class SpeechRecognizer(multiprocessing.Process):
                 self._silence_threshold += volume
                 silence_min = min(volume, silence_min)
                 silence_samples += 1
-            except Exception, e:
+            except Exception:
                 logging.exception("Training mic read raised exception")
         self._silence_threshold /= silence_samples
         self._silence_threshold -= abs(self._silence_threshold - silence_min)/2
@@ -141,7 +141,7 @@ class SpeechRecognizer(multiprocessing.Process):
                     self._audio_stream.close()
                 if consecutive_silent_samples < PAUSE_LENGTH_IN_SAMPLES:
                     self._audio_buffer.put(data)
-            except IOError, e:
+            except IOError:
                 logging.exception("IOError capturing audio")
         logging.debug("ending sound capture")
         # stop Recording
@@ -184,9 +184,9 @@ class SpeechRecognizer(multiprocessing.Process):
                         self._transcript.send(alternative.transcript)
                     if self._stop_recognizing:
                         break
-            except grpc._channel._Rendezvous, e:
+            except grpc._channel._Rendezvous:
                 logging.debug("empty stream recognition attempted")
                 continue
-            except Exception, e:
+            except Exception:
                 logging.exception("error recognizing speech")
         logging.debug("stopped recognizing")

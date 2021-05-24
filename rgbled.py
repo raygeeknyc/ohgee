@@ -91,7 +91,7 @@ if __name__ == "__main__":
     sleepLed.start()
     response = raw_input("waiting for you before stopping... ")
     demo.stop()
-    print "waiting for LED to stop cycling"
+    print("waiting for LED to stop cycling")
     sleepLed.join()
     GPIO.cleanup()
     sys.exit()

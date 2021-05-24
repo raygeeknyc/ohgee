@@ -391,9 +391,9 @@ def departed(phrase):
 
 if __name__ == '__main__':
     logging.getLogger('').setLevel(_DEBUG)
-    print getGreeting()
+    print(getGreeting())
     while True:
         phrase = raw_input("Enter a phrase to match: ")
         if not phrase:
             break
-        print getResponse(phrase, None)
+        print(getResponse(phrase, None))

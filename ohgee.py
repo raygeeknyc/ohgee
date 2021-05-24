@@ -7,7 +7,7 @@ import logging
 _DEBUG = logging.DEBUG
 _DEBUG = logging.INFO
 
-import Tkinter
+import tkinter
 import PIL
 from PIL import ImageTk, Image
 
@@ -20,7 +20,7 @@ import time
 import io
 import sys
 import os, signal
-import Queue
+import queue
 
 import rgbled
 import speechrecognizer
@@ -124,7 +124,7 @@ def speak(speech_queue):
             recognition_worker.suspendListening()
             logging.debug("Saying {}".format(utterance))
             os.system(PICO_CMD % (SPEECH_TMP_FILE, utterance, SPEECH_TMP_FILE))
-        except Exception, e:
+        except Exception:
             logging.exception("Error speaking")
         finally:
             recognition_worker.resumeListening()
@@ -182,7 +182,7 @@ def receiveLanguageResults(nl_results, search_queue):
         except EOFError:
             logging.debug("End of NL results queue")
             break
-        except Exception, e:
+        except Exception:
             logging.exception("Error speaking")
     logging.debug("Done listening")
 
@@ -193,7 +193,7 @@ def watchForVisionResults(vision_results_queue, image_queue):
     recent_face_counts = collections.deque([0.0, 0.0, 0.0], maxlen=3)
     
     last_greeting_at = 0.0
-    last_wave_at = 0l
+    last_wave_at = 0
     dominant_sentiment = -999
     last_label_response_at = time.time()
     prev_recognized_label_text = None
@@ -281,7 +281,7 @@ def watchForVisionResults(vision_results_queue, image_queue):
         except EOFError:
             logging.debug("End of vision queue")
             break
-        except Exception, e:
+        except Exception:
             logging.exception("Error watching")
     logging.debug("Done watching")
 
@@ -312,7 +312,7 @@ def searchForObjects(search_queue, image_queue):
             t = search_queue.get(False)
             logging.debug("Search queue had an entry")
             search_term = t
-        except Queue.Empty:
+        except queue.Empty:
             if not search_term:
                 logging.debug("Empty search queue, waiting")
                 time.sleep(SEARCH_POLL_DELAY_SECS)
@@ -323,26 +323,26 @@ def searchForObjects(search_queue, image_queue):
                 image_queue.put((top_image, True))
                 logging.debug("Put image on display queue")
             search_term = None
-        except Exception, e:
+        except Exception:
             logging.exception("error searching")
     logging.debug("done searching")
 
 def sleepDisplay():
     try:
         os.system(SCREEN_SLEEP_CMD)
-    except Exception, e:
+    except Exception:
         logging.exception("Error putting display to sleep")
 
 def reboot():
     try:
         os.system(REBOOT_CMD)
-    except Exception, e:
+    except Exception:
         logging.exception("Error rebooting on command")
 
 def wakeDisplay():
     try:
         os.system(SCREEN_WAKE_CMD)
-    except Exception, e:
+    except Exception:
         logging.exception("Error waking display from sleep")
 
 def maintainDisplay(root_window, image_queue):
@@ -371,7 +371,7 @@ def maintainDisplay(root_window, image_queue):
                     image_display_min_secs = IMAGE_STICKY_DISPLAY_SECS
                 else:
                     skipped_images += 1
-            except Queue.Empty:
+            except queue.Empty:
                 if not image:
                     logging.debug("Empty image queue, waiting")
                     skipped_images = 0
@@ -397,7 +397,7 @@ def maintainDisplay(root_window, image_queue):
                 image = None
                 logging.debug("displayed image %s" % id(image))
                 time.sleep(image_display_min_secs)
-        except Exception, e:
+        except Exception:
             if not logged:
                 logging.exception("error displaying")
                 logged = True
@@ -455,18 +455,18 @@ if __name__ == '__main__':
         waver = threading.Thread(target = wave, args=())
         waver.start()
 
-        image_queue = Queue.Queue()
+        image_queue = queue.Queue()
         watcher = threading.Thread(target = watchForVisionResults, args=(vision_results_queue, image_queue))
         watcher.start()
 
-        search_queue = Queue.Queue()
+        search_queue = queue.Queue()
         searcher = threading.Thread(target = searchForObjects, args=(search_queue, image_queue,))
         searcher.start()
 
         displayer = threading.Thread(target = maintainDisplay, args=(root, image_queue,))
         displayer.start()
 
-        speech_queue = Queue.Queue()
+        speech_queue = queue.Queue()
         speaker = threading.Thread(target = speak, args=(speech_queue,))
         speaker.start()
         
@@ -476,7 +476,7 @@ if __name__ == '__main__':
         speech_queue.put(INITIAL_WAKEUP_GREETING)
         logging.debug("Waiting")
         root.mainloop()
-    except Exception, e:
+    except Exception as e:
         logging.error("Error in main: {}".format(e))
     finally:
         logging.debug("Ending main")

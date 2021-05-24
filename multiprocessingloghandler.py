@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import multiprocessing, logging, sys, os, threading, time, Queue
+import multiprocessing, logging, sys, os, threading, time, queue
 
 class MultiProcessingLogHandler(logging.Handler):
     def __init__(self, queue):
@@ -34,7 +34,7 @@ class ParentMultiProcessingLogHandler(MultiProcessingLogHandler):
             try:
                 record = self.queue.get(True, self.polltime)
                 self._handler.emit(record)
-            except Queue.Empty, e:
+            except queue.Empty:
                 pass
 
     def close(self):

@@ -29,8 +29,8 @@ for i in range(10):
     print("main {}, waiting".format(i))
     time.sleep(2)
     if not waving:
-        print "go"
+        print("go")
         waving = True
-print "final wait"
+print("final wait")
 producer.join()
 print "done"

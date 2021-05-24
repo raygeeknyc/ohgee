@@ -64,7 +64,7 @@ class Background(multiprocessing.Process):
             self._exit.wait()
             logging.debug("exit event received")
  
-        except Exception, e:
+        except Exception as e:
             logging.error("***background exception: {}".format(e))
         logging.debug("***background terminating")
         self._stopProducing()
@@ -119,7 +119,7 @@ if __name__ == '__main__':
             if c > 5:
                 break;
             time.sleep(2)
-    except Exception, e:
+    except Exception as e:
         logging.error("Error in main: {}".format(e))
     logging.info("ending main")
     background_process.stop()

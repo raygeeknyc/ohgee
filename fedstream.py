@@ -2,7 +2,7 @@
 
 from multiprocessingloghandler import ChildMultiProcessingLogHandler
 import logging
-import Queue
+import queue
 import os
 
 class FedStream(object):
@@ -36,7 +36,7 @@ class FedStream(object):
         while not data and not self.closed:
             try:
                 data = [self._buff.get(timeout=0.1)]
-            except Queue.Empty:
+            except queue.Empty:
                 pass
         if not data:
             logging.debug("fedstream read() no data, closed")
@@ -46,6 +46,6 @@ class FedStream(object):
         while True:
             try:
                 data.append(self._buff.get(block=False))
-            except Queue.Empty:
+            except queue.Empty:
                 break
         return b''.join(data)
