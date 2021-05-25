@@ -5,7 +5,7 @@ import logging
 _DEBUG = logging.DEBUG
 _DEBUG = logging.INFO
 
-import Tkinter as tk
+import tkinter as tk
 import PIL
 from PIL import ImageTk, Image
 
