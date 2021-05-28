@@ -23,15 +23,20 @@ class RgbLed:
     GPIO.setmode(GPIO.BCM)
     GPIO.setwarnings(False)
 
-    def __init__(self, redPin, greenPin, bluePin):
+    def __init__(self, redPin, greenPin, bluePin, powerPin=None):
 
         self._redPin = redPin
         self._greenPin = greenPin
         self._bluePin = bluePin
+        self._powerPin = powerPin
 
         GPIO.setup(self._redPin, GPIO.OUT)
         GPIO.setup(self._greenPin, GPIO.OUT)
         GPIO.setup(self._bluePin, GPIO.OUT)
+        if powerPin is not None:
+            GPIO.setup(self._powerPin, GPIO.OUT)
+            GPIO.output(self._powerPin, GPIO.HIGH)
+        
         self.setColor(OFF)
 
     def setColor(self, rgb):
@@ -89,7 +94,7 @@ if __name__ == "__main__":
 
     sleepLed = threading.Thread(target = demo.cycle, args=(2,))
     sleepLed.start()
-    response = raw_input("waiting for you before stopping... ")
+    response = input("waiting for you before stopping... ")
     demo.stop()
     print("waiting for LED to stop cycling")
     sleepLed.join()
