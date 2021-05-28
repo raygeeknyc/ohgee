@@ -4,8 +4,8 @@ VERSION_ID = ", , version thirty nine"
 import logging
 
 # reorder as appropriate
-_DEBUG = logging.DEBUG
 _DEBUG = logging.INFO
+_DEBUG = logging.DEBUG
 
 import tkinter
 import PIL
@@ -408,6 +408,15 @@ def maintainDisplay(root_window, image_queue):
     root_window.quit()
     
 if __name__ == '__main__':
+    print('starting')
+    log_stream = sys.stderr
+    log_queue = multiprocessing.Queue(100)
+    handler = ParentMultiProcessingLogHandler(logging.StreamHandler(log_stream), log_queue)
+    logging.getLogger('').addHandler(handler)
+    logging.getLogger('').setLevel(_DEBUG)
+
+    logging.debug('starting')
+    logging.debug('setting up display')
     root = Tkinter.Tk()
     #root.geometry("%dx%d+%d+%d" % (root.winfo_screenwidth(), root.winfo_screenheight(), 0, 0))
     root.wm_attributes('-fullscreen','true')
@@ -415,20 +424,16 @@ if __name__ == '__main__':
     root.overrideredirect(True)
     root.config(cursor='none')
 
+    logging.debug('setting up LED')
     led = rgbled.RgbLed(rgbled.redPin, rgbled.greenPin, rgbled.bluePin)
     led.setColor(rgbled.OFF)
 
+    logging.debug('setting up servo')
     GPIO.setup(servoPin, GPIO.OUT)
     arm = GPIO.PWM(servoPin, 50)
     arm.start(0)
 
     waveArm()
-
-    log_stream = sys.stderr
-    log_queue = multiprocessing.Queue(100)
-    handler = ParentMultiProcessingLogHandler(logging.StreamHandler(log_stream), log_queue)
-    logging.getLogger('').addHandler(handler)
-    logging.getLogger('').setLevel(_DEBUG)
 
     transcript = multiprocessing.Pipe()
     recognition_worker = speechrecognizer.SpeechRecognizer(transcript, log_queue, logging.getLogger('').getEffectiveLevel())

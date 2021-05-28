@@ -2,6 +2,7 @@
 
 import logging
 
+from google.cloud import speech
 import multiprocessing
 import time
 from multiprocessingloghandler import ChildMultiProcessingLogHandler
@@ -13,8 +14,6 @@ import queue
 import io
 import os
 import sys
-import grpc  # for error types returned by the client
-from google.cloud import speech
 
 # Setup audio and cloud speech
 FORMAT = pyaudio.paInt16
@@ -28,6 +27,9 @@ SAMPLE_RETRY_DELAY_SECS = 0.1
 
 # This is how many samples to take to find the lowest sound level
 SILENCE_TRAINING_SAMPLES = 10
+
+# How many consecutive errors we'll tolerate from the cloud speech service
+MAX_CONSECUTIVE_SPEECH_ERRORS = 3
 
 class SpeechRecognizer(multiprocessing.Process):
     def __init__(self, transcript, log_queue, logging_level):
@@ -152,8 +154,21 @@ class SpeechRecognizer(multiprocessing.Process):
 
     def recognizeSpeech(self):
         logging.debug("started recognizing")
-        self._speech_client = speech.Client()
+        self._speech_client = speech.SpeechClient()
+
+        language_code = 'en-US'  # a BCP-47 language tag
+        speech_client = speech.SpeechClient()
+        config = speech.RecognitionConfig(
+            encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
+            sample_rate_hertz=RATE,
+            language_code=language_code,
+            enable_word_time_offsets=False)
+        self._streaming_config = speech.StreamingRecognitionConfig(
+            config=config,
+            interim_results=False)
+
         logging.debug("Starting sampling")
+
         audio_sample = self._speech_client.sample(
             stream=self._audio_stream,
             source_uri=None,
@@ -161,6 +176,7 @@ class SpeechRecognizer(multiprocessing.Process):
             sample_rate_hertz=RATE)
         logging.debug("Starting recognizing")
         waiting = False
+        consecutive_error_count = 0 
         while not self._stop_recognizing:
             try:
                 if self._audio_stream.closed:
@@ -175,6 +191,7 @@ class SpeechRecognizer(multiprocessing.Process):
                 logging.debug("recognizing speech")
                 alternatives = audio_sample.streaming_recognize('en-US',
                     interim_results=True)
+                consecutive_error_count = 0 
                 for alternative in alternatives:
                     logging.debug("speech: {}".format(alternative.transcript))
                     logging.debug("final: {}".format(alternative.is_final))
@@ -184,9 +201,10 @@ class SpeechRecognizer(multiprocessing.Process):
                         self._transcript.send(alternative.transcript)
                     if self._stop_recognizing:
                         break
-            except grpc._channel._Rendezvous:
-                logging.debug("empty stream recognition attempted")
-                continue
             except Exception:
-                logging.exception("error recognizing speech")
+                consecutive_error_count += 1
+                logging.exception("error[%d] recognizing speech", consecutive_error_count)
+                if consecutive_error_count < MAX_CONSECUTIVE_SPEECH_ERRORS:
+                    continue
+                logging.error('max consecutive errors reached. aborting.')
         logging.debug("stopped recognizing")
