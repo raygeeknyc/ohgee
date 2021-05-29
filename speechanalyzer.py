@@ -44,7 +44,7 @@ class SpeechAnalyzer(multiprocessing.Process):
         self._initLogging()
         logging.debug("***speech analyzer starting")
         try:
-            self._language_client = language.Client()
+            self._language_client = language.LanguageServiceClient()
             self._analyzeSpeech()
             logging.debug("speech analyzer done analyzing")
         except Exception:

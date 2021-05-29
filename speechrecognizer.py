@@ -96,7 +96,7 @@ class SpeechRecognizer(multiprocessing.Process):
         self._silence_threshold = 0
         silence_min = 9999
         silence_samples = 0
-        for sample in xrange(SILENCE_TRAINING_SAMPLES):
+        for sample in range(SILENCE_TRAINING_SAMPLES):
             try:
                 data = mic_stream.read(FRAMES_PER_BUFFER)
                 volume = max(array.array('h', data))

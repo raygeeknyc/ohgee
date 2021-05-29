@@ -213,8 +213,8 @@ class ImageAnalyzer(multiprocessing.Process):
             y_step = 1
         logging.debug("Motion threshold, pct, size, step_size, x_step, y_step: {},{},{},{},{},{}".format(change_threshold, sample_percentage, sample_size, step_size, x_step, y_step))
         samples = 0
-        for x in xrange(0, self._camera.resolution[0], x_step):
-            for y in xrange(0, self._camera.resolution[1], y_step):
+        for x in range(0, self._camera.resolution[0], x_step):
+            for y in range(0, self._camera.resolution[1], y_step):
                 samples += 1
                 if abs(self._current_frame[1][x,y][1] - self._prev_frame[1][x,y][1]) > PIXEL_SHIFT_SENSITIVITY:
                     changed_pixels += 1
@@ -271,7 +271,7 @@ class ImageAnalyzer(multiprocessing.Process):
             sys.exit(0)
 
     def analyzeVision(self):
-        self._vision_client = vision.Client()
+        self._vision_client = vision.ImageAnnotatorClient()
         skipped_images = 0
         frame = None
         while not self._stop_analyzing:
@@ -334,7 +334,7 @@ class ImageAnalyzer(multiprocessing.Process):
         self._camera.vflip = True
         prev_array = None
         logging.info("Training motion detection")
-        for retry in xrange(3):
+        for retry in range(3):
             if self.trainMotion():
                 break
         logging.info("Trained motion detection {}".format(self._motion_threshold))

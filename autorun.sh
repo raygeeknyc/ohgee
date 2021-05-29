@@ -3,8 +3,6 @@ PYTHON=$(which python3)
 if [[ -z "$DISPLAY" ]];then
   export DISPLAY=":0.0"
 fi
-echo "Setting up audio"
-./setaudio.sh
 echo "Waiting for connectivity"
 timeout_secs=90
 endTime=$(( $(date +%s) + timeout_secs )) # Calculate end time.
