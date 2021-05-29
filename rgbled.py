@@ -9,6 +9,7 @@ import sys
 redPin = 2
 greenPin = 3
 bluePin = 4
+powerPin = 17
 
 RED = (True, False, False)
 GREEN = (False, True, False)
@@ -35,12 +36,16 @@ class RgbLed:
         GPIO.setup(self._bluePin, GPIO.OUT)
         if powerPin is not None:
             GPIO.setup(self._powerPin, GPIO.OUT)
-            GPIO.output(self._powerPin, GPIO.HIGH)
         
         self.setColor(OFF)
 
     def setColor(self, rgb):
         self._color = rgb
+        if powerPin is not None:
+            if rgb[0] or rgb[1] or rgb[2]:
+                GPIO.output(self._powerPin, GPIO.HIGH)
+            else:
+                GPIO.output(self._powerPin, GPIO.LOW)
         GPIO.output(self._redPin, GPIO.LOW if rgb[0] else GPIO.HIGH)
         GPIO.output(self._greenPin, GPIO.LOW if rgb[1] else GPIO.HIGH)
         GPIO.output(self._bluePin, GPIO.LOW if rgb[2] else GPIO.HIGH)
@@ -73,7 +78,7 @@ class RgbLed:
             self.setColor(RED)
 
 if __name__ == "__main__":
-    demo = RgbLed(redPin, greenPin, bluePin)
+    demo = RgbLed(redPin, greenPin, bluePin, powerPin)
     demo.setColor(RED)
     time.sleep((0.5))
     demo.setColor(GREEN)

@@ -425,7 +425,7 @@ if __name__ == '__main__':
     root.config(cursor='none')
 
     logging.debug('setting up LED')
-    led = rgbled.RgbLed(rgbled.redPin, rgbled.greenPin, rgbled.bluePin)
+    led = rgbled.RgbLed(rgbled.redPin, rgbled.greenPin, rgbled.bluePin, rgbled.powerPin)
     led.setColor(rgbled.OFF)
 
     logging.debug('setting up servo')
