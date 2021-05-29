@@ -348,7 +348,7 @@ def wakeDisplay():
 def maintainDisplay(root_window, image_queue):
     last_image_at = time.time()
     display_off = False
-    canvas = Tkinter.Canvas(root_window, width=root_window.winfo_screenwidth(), height=root_window.winfo_screenheight())
+    canvas = tkinter.Canvas(root_window, width=root_window.winfo_screenwidth(), height=root_window.winfo_screenheight())
     canvas.pack()
     logged = False
     image = None
@@ -417,7 +417,7 @@ if __name__ == '__main__':
 
     logging.debug('starting')
     logging.debug('setting up display')
-    root = Tkinter.Tk()
+    root = tkinter.Tk()
     #root.geometry("%dx%d+%d+%d" % (root.winfo_screenwidth(), root.winfo_screenheight(), 0, 0))
     root.wm_attributes('-fullscreen','true')
     root.wm_attributes('-type', 'splash')

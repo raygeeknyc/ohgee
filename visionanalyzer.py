@@ -13,7 +13,11 @@ from PIL import Image, ImageDraw
 
 # Imports the Google Cloud client packages we need
 from google.cloud import vision
-from google.cloud.vision.likelihood import Likelihood
+
+# Enumerate the likelihood names that are defined by Cloud Vision 1
+LIKELIHOOD_NAMES = ('UNKNOWN', 'VERY_UNLIKELY', 'UNLIKELY', 'POSSIBLE',
+  'LIKELY', 'VERY_LIKELY')
+
 
 from picamera import PiCamera
 
@@ -26,7 +30,7 @@ import sys
 import os
 import time
 import signal
-import Queue
+import queue
 import threading
 
 # This is the desired resolution of the Pi camera
@@ -135,16 +139,16 @@ def getSentimentForLevel(face, level):
 def getSentimentWeightedByLevel(face):
     logging.debug("joy: {}, surprise:{}, anger:{}, sorrow:{}".format(
         face.joy, face.surprise, face.anger, face.sorrow))
-    sentiment = getSentimentForLevel(face, Likelihood.VERY_LIKELY)
+    sentiment = getSentimentForLevel(face, LIKELIHOOD_NAMES.VERY_LIKELY)
     if sentiment != 0:
        return sentiment
-    sentiment = getSentimentForLevel(face, Likelihood.LIKELY)
+    sentiment = getSentimentForLevel(face, LIKELIHOOD_NAMES.LIKELY)
     if sentiment != 0:
        return sentiment * SENTIMENT_CONFIDENCE_THRESHOLD
-    sentiment = getSentimentForLevel(face, Likelihood.POSSIBLE)
+    sentiment = getSentimentForLevel(face, LIKELIHOOD_NAMES.POSSIBLE)
     if sentiment != 0:
        return sentiment * SENTIMENT_CONFIDENCE_THRESHOLD
-    sentiment = getSentimentForLevel(face, Likelihood.UNLIKELY)
+    sentiment = getSentimentForLevel(face, LIKELIHOOD_NAMES.UNLIKELY)
     if sentiment != 0:
        return sentiment * 0.25
     return 0.0
@@ -246,7 +250,7 @@ class ImageAnalyzer(multiprocessing.Process):
     def run(self):
         self._initLogging()
         try:
-            self._frames = Queue.Queue()
+            self._frames = queue.Queue()
             self._stop_capturing = False
             self._stop_analyzing = False
             self._capturer = threading.Thread(target=self.captureFrames)
@@ -274,7 +278,7 @@ class ImageAnalyzer(multiprocessing.Process):
             try:
                 frame = self._frames.get(block=False)
                 skipped_images += 1
-            except Queue.Empty:
+            except queue.Empty:
                 if not frame:
                     logging.debug("Empty image queue, waiting")
                     skipped_images = 0

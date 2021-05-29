@@ -8,7 +8,7 @@ _DEBUG=logging.DEBUG
 import os
 from random import randint
 from datetime import datetime
-from google.cloud.language.entity import EntityType
+from google.cloud import language_v1
 
 REBOOT_PROMPTS = (["og", "please", "reboot"], ["oh", "please", "reboot"], ["o", "please", "reboot"])
 REBOOT_RESPONSES = (["rebooting"], ["I'm", "rebooting"],  ["Okay", "", "I'm", "on", "it"])
@@ -301,7 +301,7 @@ def getPerson(entities):
     salience = 0
     person = ""
     for entity in entities:
-        if entity.entity_type == EntityType.PERSON:
+        if entity.entity_type == language_v1.Entity.Type.PERSON:
           if entity.salience > salience:
             salience = entity.salience
             person = entity.name
