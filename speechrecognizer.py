@@ -158,22 +158,15 @@ class SpeechRecognizer(multiprocessing.Process):
 
         language_code = 'en-US'  # a BCP-47 language tag
         speech_client = speech.SpeechClient()
+        requests = (speech.StreamingRecognizeRequest(audio_content=chunk) for chunk in self._audio_stream)
         config = speech.RecognitionConfig(
             encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
             sample_rate_hertz=RATE,
-            language_code=language_code,
-            enable_word_time_offsets=False)
+            language_code=language_code)
         self._streaming_config = speech.StreamingRecognitionConfig(
             config=config,
-            interim_results=False)
+            interim_results=True)
 
-        logging.debug("Starting sampling")
-
-        audio_sample = self._speech_client.sample(
-            stream=self._audio_stream,
-            source_uri=None,
-            encoding=speech.encoding.Encoding.LINEAR16,
-            sample_rate_hertz=RATE)
         logging.debug("Starting recognizing")
         waiting = False
         consecutive_error_count = 0 
@@ -189,8 +182,17 @@ class SpeechRecognizer(multiprocessing.Process):
                     logging.debug("heard sound to analyze")
                     waiting = False
                 logging.debug("recognizing speech")
-                alternatives = audio_sample.streaming_recognize('en-US',
-                    interim_results=True)
+
+                responses = client.streaming_recognize(
+                    config=streaming_config, requests=requests)
+
+                if not responses:
+                    continue
+                response = responses[0]
+                result = response.results[0]
+                if not result.alternatives:
+                    continue
+                alternatives = result.alternatives
                 consecutive_error_count = 0 
                 for alternative in alternatives:
                     logging.debug("speech: {}".format(alternative.transcript))
