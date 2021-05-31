@@ -167,7 +167,8 @@ class SpeechRecognizer(multiprocessing.Process):
 
         language_code = 'en-US'  # a BCP-47 language tag
         speech_client = speech.SpeechClient()
-        requests = (speech.StreamingRecognizeRequest(audio_content=chunk) for chunk in self._audio_stream)
+
+        requests = (speech.StreamingRecognizeRequest(audio_content=chunk) for content, seq, chunk_count, start_offset, end_offset in next(self._audio_generator))
         config = speech.RecognitionConfig(
             encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
             sample_rate_hertz=RATE,
