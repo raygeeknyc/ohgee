@@ -65,11 +65,11 @@ class SpeechRecognizer(multiprocessing.Process):
     def run(self):
         logging.debug("***background active")
         self._initLogging()
+        self._setup_audio_generator()
+        self.trainSilence()
         logging.debug("process %s (%d)" % (self.name, os.getpid()))
         try:
-            self._setup_audio_generator()
             self._capturer = threading.Thread(target=self.captureSound)
-            self.trainSilence()
             self._recognizer = threading.Thread(target=self.recognizeSpeech)
             self._audio = pyaudio.PyAudio()
             logging.debug("recognizer process active")
@@ -98,7 +98,6 @@ class SpeechRecognizer(multiprocessing.Process):
         self._stop_recognizing = True
 
     def trainSilence(self):
-        print('trainSilence()')
         logging.debug("Training silence")
         self._silence_threshold = 0
         silence_min = 9999
@@ -106,8 +105,7 @@ class SpeechRecognizer(multiprocessing.Process):
         while True:
             content, seq, chunk_count, start_offset, end_offset = next(self._audio_generator)
             try:
-                volume = max(array.array('h', sound_content))
-                print('sample')
+                volume = max(array.array('h', content))
                 logging.debug("sample {}".format(volume))
                 if volume < 0:
                     continue
@@ -158,11 +156,10 @@ class SpeechRecognizer(multiprocessing.Process):
 
     def _setup_audio_generator(self):
         logging.debug("Setting up audio generator")
-        print("Setting up audio generator")
-        with microphonestream.MicrophoneStream() as stream:
-            while stream.get_start_time() is None:
-                time.sleep(microphonestream.CHUNK_DURATION_SECS)
-            self._audio_generator = stream.generator()
+        mic =  microphonestream.MicrophoneStream()
+        while mic.get_start_time() is None:
+            time.sleep(microphonestream.CHUNK_DURATION_SECS)
+        self._audio_generator = mic.generator()
 
     def recognizeSpeech(self):
         logging.debug("started recognizing")

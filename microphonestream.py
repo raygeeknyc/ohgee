@@ -39,11 +39,12 @@ class MicrophoneStream(object):
         self.closed = True
 
         self._audio_base_time = None
+        self._begin()
 
     def get_start_time(self):
         return self._audio_base_time
 
-    def __enter__(self):
+    def _begin(self):
         self._audio_interface = pyaudio.PyAudio()
         self._audio_stream = self._audio_interface.open(
             format=pyaudio.paInt16,
@@ -65,7 +66,7 @@ class MicrophoneStream(object):
         if self._audio_base_time is None:
             self._audio_base_time = time.time() - CHUNK_DURATION_SECS
 
-    def __exit__(self, type, value, traceback):
+    def close(self):
         self._audio_stream.stop_stream()
         self._audio_stream.close()
         self.closed = True
@@ -123,17 +124,20 @@ class MicrophoneStream(object):
             chunk_count = 0
             yield soundbite
 
+
 def main():
-    with MicrophoneStream() as stream:
-        while stream.get_start_time() is None:
+    mic = MicrophoneStream()
+    try:
+        while mic.get_start_time() is None:
             time.sleep(CHUNK_DURATION_SECS)
-        audio_generator = stream.generator()
+        audio_generator = mic.generator()
         while True:
             content, seq, chunk_count, start_offset, end_offset = next(audio_generator)
             volume = max(array.array('h', content))
-
             print('volume %d' % volume)
-
+    finally:
+        print('closing mic')
+        mic.close()
 
 if __name__ == '__main__':
     main()
