@@ -4,7 +4,7 @@ import logging
 _DEBUG = logging.DEBUG
 
 import multiprocessingloghandler
-import StringIO
+from io import StringIO
 import multiprocessing
 import threading
 from collections import deque
@@ -129,5 +129,5 @@ if __name__ == '__main__':
     time.sleep(2)
     logging.info("logged: main done")
     logging.shutdown()
-    logging.error("main post-logging")
+    logging.info("main post-logging")
     sys.exit() 

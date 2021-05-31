@@ -1,13 +1,15 @@
 #!/usr/bin/python3
 
 import logging
+_DEBUG = logging.DEBUG
 
 from google.cloud import speech
 import multiprocessing
+import multiprocessingloghandler
 import time
-from multiprocessingloghandler import ChildMultiProcessingLogHandler
+import multiprocessing
+import microphonestream
 import threading
-from fedstream import FedStream
 import pyaudio
 import array
 import queue
@@ -33,7 +35,7 @@ MAX_CONSECUTIVE_SPEECH_ERRORS = 3
 
 class SpeechRecognizer(multiprocessing.Process):
     def __init__(self, transcript, log_queue, logging_level):
-        multiprocessing.Process.__init__(self)
+        super(SpeechRecognizer,self).__init__()
         self._log_queue = log_queue
         self._logging_level = logging_level
         self._exit = multiprocessing.Event()
@@ -41,7 +43,7 @@ class SpeechRecognizer(multiprocessing.Process):
         self._transcript, _ = transcript
         self._stop_capturing = False
         self._stop_recognizing = False
-        self._audio_buffer = queue.Queue()
+        self._audio_generator = None
 
     def resumeListening(self):
         logging.debug("***background received resume")
@@ -56,19 +58,23 @@ class SpeechRecognizer(multiprocessing.Process):
         self._exit.set()
 
     def _initLogging(self):
-        handler = ChildMultiProcessingLogHandler(self._log_queue)
+        handler = multiprocessingloghandler.ChildMultiProcessingLogHandler(self._log_queue)
         logging.getLogger(str(os.getpid())).addHandler(handler)
         logging.getLogger(str(os.getpid())).setLevel(self._logging_level)
 
     def run(self):
+        logging.debug("***background active")
         self._initLogging()
+        logging.debug("process %s (%d)" % (self.name, os.getpid()))
         try:
+            self._setup_audio_generator()
             self._capturer = threading.Thread(target=self.captureSound)
+            self.trainSilence()
             self._recognizer = threading.Thread(target=self.recognizeSpeech)
-            self._audio_stream = FedStream(self._audio_buffer, self._log_queue, self._logging_level)
             self._audio = pyaudio.PyAudio()
             logging.debug("recognizer process active")
             self._recognizer.start()
+            self._capturer.start()
             self._suspend_listening.clear()
             self._capturer.start()
             self._exit.wait()
@@ -91,36 +97,34 @@ class SpeechRecognizer(multiprocessing.Process):
         logging.debug("setting stop_recognizing")
         self._stop_recognizing = True
 
-    def trainSilence(self, mic_stream):
+    def trainSilence(self):
+        print('trainSilence()')
         logging.debug("Training silence")
         self._silence_threshold = 0
         silence_min = 9999
-        silence_samples = 0
-        for sample in range(SILENCE_TRAINING_SAMPLES):
+        silence_sample_count = 0
+        while True:
+            content, seq, chunk_count, start_offset, end_offset = next(self._audio_generator)
             try:
-                data = mic_stream.read(FRAMES_PER_BUFFER)
-                volume = max(array.array('h', data))
+                volume = max(array.array('h', sound_content))
+                print('sample')
                 logging.debug("sample {}".format(volume))
                 if volume < 0:
                     continue
                 self._silence_threshold += volume
                 silence_min = min(volume, silence_min)
-                silence_samples += 1
+                silence_sample_count += 1
+                if silence_sample_count > SILENCE_TRAINING_SAMPLES:
+                    break
             except Exception:
                 logging.exception("Training mic read raised exception")
-        self._silence_threshold /= silence_samples
+        self._silence_threshold /= silence_sample_count
         self._silence_threshold -= abs(self._silence_threshold - silence_min)/2
         logging.info("Trained silence volume {} min was {} pause samples {}".format(self._silence_threshold, silence_min, PAUSE_LENGTH_IN_SAMPLES))
 
     def captureSound(self):
         logging.debug("starting capturing")
-        mic_stream = self._audio.open(format=FORMAT, channels=CHANNELS,
-            rate=RATE, input=True,
-            frames_per_buffer=FRAMES_PER_BUFFER)
-
-        self.trainSilence(mic_stream)
         consecutive_silent_samples = 999
-        self._audio_stream.close()
         samples = 0
         while not self._stop_capturing:
             samples += 1
@@ -151,6 +155,14 @@ class SpeechRecognizer(multiprocessing.Process):
         mic_stream.close()
         self._audio.terminate()
         logging.debug("stopped capturing")
+
+    def _setup_audio_generator(self):
+        logging.debug("Setting up audio generator")
+        print("Setting up audio generator")
+        with microphonestream.MicrophoneStream() as stream:
+            while stream.get_start_time() is None:
+                time.sleep(microphonestream.CHUNK_DURATION_SECS)
+            self._audio_generator = stream.generator()
 
     def recognizeSpeech(self):
         logging.debug("started recognizing")
@@ -210,3 +222,25 @@ class SpeechRecognizer(multiprocessing.Process):
                     continue
                 logging.error('max consecutive errors reached. aborting.')
         logging.debug("stopped recognizing")
+
+def main(argv):
+    log_stream = sys.stderr
+    log_queue = multiprocessing.Queue(100)
+    handler = multiprocessingloghandler.ParentMultiProcessingLogHandler(logging.StreamHandler(log_stream), log_queue)
+    logging.getLogger('').addHandler(handler)
+    logging.getLogger('').setLevel(_DEBUG)
+
+    transcript = multiprocessing.Pipe()
+    recognition_worker = SpeechRecognizer(transcript, log_queue, logging.getLogger('').getEffectiveLevel())
+    logging.debug("Starting speech recognition")
+    recognition_worker.start()
+    unused, _ = transcript
+    unused.close()
+
+    logging.shutdown()
+
+    print("ended")
+    sys.exit(0)
+
+if __name__ == '__main__':
+    main(sys.argv)
