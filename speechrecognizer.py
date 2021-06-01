@@ -69,21 +69,20 @@ class SpeechRecognizer(multiprocessing.Process):
         self.trainSilence()
         logging.debug("process %s (%d)" % (self.name, os.getpid()))
         try:
-            self._capturer = threading.Thread(target=self.captureSound)
+#            self._capturer = threading.Thread(target=self.captureSound)
             self._recognizer = threading.Thread(target=self.recognizeSpeech)
             self._audio = pyaudio.PyAudio()
             logging.debug("recognizer process active")
             self._recognizer.start()
-            self._capturer.start()
+            #self._capturer.start()
             self._suspend_listening.clear()
-            self._capturer.start()
             self._exit.wait()
         except Exception:
             logging.exception("recognizer process exception")
         finally:
             self._stopCapturing()
             self._stopRecognizing()
-            self._capturer.join()
+            #self._capturer.join()
             self._recognizer.join()
             self._transcript.close()
             logging.debug("recognizer process terminating")
@@ -128,10 +127,10 @@ class SpeechRecognizer(multiprocessing.Process):
             samples += 1
             volume = 0
             try:
-                data = mic_stream.read(FRAMES_PER_BUFFER)
+                sound_chunk, seq, chunk_count, start_offset, end_offset = next(self._audio_generator)
                 if self._suspend_listening.is_set():
                     continue
-                volume = max(array.array('h', data))
+                volume = max(array.array('h', sound_chunk))
                 logging.debug("Volume max {}".format(volume))
                 if volume <= self._silence_threshold:
                     consecutive_silent_samples += 1
@@ -166,14 +165,12 @@ class SpeechRecognizer(multiprocessing.Process):
         self._speech_client = speech.SpeechClient()
 
         language_code = 'en-US'  # a BCP-47 language tag
-        speech_client = speech.SpeechClient()
 
-        requests = (speech.StreamingRecognizeRequest(audio_content=chunk) for content, seq, chunk_count, start_offset, end_offset in next(self._audio_generator))
         config = speech.RecognitionConfig(
             encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
             sample_rate_hertz=RATE,
             language_code=language_code)
-        self._streaming_config = speech.StreamingRecognitionConfig(
+        streaming_config = speech.StreamingRecognitionConfig(
             config=config,
             interim_results=True)
 
@@ -182,34 +179,39 @@ class SpeechRecognizer(multiprocessing.Process):
         consecutive_error_count = 0 
         while not self._stop_recognizing:
             try:
-                if self._audio_stream.closed:
-                    if not waiting:
-                        logging.debug("waiting for sound to analyze")
-                        waiting = True
-                    time.sleep(SAMPLE_RETRY_DELAY_SECS)
-                    continue
-                if waiting:
-                    logging.debug("heard sound to analyze")
-                    waiting = False
-                logging.debug("recognizing speech")
+                requests = (speech.StreamingRecognizeRequest(audio_content=sound_chunk) for sound_chunk, seq, chunk_count, start_offset, end_offset in self._audio_generator)
+        #        if self._audio_stream.closed:
+        #            if not waiting:
+        #                logging.debug("waiting for sound to analyze")
+        #                waiting = True
+        #            time.sleep(SAMPLE_RETRY_DELAY_SECS)
+        #            continue
+        #        if waiting:
+        #            logging.debug("heard sound to analyze")
+        #            waiting = False
+        #        logging.debug("recognizing speech")
 
-                responses = client.streaming_recognize(
+                responses = self._speech_client.streaming_recognize(
                     config=streaming_config, requests=requests)
-
                 if not responses:
                     continue
-                response = responses[0]
+
+                response = responses.next()
+                if not response:
+                    continue
+
                 result = response.results[0]
                 if not result.alternatives:
                     continue
+
                 alternatives = result.alternatives
                 consecutive_error_count = 0 
                 for alternative in alternatives:
                     logging.debug("speech: {}".format(alternative.transcript))
-                    logging.debug("final: {}".format(alternative.is_final))
+                    logging.debug("final: {}".format(result.is_final))
                     logging.debug("confidence: {}".format(alternative.confidence))
                     logging.debug("putting phrase {}".format(alternative.transcript))
-                    if alternative.is_final or self._stop_recognizing:
+                    if result.is_final or self._stop_recognizing:
                         self._transcript.send(alternative.transcript)
                     if self._stop_recognizing:
                         break
