@@ -172,7 +172,8 @@ class SpeechRecognizer(multiprocessing.Process):
             language_code=language_code)
         streaming_config = speech.StreamingRecognitionConfig(
             config=config,
-            interim_results=True)
+            interim_results=False,
+            single_utterance=True)
 
         logging.debug("Starting recognizing")
         waiting = False
