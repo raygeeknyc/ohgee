@@ -25,7 +25,7 @@ import queue
 import rgbled
 import speechrecognizer
 import phraseresponder
-import speechanalyzer
+import languageanalyzer
 import visionanalyzer
 import imagesearch
 
@@ -159,9 +159,9 @@ def receiveLanguageResults(nl_results, search_queue):
             phrase = nl_results.recv()
             text, tokens, entities, sentiment, decorated_noun = phrase
             logging.debug("Got spoken phrase {}".format(text))
-            if speechanalyzer.isGood(sentiment):
+            if languageanalyzer.isGood(sentiment):
                 showGoodMood(sentiment.score)
-            elif speechanalyzer.isBad(sentiment):
+            elif languageanalyzer.isBad(sentiment):
                 showBadMood(sentiment.score)
             else:
                 showMehMood(sentiment.score)
@@ -443,7 +443,7 @@ if __name__ == '__main__':
     unused.close()
 
     nl_results = multiprocessing.Pipe()
-    analysis_worker = speechanalyzer.SpeechAnalyzer(transcript, nl_results, log_queue, logging.getLogger('').getEffectiveLevel())
+    analysis_worker = languageanalyzer.LanguageAnalyzer(transcript, nl_results, log_queue, logging.getLogger('').getEffectiveLevel())
     logging.debug("Starting speech analysis")
     analysis_worker.start()
     unused, _ = nl_results

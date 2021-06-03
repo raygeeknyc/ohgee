@@ -22,7 +22,7 @@ def isBad(sentiment):
 def isMeh(sentiment):
     return MOOD_THRESHOLD >= sentiment.score >= LOWER_MOOD_THRESHOLD
 
-class SpeechAnalyzer(multiprocessing.Process):
+class LanguageAnalyzer(multiprocessing.Process):
     def __init__(self, text_transcript, nl_results, log_queue, logging_level):
         multiprocessing.Process.__init__(self)
         _, self._text_transcript = text_transcript
