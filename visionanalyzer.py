@@ -15,8 +15,8 @@ from PIL import Image, ImageDraw
 from google.cloud import vision
 
 # Enumerate the likelihood names that are defined by Cloud Vision 1
-LIKELIHOOD_NAMES = ('UNKNOWN', 'VERY_UNLIKELY', 'UNLIKELY', 'POSSIBLE',
-  'LIKELY', 'VERY_LIKELY')
+LIKELIHOOD_NAMES = {'UNKNOWN':0, 'VERY_UNLIKELY':1, 'UNLIKELY':2, 'POSSIBLE':3,
+  'LIKELY':4, 'VERY_LIKELY':5}
 
 
 from picamera import PiCamera
@@ -128,27 +128,27 @@ def labelMatch(labels,tags):
 # Sentiment is -1, 0 or +1 for this sentiment and level
 # -1 == bad, 0 == meh, +1 == good
 def getSentimentForLevel(face, level):
-    if face.joy == level or face.surprise == level:
-        logging.debug("getSentimentForLevel: %s joy: %s surprise: %s" % (str(level), str(face.joy), str(face.surprise)))
+    if face.joy_likelihood == level or face.surprise_likelihood == level:
+        logging.debug("getSentimentForLevel: %s joy: %s surprise: %s" % (str(level), str(face.joy_likelihood), str(face.surprise_likelihood)))
         return 1.0
-    if face.anger == level or face.sorrow == level:
-        logging.debug("getSentimentForLevel: %s anger: %s sorrow: %s" % (str(level), str(face.anger), str(face.sorrow)))
+    if face.anger_likelihood == level or face.sorrow_likelihood == level:
+        logging.debug("getSentimentForLevel: %s anger: %s sorrow: %s" % (str(level), str(face.anger_likelihood), str(face.sorrow_likelihood)))
         return -1.0
     return 0.0
 
 def getSentimentWeightedByLevel(face):
     logging.debug("joy: {}, surprise:{}, anger:{}, sorrow:{}".format(
-        face.joy, face.surprise, face.anger, face.sorrow))
-    sentiment = getSentimentForLevel(face, LIKELIHOOD_NAMES.VERY_LIKELY)
+        face.joy_likelihood, face.surprise_likelihood, face.anger_likelihood, face.sorrow_likelihood))
+    sentiment = getSentimentForLevel(face, LIKELIHOOD_NAMES['VERY_LIKELY'])
     if sentiment != 0:
        return sentiment
-    sentiment = getSentimentForLevel(face, LIKELIHOOD_NAMES.LIKELY)
+    sentiment = getSentimentForLevel(face, LIKELIHOOD_NAMES['LIKELY'])
     if sentiment != 0:
        return sentiment * SENTIMENT_CONFIDENCE_THRESHOLD
-    sentiment = getSentimentForLevel(face, LIKELIHOOD_NAMES.POSSIBLE)
+    sentiment = getSentimentForLevel(face, LIKELIHOOD_NAMES['POSSIBLE'])
     if sentiment != 0:
        return sentiment * SENTIMENT_CONFIDENCE_THRESHOLD
-    sentiment = getSentimentForLevel(face, LIKELIHOOD_NAMES.UNLIKELY)
+    sentiment = getSentimentForLevel(face, LIKELIHOOD_NAMES['UNLIKELY'])
     if sentiment != 0:
        return sentiment * 0.25
     return 0.0
@@ -292,7 +292,8 @@ class ImageAnalyzer(multiprocessing.Process):
                         results[0].save(buffer, format="JPEG")
                         buffer.seek(0)
                         img_bytes = buffer.getvalue()
-                        logging.debug("send image %s" % id(img_bytes))
+                        logging.debug("send image %s" % type(img_bytes))
+                        logging.debug("%s, %s, %s, %s" % (type(results[1]), type(results[2]), type(results[3]), type(results[4])))
                         self._vision_queue.send((img_bytes, results[1], results[2], results[3], results[4]))
                     except Exception:
                         logging.exception("error reading image")
@@ -304,9 +305,10 @@ class ImageAnalyzer(multiprocessing.Process):
     def _analyzeFrame(self, frame):
         s=time.time()
         logging.debug("analyzing image")
-        remote_image = self._vision_client.image(content=frame[0])
-        labels = remote_image.detect_labels()
-        faces = remote_image.detect_faces(limit=5)
+        remote_image = vision.Image(content=frame[0])
+        labels = self._vision_client.label_detection(image=remote_image).label_annotations
+        faces = self._vision_client.face_detection(image=remote_image, image_context=None,
+            max_results=2).face_annotations
         faces_details = findFacesDetails(faces)
         im = Image.open(io.BytesIO(frame[0]))
         size = im.size[0] * im.size[1]
@@ -325,7 +327,8 @@ class ImageAnalyzer(multiprocessing.Process):
                 logging.debug("sentiment:{}".format(strongest_sentiment))
         logging.debug("_analyzeFrame took {}".format(time.time()-s))
         max_area_portion = (max_area * 1.0) / size
-        return (im, labels, faces, strongest_sentiment, max_area_portion)
+        label_descriptions = [label.description for label in labels]
+        return (im, label_descriptions, faces_details, strongest_sentiment, max_area_portion)
 
     def captureFrames(self):
         self._image_buffer = io.BytesIO()
@@ -352,22 +355,22 @@ class ImageAnalyzer(multiprocessing.Process):
         self._camera.close()
 
 def findFacesDetails(faces):
-    face_details = []
+    faces_details = []
     if faces:
         for face in faces:
             top = 9999
             left = 9999
             bottom = 0
             right = 0
-            for point in face.bounds.vertices:
-                top = min(top, point.y_coordinate)
-                left = min(left, point.x_coordinate)
-                bottom = max(bottom, point.y_coordinate)
-                right = max(right, point.x_coordinate)
+            for point in face.bounding_poly.vertices:
+                top = min(top, point.y)
+                left = min(left, point.x)
+                bottom = max(bottom, point.y)
+                right = max(right, point.x)
             sentiment = getSentimentWeightedByLevel(face)
             area = abs(bottom - top) * abs(right - left)
-            face_details.append((sentiment, ((left, top), (right, bottom)), face.detection_confidence, area))
-    return face_details
+            faces_details.append((sentiment, ((left, top), (right, bottom)), face.detection_confidence, area))
+    return faces_details
 
 def getColorForSentiment(sentiment):
     if sentiment < 0:
@@ -382,15 +385,15 @@ def watchForResults(vision_results_queue):
     _, incoming_results = vision_results_queue
     try:
         while True:
-            image, labels, faces = incoming_results.recv()
-            logging.debug("{} faces detected".format(len(faces)))
+            image, labels, faces_details, sentiment, max_area_portion = incoming_results.recv()
+            logging.debug("{} faces detected".format(len(faces_details)))
             for label in labels:
-                logging.debug("label: {}".format(label.description))
+                logging.debug("label: {}".format(label))
     except EOFError:
         logging.debug("Done watching")
 
-def obscureFacesWithSentiments(canvas, face_details):
-   for face_sentiment, face_boundary, _, _ in face_details:
+def obscureFacesWithSentiments(canvas, faces_details):
+   for face_sentiment, face_boundary, _, _ in faces_details:
         sentiment_color = getColorForSentiment(face_sentiment)
         canvas.ellipse(face_boundary, fill=sentiment_color, outline=None)
         eye_size = max(1, (face_boundary[1][0] - face_boundary[0][0]) / 50)
