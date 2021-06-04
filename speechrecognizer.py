@@ -1,35 +1,46 @@
 #!/usr/bin/python3
 
 import logging
+_LOGGING_LEVEL = logging.DEBUG
 
 import multiprocessing
 import time
-from multiprocessingloghandler import ChildMultiProcessingLogHandler
+from multiprocessingloghandler import ParentMultiProcessingLogHandler, ChildMultiProcessingLogHandler
 import threading
+from collections import deque
 from fedstream import FedStream
+from google.cloud import speech
 import pyaudio
 import array
 import queue
 import io
 import os
 import sys
-import grpc  # for error types returned by the client
-from google.cloud import speech
 
 # Setup audio and cloud speech
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 16000
-FRAMES_PER_BUFFER = 4096
-PAUSE_LENGTH_SECS = 1.0
+FRAMES_PER_BUFFER = 1600
+PAUSE_LENGTH_SECS = 0.5
+UNPAUSE_LENGTH_SECS = 0.25
 MAX_BUFFERED_SAMPLES = 1
 PAUSE_LENGTH_IN_SAMPLES = int((PAUSE_LENGTH_SECS * RATE / FRAMES_PER_BUFFER) + 0.5)
+UNPAUSE_LENGTH_IN_SAMPLES = int((UNPAUSE_LENGTH_SECS * RATE / FRAMES_PER_BUFFER) + 0.5)
 SAMPLE_RETRY_DELAY_SECS = 0.1
 
 # This is how many samples to take to find the lowest sound level
 SILENCE_TRAINING_SAMPLES = 10
 MAX_CONSECUTIVE_ERRORS = 3
   
+class IterableQueue(queue.SimpleQueue): 
+    _sentinel = object()
+    def __iter__(self):
+        return iter(self.get, self._sentinel)
+
+    def close(self):
+        self.put(self._sentinel)
+
 class SpeechRecognizer(multiprocessing.Process):
     def __init__(self, transcript, log_queue, logging_level):
         multiprocessing.Process.__init__(self)
@@ -37,18 +48,27 @@ class SpeechRecognizer(multiprocessing.Process):
         self._logging_level = logging_level
         self._exit = multiprocessing.Event()
         self._suspend_listening = multiprocessing.Event()
+        self._suspend_recognizing = multiprocessing.Event()
         self._transcript, _ = transcript
         self._stop_capturing = False
         self._stop_recognizing = False
-        self._audio_buffer = queue.Queue()
+        self._audio_buffer = IterableQueue()
 
     def resumeListening(self):
-        logging.debug("***background received resume")
+        logging.debug("resumeListening")
         self._suspend_listening.clear()
 
     def suspendListening(self):
-        logging.debug("***background received suspend")
+        logging.debug("suspendListening")
         self._suspend_listening.set()
+
+    def resumeRecognizing(self):
+        logging.debug("resumeRecognizing")
+        self._suspend_recognizing.clear()
+
+    def suspendRecognizing(self):
+        logging.debug("suspendRecognizing")
+        self._suspend_recognizing.set()
 
     def stop(self):
         logging.debug("***background received shutdown")
@@ -64,11 +84,11 @@ class SpeechRecognizer(multiprocessing.Process):
         try:
             self._capturer = threading.Thread(target=self.captureSound)
             self._recognizer = threading.Thread(target=self.recognizeSpeech)
-            self._audio_stream = FedStream(self._audio_buffer, self._log_queue, self._logging_level)
             self._audio = pyaudio.PyAudio()
             logging.debug("recognizer process active")
             self._recognizer.start()
             self._suspend_listening.clear()
+            self._suspend_recognizing.clear()
             self._capturer.start()
             self._exit.wait()
         except Exception:
@@ -95,7 +115,7 @@ class SpeechRecognizer(multiprocessing.Process):
         self._silence_threshold = 0
         silence_min = 9999
         silence_samples = 0
-        for sample in xrange(SILENCE_TRAINING_SAMPLES):
+        for sample in range(SILENCE_TRAINING_SAMPLES):
             try:
                 data = mic_stream.read(FRAMES_PER_BUFFER)
                 volume = max(array.array('h', data))
@@ -108,8 +128,8 @@ class SpeechRecognizer(multiprocessing.Process):
             except Exception:
                 logging.exception("Training mic read raised exception")
         self._silence_threshold /= silence_samples
-        self._silence_threshold -= abs(self._silence_threshold - silence_min)/2
-        logging.info("Trained silence volume {} min was {} pause samples {}".format(self._silence_threshold, silence_min, PAUSE_LENGTH_IN_SAMPLES))
+        self._silence_threshold -= abs(self._silence_threshold - silence_min)/4
+        logging.info("Trained silence volume {} min was {} pause samples {} unpause_samples {}".format(self._silence_threshold, silence_min, PAUSE_LENGTH_IN_SAMPLES, UNPAUSE_LENGTH_IN_SAMPLES))
 
     def captureSound(self):
         logging.debug("starting capturing")
@@ -118,29 +138,44 @@ class SpeechRecognizer(multiprocessing.Process):
             frames_per_buffer=FRAMES_PER_BUFFER)
 
         self.trainSilence(mic_stream)
-        consecutive_silent_samples = 999
-        self._audio_stream.close()
+        consecutive_silent_samples = PAUSE_LENGTH_IN_SAMPLES + 1
+        consecutive_noisy_samples = 0
         samples = 0
+        paused_for_silence = True
+ 
+        temp_audio_buffer = deque()
         while not self._stop_capturing:
-            samples += 1
-            volume = 0
+            if self._suspend_listening.is_set():
+                continue
             try:
+                samples += 1
                 data = mic_stream.read(FRAMES_PER_BUFFER)
-                if self._suspend_listening.is_set():
-                    continue
                 volume = max(array.array('h', data))
                 logging.debug("Volume max {}".format(volume))
-                if volume <= self._silence_threshold:
-                    consecutive_silent_samples += 1
-                else:
-                    if consecutive_silent_samples >= PAUSE_LENGTH_IN_SAMPLES:
-                        logging.debug("pause ended")
-                        self._audio_stream.open()
+                if volume > self._silence_threshold:
+                    consecutive_noisy_samples += 1
                     consecutive_silent_samples = 0
+                else:
+                    consecutive_silent_samples += 1
+                    consecutive_noisy_samples = 0
+                
                 if consecutive_silent_samples == PAUSE_LENGTH_IN_SAMPLES:
-                    logging.debug("pause started")
-                    self._audio_stream.close()
-                if consecutive_silent_samples < PAUSE_LENGTH_IN_SAMPLES:
+                    logging.info("Pausing audio streaming")
+                    self.suspendRecognizing()
+                    paused_for_silence = True
+                if paused_for_silence:
+                    if consecutive_noisy_samples == UNPAUSE_LENGTH_IN_SAMPLES: 
+                        logging.info("Resuming audio streaming")
+                        paused_for_silence = False
+                        (self._audio_buffer.put(buffered_data) for buffered_data in temp_audio_buffer)
+                        self.resumeRecognizing()
+                    elif consecutive_noisy_samples == 0:
+                        temp_audio_buffer.clear()
+                    else:
+                        logging.debug("buffering possible resumption")
+                        temp_audio_buffer.append(data)
+               
+                if not paused_for_silence:
                     self._audio_buffer.put(data)
             except IOError:
                 logging.exception("IOError capturing audio")
@@ -153,40 +188,38 @@ class SpeechRecognizer(multiprocessing.Process):
 
     def recognizeSpeech(self):
         logging.debug("started recognizing")
-        self._speech_client = speech.Client()
-        logging.debug("Starting sampling")
-        audio_sample = self._speech_client.sample(
-            stream=self._audio_stream,
-            source_uri=None,
-            encoding=speech.encoding.Encoding.LINEAR16,
-            sample_rate_hertz=RATE)
+        self._speech_client = speech.SpeechClient()
+        config = speech.RecognitionConfig(
+            encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
+            sample_rate_hertz=RATE,
+            language_code="en-US",
+        )
+        streaming_config = speech.StreamingRecognitionConfig(config=config,
+            interim_results=False)
+
         logging.debug("Starting recognizing")
-        waiting = False
         consecutive_recognition_errors = 0
         while not self._stop_recognizing:
             try:
-                if self._audio_stream.closed:
-                    if not waiting:
-                        logging.debug("waiting for sound to analyze")
-                        waiting = True
-                    time.sleep(SAMPLE_RETRY_DELAY_SECS)
+                if self._suspend_recognizing.is_set():
                     continue
-                if waiting:
-                    logging.debug("heard sound to analyze")
-                    waiting = False
-                logging.debug("recognizing speech")
-                alternatives = audio_sample.streaming_recognize('en-US',
-                    interim_results=True)
-                for alternative in alternatives:
-                    logging.debug("speech: {}".format(alternative.transcript))
-                    logging.debug("final: {}".format(alternative.is_final))
+                requests = (speech.StreamingRecognizeRequest(audio_content=sound_chunk) for sound_chunk in self._audio_buffer)
+                logging.info('created requests generator')
+                responses = self._speech_client.streaming_recognize(streaming_config, requests)
+                for response in responses:
+                    if not response.results:
+                        continue
+                    result = response.results[0]
+                    if not result.alternatives:
+                        continue
+                    alternative = result.alternatives[0]
+                    logging.info("speech: {}".format(alternative.transcript))
+                    logging.debug("final: {}".format(result.is_final))
                     logging.debug("confidence: {}".format(alternative.confidence))
-                    logging.debug("putting phrase {}".format(alternative.transcript))
-                    if alternative.is_final or self._stop_recognizing:
-                        self._transcript.send(alternative.transcript)
+                    self._transcript.send(alternative.transcript)
                     if self._stop_recognizing:
                         break
-                consecutive_recognition_errors = 0
+                    consecutive_recognition_errors = 0
             except Exception as e:
                 logging.exception("error recognizing speech")
                 consecutive_recognition_errors += 1
@@ -195,3 +228,22 @@ class SpeechRecognizer(multiprocessing.Process):
                     raise e
                 continue
         logging.debug("stopped recognizing")
+
+def main(unused):
+    log_stream = sys.stderr
+    log_queue = multiprocessing.Queue(100)
+    handler = ParentMultiProcessingLogHandler(logging.StreamHandler(log_stream), log_queue)
+    logging.getLogger('').addHandler(handler)
+    logging.getLogger('').setLevel(_LOGGING_LEVEL)
+
+    transcript = multiprocessing.Pipe()
+    recognition_worker = SpeechRecognizer(transcript, log_queue, logging.getLogger('').getEffectiveLevel())
+    logging.debug("Starting speech recognition")
+    recognition_worker.start()
+    unused, _ = transcript
+    unused.close()
+
+if __name__ == '__main__':
+    print('running standalone recognizer')
+    main(sys.argv)
+    print('exiting')
