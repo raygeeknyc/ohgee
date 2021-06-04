@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 import logging
-_LOGGING_LEVEL = logging.DEBUG
+_LOGGING_LEVEL = logging.INFO
 
 import multiprocessing
 import time
@@ -23,7 +23,7 @@ CHANNELS = 1
 RATE = 16000
 FRAMES_PER_BUFFER = 1600
 PAUSE_LENGTH_SECS = 0.5
-UNPAUSE_LENGTH_SECS = 0.25
+UNPAUSE_LENGTH_SECS = 0.2
 MAX_BUFFERED_SAMPLES = 1
 PAUSE_LENGTH_IN_SAMPLES = int((PAUSE_LENGTH_SECS * RATE / FRAMES_PER_BUFFER) + 0.5)
 UNPAUSE_LENGTH_IN_SAMPLES = int((UNPAUSE_LENGTH_SECS * RATE / FRAMES_PER_BUFFER) + 0.5)
@@ -160,19 +160,20 @@ class SpeechRecognizer(multiprocessing.Process):
                     consecutive_noisy_samples = 0
                 
                 if consecutive_silent_samples == PAUSE_LENGTH_IN_SAMPLES:
-                    logging.info("Pausing audio streaming")
+                    logging.debug("Pausing audio streaming")
                     self.suspendRecognizing()
                     paused_for_silence = True
                 if paused_for_silence:
                     if consecutive_noisy_samples == UNPAUSE_LENGTH_IN_SAMPLES: 
-                        logging.info("Resuming audio streaming")
+                        logging.debug("Resuming audio streaming")
                         paused_for_silence = False
                         (self._audio_buffer.put(buffered_data) for buffered_data in temp_audio_buffer)
                         self.resumeRecognizing()
                     elif consecutive_noisy_samples == 0:
+                        logging.debug("Clearing resumption buffer")
                         temp_audio_buffer.clear()
                     else:
-                        logging.debug("buffering possible resumption")
+                        logging.debug("Buffering possible resumption")
                         temp_audio_buffer.append(data)
                
                 if not paused_for_silence:
@@ -204,7 +205,7 @@ class SpeechRecognizer(multiprocessing.Process):
                 if self._suspend_recognizing.is_set():
                     continue
                 requests = (speech.StreamingRecognizeRequest(audio_content=sound_chunk) for sound_chunk in self._audio_buffer)
-                logging.info('created requests generator')
+                logging.debug('created requests generator')
                 responses = self._speech_client.streaming_recognize(streaming_config, requests)
                 for response in responses:
                     if not response.results:
