@@ -57,10 +57,12 @@ class SpeechRecognizer(multiprocessing.Process):
     def resumeListening(self):
         logging.debug("resumeListening")
         self._suspend_listening.clear()
+        self.resumeRecognizing()
 
     def suspendListening(self):
         logging.debug("suspendListening")
         self._suspend_listening.set()
+        self.suspendRecognizing()
 
     def resumeRecognizing(self):
         logging.debug("resumeRecognizing")

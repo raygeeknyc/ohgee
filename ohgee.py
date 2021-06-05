@@ -119,14 +119,16 @@ def speak(speech_queue):
     logging.debug("Speaker started")
     while not STOP:
         try:
-            logging.debug("Waiting to talk")
+            logging.debug("Waiting for something to say")
             utterance = " ".join(speech_queue.get())
+            logging.debug("Not listening while talking")
             recognition_worker.suspendListening()
             logging.debug("Saying {}".format(utterance))
             os.system(PICO_CMD % (SPEECH_TMP_FILE, utterance, SPEECH_TMP_FILE))
         except Exception:
             logging.exception("Error speaking")
         finally:
+            logging.debug("Ready to listen")
             recognition_worker.resumeListening()
     logging.debug("Speaker stopping")
 
