@@ -1,13 +1,15 @@
 #!/usr/bin/python3
 
 import os
+import sys
 import logging
-_LOGGING_LEVEL = logging.DEBUG
+_LOGGING_LEVEL = logging.INFO
 
 import multiprocessing
-from multiprocessingloghandler import ChildMultiProcessingLogHandler
+from multiprocessingloghandler import ParentMultiProcessingLogHandler, ChildMultiProcessingLogHandler
 
-from google.cloud import language
+from google.cloud import language_v1
+
 
 MOOD_THRESHOLD = 0.2
 LOWER_MOOD_THRESHOLD = -1 * MOOD_THRESHOLD
@@ -18,14 +20,14 @@ POS_ADJECTIVE = "ADJ"
 DEMO_PHRASES = ["Hello there Raymond", "I love to eat lettuce",
     "I hate you", "You are very adorable"]
 
-def isGood(sentiment):
-    return sentiment.score >= MOOD_THRESHOLD
+def isGood(sentiment_score):
+    return sentiment_score >= MOOD_THRESHOLD
 
-def isBad(sentiment):
-    return sentiment.score <= LOWER_MOOD_THRESHOLD
+def isBad(sentiment_score):
+    return sentiment_score <= LOWER_MOOD_THRESHOLD
 
-def isMeh(sentiment):
-    return MOOD_THRESHOLD >= sentiment.score >= LOWER_MOOD_THRESHOLD
+def isMeh(sentiment_score):
+    return MOOD_THRESHOLD >= sentiment_score >= LOWER_MOOD_THRESHOLD
 
 class LanguageAnalyzer(multiprocessing.Process):
     def __init__(self, text_transcript, nl_results, log_queue, logging_level):
@@ -49,7 +51,7 @@ class LanguageAnalyzer(multiprocessing.Process):
         self._initLogging()
         logging.debug("***speech analyzer starting")
         try:
-            self._language_client = language.LanguageServiceClient()
+            self._language_client = language_v1.LanguageServiceClient()
             self._analyzeSpeech()
             logging.debug("speech analyzer done analyzing")
         except Exception:
@@ -61,37 +63,51 @@ class LanguageAnalyzer(multiprocessing.Process):
         logging.debug("***speech analyzer analyzing")
         while not self._exit.is_set():
             try:
+                logging.debug("waiting for text")
                 text = self._text_transcript.recv()
-                logging.debug("analyzing speech")
-                document = self._language_client.document_from_text(text)
+                logging.debug("analyzing '%s'" % text)
+                document = language_v1.Document(content=text, type_=language_v1.Document.Type.PLAIN_TEXT)
+
                 content = document.content
                 logging.debug("analyzer received text: {}".format(content))
-                entities = document.analyze_entities().entities
-                tokens = document.analyze_syntax().tokens
-                sentiment = document.analyze_sentiment().sentiment
+                sentiment = self._language_client.analyze_sentiment(document=document).document_sentiment
 
                 logging.debug("Sentiment: {}, {}".format(sentiment.score, sentiment.magnitude))
-                for entity in entities:
-                    logging.debug("Entity: {}: {}".format(entity.entity_type, entity.name))
-                    logging.debug("source: {}: {}".format(entity.metadata, entity.salience))
 
+                response = self._language_client.analyze_entities(document=document)
+
+                entities = response.entities
+                for entity in entities:
+                    logging.debug("Entity {} Type {}".format(entity.name, entity.type_.name))
+
+                    logging.debug(u"Salience score: {}".format(entity.salience))
+                    for metadata_name, metadata_value in entity.metadata.items():
+                        print(u"{}: {}".format(metadata_name, metadata_value))
+
+                response = self._language_client.analyze_syntax(document=document)
+
+                tokens = response.tokens
                 for token in tokens:
-                    logging.debug("Token: {}: {}".format(token.part_of_speech, token.text_content))
+                    logging.debug("Token: {}: {}".format(token.part_of_speech, token.text))
                 noun = None
                 adjective = None
                 decorated_noun = None
                 for token in reversed(tokens):
                     if token.part_of_speech == POS_NOUN:
-                        noun = token.text_content
+                        noun = token.text
                         continue
                     if token.part_of_speech == POS_ADJECTIVE and noun:
-                        adjective = token.text_content
+                        adjective = token.text
                         break
                 if noun and adjective:
                     decorated_noun = (adjective, noun)
                     logging.debug("ADJ+NOUN {}".format(decorated_noun))
 
-                results = (content, tokens, entities, sentiment, decorated_noun)
+                portable_tokens = [{'text':token.text.content, 'part_of_speech':token.part_of_speech.tag} for token in tokens]
+                portable_entities = [{'name':str(entity.name), 'entity_type':str(entity.type_.name), 'salience':entity.salience} for entity in entities]
+                portable_sentiment = {'score':sentiment.score, 'magnitude':sentiment.magnitude}
+                results = (content, portable_tokens, portable_entities, portable_sentiment, decorated_noun)
+                logging.debug("sending {}, {}, {}, {}, {}".format(type(content), type(portable_tokens), type(portable_entities), type(portable_sentiment), type(decorated_noun)))
                 self._nl_results.send(results)
             except EOFError:
                 logging.debug("EOF on speech analyzer input")
@@ -112,22 +128,25 @@ def main(unused):
 
     transcript = multiprocessing.Pipe()
     nl_results = multiprocessing.Pipe()
-    language_worker = languageanalyzer.LanguageAnalyzer(transcript, nl_results, log_queue, logging.getLogger('').getEffectiveLevel())
+    language_worker = LanguageAnalyzer(transcript, nl_results, log_queue, logging.getLogger('').getEffectiveLevel())
     logging.debug("Starting language analyzer")
     language_worker.start()
 
-    unused, phrase_pipe = transcript
+    phrase_pipe, unused = transcript
     unused.close()
 
     unused, language_results = nl_results
     unused.close()
 
     for phrase in DEMO_PHRASES:
+        print("sending phrase '%s'" % phrase)
         phrase_pipe.send(phrase)
+    print("sent %d phrases" % len(DEMO_PHRASES))
+    phrase_pipe.close()
 
-    while True;
+    while True:
         try:
-            phrase = nl_results.recv()
+            phrase = language_results.recv()
             print("got %s" % str(phrase))
         except EOFError:
             print("End of NL results queue")

@@ -36,11 +36,7 @@ chmod a+x *.sh
 ####
 
 ./update.sh 2>&1
-eval `./setup_auth.sh` # sets rc
-if [[ $rc -ne 0 ]]; then
-  pico2wave -l en-US --wave "/tmp/ohgee_help.wav" "HELP!  Error authenticating cloud services";aplay "/tmp/ohgee_help.wav"
-  exit 255
-fi
+. ./setup_auth.sh
 ./pre_launch_hook.sh 2>&1
 nohup $PYTHON ohgee.py &
 exit 0
