@@ -425,6 +425,18 @@ if __name__ == '__main__':
 
     logging.debug('setting up LED')
     led = rgbled.RgbLed(rgbled.redPin, rgbled.greenPin, rgbled.bluePin, rgbled.powerPin)
+    led.setColor(rgbled.RED)
+    time.sleep(rgbled.COLOR_CYCLE_SECS)
+    led.setColor(rgbled.MAGENTA)
+    time.sleep(rgbled.COLOR_CYCLE_SECS)
+    led.setColor(rgbled.BLUE)
+    time.sleep(rgbled.COLOR_CYCLE_SECS)
+    led.setColor(rgbled.CYAN)
+    time.sleep(rgbled.COLOR_CYCLE_SECS)
+    led.setColor(rgbled.GREEN)
+    time.sleep(rgbled.COLOR_CYCLE_SECS)
+    led.setColor(rgbled.YELLOW)
+    time.sleep(rgbled.COLOR_CYCLE_SECS)
     led.setColor(rgbled.OFF)
 
     logging.debug('setting up servo')

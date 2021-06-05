@@ -20,6 +20,8 @@ CYAN = (False, True, True)
 MAGENTA = (True, False, True)
 OFF = (False, False, False)
 
+COLOR_CYCLE_SECS = 0.5
+
 class RgbLed:
     GPIO.setmode(GPIO.BCM)
     GPIO.setwarnings(False)
@@ -80,21 +82,21 @@ class RgbLed:
 if __name__ == "__main__":
     demo = RgbLed(redPin, greenPin, bluePin, powerPin)
     demo.setColor(RED)
-    time.sleep((0.5))
+    time.sleep((COLOR_CYCLE_SECS))
     demo.setColor(GREEN)
-    time.sleep((0.5))
+    time.sleep((COLOR_CYCLE_SECS))
     demo.setColor(BLUE)
-    time.sleep((0.5))
+    time.sleep((COLOR_CYCLE_SECS))
     demo.setColor(OFF)
     time.sleep(2)
     demo.setColor(CYAN)
-    time.sleep((0.5))
+    time.sleep((COLOR_CYCLE_SECS))
     demo.setColor(YELLOW)
-    time.sleep((0.5))
+    time.sleep((COLOR_CYCLE_SECS))
     demo.setColor(MAGENTA)
-    time.sleep((0.5))
+    time.sleep((COLOR_CYCLE_SECS))
     demo.setColor(WHITE)
-    time.sleep((0.5))
+    time.sleep((COLOR_CYCLE_SECS))
     demo.setColor(OFF)
 
     sleepLed = threading.Thread(target = demo.cycle, args=(2,))
