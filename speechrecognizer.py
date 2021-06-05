@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 import logging
-_LOGGING_LEVEL = logging.INFO
+_LOGGING_LEVEL = logging.DEBUG
 
 import multiprocessing
 import time
@@ -159,7 +159,7 @@ class SpeechRecognizer(multiprocessing.Process):
                     consecutive_silent_samples += 1
                     consecutive_noisy_samples = 0
                 
-                if consecutive_silent_samples == PAUSE_LENGTH_IN_SAMPLES:
+                if not paused_for_silence and consecutive_silent_samples == PAUSE_LENGTH_IN_SAMPLES:
                     logging.debug("Pausing audio streaming")
                     self.suspendRecognizing()
                     paused_for_silence = True

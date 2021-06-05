@@ -254,7 +254,6 @@ def watchForVisionResults(vision_results_queue, image_queue):
                 greeting = phraseresponder.getFarewell()
 
             # Issue a response the first consecutive time we see a set of labels that we know a response to
-            label_text = [label.description for label in labels]
             image_label_greeting = visionanalyzer.getGreetingForLabels(labels)
             if image_label_greeting and image_label_greeting[0]:
                 logging.debug("l: {}  pl: {} g: {}".format(image_label_greeting[2], prev_recognized_label_text, image_label_greeting[0]))

@@ -111,7 +111,7 @@ def getGoodMoodGreeting():
 def getGreetingForLabels(labels):
     for tags, greetings, excludes, wave_flag in LABELS_GREETINGS:
         for label in labels:
-            logging.debug("label: {}".format(label.description))
+            logging.debug("label: {}".format(label))
         matched_label_text = labelMatch(labels, tags)
         if matched_label_text:
             matched_exclude = labelMatch(labels, excludes)
@@ -121,8 +121,8 @@ def getGreetingForLabels(labels):
 
 def labelMatch(labels,tags):
     for candidate_label in labels:
-        if candidate_label.description in tags:	
-            return candidate_label.description
+        if candidate_label in tags:	
+            return candidate_label
     return None
 
 # Sentiment is -1, 0 or +1 for this sentiment and level
