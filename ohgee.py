@@ -491,7 +491,9 @@ if __name__ == '__main__':
         listener = threading.Thread(target = receiveLanguageResults, args=(nl_results, search_queue,))
         listener.start()
 
-        speech_queue.put(INITIAL_WAKEUP_GREETING)
+        #TODO(raymond) Wait for the speechrecognizer to indicate that it is trained before this
+        #speech_queue.put(INITIAL_WAKEUP_GREETING)
+
         logging.debug("Waiting")
         root.mainloop()
     except Exception as e:

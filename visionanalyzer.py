@@ -293,7 +293,6 @@ class ImageAnalyzer(multiprocessing.Process):
                         buffer.seek(0)
                         img_bytes = buffer.getvalue()
                         logging.debug("send image %s" % type(img_bytes))
-                        logging.debug("%s, %s, %s, %s" % (type(results[1]), type(results[2]), type(results[3]), type(results[4])))
                         self._vision_queue.send((img_bytes, results[1], results[2], results[3], results[4]))
                     except Exception:
                         logging.exception("error reading image")

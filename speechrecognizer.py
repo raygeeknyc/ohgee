@@ -117,6 +117,8 @@ class SpeechRecognizer(multiprocessing.Process):
         self._silence_threshold = 0
         silence_min = 9999
         silence_samples = 0
+        while self._suspend_listening.is_set():
+            pass
         for sample in range(SILENCE_TRAINING_SAMPLES):
             try:
                 data = mic_stream.read(FRAMES_PER_BUFFER)
@@ -167,7 +169,7 @@ class SpeechRecognizer(multiprocessing.Process):
                     paused_for_silence = True
                 if paused_for_silence:
                     if consecutive_noisy_samples == UNPAUSE_LENGTH_IN_SAMPLES: 
-                        logging.debug("Resuming audio streaming")
+                        logging.debug("Resuming audio streaming with %d chunks" % len(temp_audio_buffer))
                         paused_for_silence = False
                         (self._audio_buffer.put(buffered_data) for buffered_data in temp_audio_buffer)
                         self.resumeRecognizing()
@@ -179,6 +181,7 @@ class SpeechRecognizer(multiprocessing.Process):
                         temp_audio_buffer.append(data)
                
                 if not paused_for_silence:
+                    logging.debug("chunk")
                     self._audio_buffer.put(data)
             except IOError:
                 logging.exception("IOError capturing audio")
