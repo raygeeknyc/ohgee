@@ -17,7 +17,7 @@ LOWER_MOOD_THRESHOLD = -1 * MOOD_THRESHOLD
 POS_NOUN = "NOUN"
 POS_ADJECTIVE = "ADJ"
 
-DEMO_PHRASES = ["Hello there Raymond", "I love to eat lettuce",
+DEMO_PHRASES = ["Hello there Raymond", "What a cute robot", "I love to eat lettuce",
     "I hate you", "You are very adorable"]
 
 def isGood(sentiment):
@@ -88,22 +88,22 @@ class LanguageAnalyzer(multiprocessing.Process):
 
                 tokens = response.tokens
                 for token in tokens:
-                    logging.debug("Token: {}: {}".format(token.part_of_speech, token.text))
+                    logging.debug("Token: {}: {}".format(token.part_of_speech.tag.name, token.text))
                 noun = None
                 adjective = None
                 decorated_noun = None
                 for token in reversed(tokens):
-                    if token.part_of_speech == POS_NOUN:
-                        noun = token.text
+                    if token.part_of_speech.tag.name == POS_NOUN:
+                        noun = token.text.content
                         continue
-                    if token.part_of_speech == POS_ADJECTIVE and noun:
-                        adjective = token.text
+                    if token.part_of_speech.tag.name == POS_ADJECTIVE and noun:
+                        adjective = token.text.content
                         break
                 if noun and adjective:
                     decorated_noun = (adjective, noun)
                     logging.debug("ADJ+NOUN {}".format(decorated_noun))
 
-                portable_tokens = [{'text':token.text.content, 'part_of_speech':token.part_of_speech.tag} for token in tokens]
+                portable_tokens = [{'text':token.text.content, 'part_of_speech':token.part_of_speech.tag.name} for token in tokens]
                 portable_entities = [{'name':str(entity.name), 'entity_type':str(entity.type_.name), 'salience':entity.salience} for entity in entities]
                 portable_sentiment = {'score':sentiment.score, 'magnitude':sentiment.magnitude}
                 results = (content, portable_tokens, portable_entities, portable_sentiment, decorated_noun)

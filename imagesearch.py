@@ -4,7 +4,7 @@ import PIL
 import sys
 from PIL import Image
 import logging
-from io import StringIO
+from io import BytesIO
 
 import requests
 
@@ -56,7 +56,7 @@ def getTopImage(search_term):
                     logging.debug("Skipping {}".format(item['link'].encode('utf-8')))
                     continue
                 logging.debug("Fetching {} from {}".format(item['title'].encode('utf-8'), item['link'].encode('utf-8')))
-                image_stream = StringIO(requests.get(image_url, stream=True, allow_redirects=True).content)
+                image_stream = BytesIO(requests.get(image_url, stream=True, allow_redirects=True).content)
                 if image_stream:
                     logging.debug("image was fetched")
                     return getImage(image_stream)

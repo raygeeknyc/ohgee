@@ -179,6 +179,7 @@ def receiveLanguageResults(nl_results, search_queue):
             if decorated_noun:
                 since_searched = time.time() - last_search_at
                 if since_searched > SEARCH_INTERVAL_SECS:
+                    logging.info("Searching for images of %s" % str(decorated_noun))
                     search_queue.put(decorated_noun)
                     last_search_at = time.time()
         except EOFError:
@@ -306,19 +307,19 @@ def searchForTermImage(search_term):
     return image
 
 def searchForObjects(search_queue, image_queue):
-    logging.debug("search thread started")
+    logging.debug("Image search thread started")
     search_term = None
     while not STOP:
         try:
             t = search_queue.get(False)
-            logging.debug("Search queue had an entry")
+            logging.debug("Image search queue had an entry")
             search_term = t
         except queue.Empty:
             if not search_term:
                 logging.debug("Empty search queue, waiting")
                 time.sleep(SEARCH_POLL_DELAY_SECS)
                 continue
-            logging.debug("Search term {}".format(search_term))
+            logging.debug("Image search term {}".format(search_term))
             top_image = searchForTermImage(search_term)
             if top_image:
                 image_queue.put((top_image, True))
