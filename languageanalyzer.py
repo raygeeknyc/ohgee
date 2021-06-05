@@ -3,7 +3,7 @@
 import os
 import sys
 import logging
-_LOGGING_LEVEL = logging.INFO
+_LOGGING_LEVEL = logging.DEBUG
 
 import multiprocessing
 from multiprocessingloghandler import ParentMultiProcessingLogHandler, ChildMultiProcessingLogHandler
@@ -20,14 +20,14 @@ POS_ADJECTIVE = "ADJ"
 DEMO_PHRASES = ["Hello there Raymond", "I love to eat lettuce",
     "I hate you", "You are very adorable"]
 
-def isGood(sentiment_score):
-    return sentiment_score >= MOOD_THRESHOLD
+def isGood(sentiment):
+    return sentiment['score'] >= MOOD_THRESHOLD
 
-def isBad(sentiment_score):
-    return sentiment_score <= LOWER_MOOD_THRESHOLD
+def isBad(sentiment):
+    return sentiment['score'] <= LOWER_MOOD_THRESHOLD
 
-def isMeh(sentiment_score):
-    return MOOD_THRESHOLD >= sentiment_score >= LOWER_MOOD_THRESHOLD
+def isMeh(sentiment):
+    return MOOD_THRESHOLD >= sentiment['score'] >= LOWER_MOOD_THRESHOLD
 
 class LanguageAnalyzer(multiprocessing.Process):
     def __init__(self, text_transcript, nl_results, log_queue, logging_level):

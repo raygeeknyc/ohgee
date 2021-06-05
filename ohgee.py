@@ -152,7 +152,7 @@ def wave():
         waving = False
 
 def receiveLanguageResults(nl_results, search_queue):
-    logging.debug("Listening")
+    logging.debug("Listening for language")
     _, nl_results = nl_results
     last_search_at = 0.0
     
@@ -160,13 +160,13 @@ def receiveLanguageResults(nl_results, search_queue):
         try:
             phrase = nl_results.recv()
             text, tokens, entities, sentiment, decorated_noun = phrase
-            logging.debug("Got spoken phrase {}".format(text))
+            logging.debug("Got spoken phrase {} noun {}".format(text, decorated_noun))
             if languageanalyzer.isGood(sentiment):
-                showGoodMood(sentiment.score)
+                showGoodMood(sentiment)
             elif languageanalyzer.isBad(sentiment):
-                showBadMood(sentiment.score)
+                showBadMood(sentiment)
             else:
-                showMehMood(sentiment.score)
+                showMehMood(sentiment)
             response = phraseresponder.getResponse(text, entities)
             if response:
                 logging.debug("Phrase matched")
