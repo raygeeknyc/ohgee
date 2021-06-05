@@ -15,6 +15,9 @@ LOWER_MOOD_THRESHOLD = -1 * MOOD_THRESHOLD
 POS_NOUN = "NOUN"
 POS_ADJECTIVE = "ADJ"
 
+DEMO_PHRASES = ["Hello there Raymond", "I love to eat lettuce",
+    "I hate you", "You are very adorable"]
+
 def isGood(sentiment):
     return sentiment.score >= MOOD_THRESHOLD
 
@@ -108,13 +111,28 @@ def main(unused):
     logging.getLogger('').setLevel(_LOGGING_LEVEL)
 
     transcript = multiprocessing.Pipe()
+    nl_results = multiprocessing.Pipe()
     language_worker = languageanalyzer.LanguageAnalyzer(transcript, nl_results, log_queue, logging.getLogger('').getEffectiveLevel())
     logging.debug("Starting language analyzer")
     language_worker.start()
+
     unused, phrase_pipe = transcript
+    unused.close()
+
+    unused, language_results = nl_results
+    unused.close()
+
     for phrase in DEMO_PHRASES:
         phrase_pipe.send(phrase)
-    unused.close()
+
+    while True;
+        try:
+            phrase = nl_results.recv()
+            print("got %s" % str(phrase))
+        except EOFError:
+            print("End of NL results queue")
+            break
+    print("done")
 
 
 if __name__ == '__main__':
