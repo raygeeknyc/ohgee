@@ -2,6 +2,8 @@
 
 import os
 import logging
+_LOGGING_LEVEL = logging.DEBUG
+
 import multiprocessing
 from multiprocessingloghandler import ChildMultiProcessingLogHandler
 
@@ -96,3 +98,26 @@ class LanguageAnalyzer(multiprocessing.Process):
         logging.debug("end of speech analyzer")
         self._text_transcript.close()
         self._nl_results.close()
+
+
+def main(unused):
+    log_stream = sys.stderr
+    log_queue = multiprocessing.Queue(100)
+    handler = ParentMultiProcessingLogHandler(logging.StreamHandler(log_stream), log_queue)
+    logging.getLogger('').addHandler(handler)
+    logging.getLogger('').setLevel(_LOGGING_LEVEL)
+
+    transcript = multiprocessing.Pipe()
+    language_worker = languageanalyzer.LanguageAnalyzer(transcript, nl_results, log_queue, logging.getLogger('').getEffectiveLevel())
+    logging.debug("Starting language analyzer")
+    language_worker.start()
+    unused, phrase_pipe = transcript
+    for phrase in DEMO_PHRASES:
+        phrase_pipe.send(phrase)
+    unused.close()
+
+
+if __name__ == '__main__':
+    print('Running standalone language analyzer.')
+    main(sys.argv)
+    print('exiting')
