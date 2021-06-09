@@ -4,8 +4,8 @@ VERSION_ID = ", , version Forty"
 import logging
 
 # reorder as appropriate
-_DEBUG = logging.INFO
 _DEBUG = logging.DEBUG
+_DEBUG = logging.INFO
 
 import tkinter
 import PIL
@@ -123,8 +123,9 @@ def speak(speech_queue):
             utterance = " ".join(speech_queue.get())
             logging.debug("Not listening while talking")
             recognition_worker.suspendListening()
-            logging.debug("Saying {}".format(utterance))
+            logging.debug("TRACE Saying %s", utterance)
             os.system(PICO_CMD % (SPEECH_TMP_FILE, utterance, SPEECH_TMP_FILE))
+            logging.debug("TRACE Done Saying")
         except Exception:
             logging.exception("Error speaking")
         finally:

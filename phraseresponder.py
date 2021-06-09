@@ -37,6 +37,9 @@ FRIENDS_2_RESPONSES = (["" ,"Nicole!"], ["New", "York", "misses", "you", "Nicole
 FRIENDS_3_PROMPTS = (["I'm", "Daniela"], ["I", "am", "Daniela"], ["this", "is", "Daniela"])
 FRIENDS_3_RESPONSES = (["ola", "Daniela"],["nice", "to", "meet", "you", "Daniela"])
 
+FRIENDS_4_PROMPTS = (["I'm", "Raymond"], ["I", "am", "Raymond"], ["this", "is", "Raymond"])
+FRIENDS_4_RESPONSES = (["You", "are", "the" "kirk"],["I", "love", "you", "raymond", "because", "you", "just", "get", "smarter", "every", "day"], ["Raymond", "is", "a", "robots", "best", "friend"])
+
 ID_PROMPTS = (["who", "are", "you"], ["what", "is", "your", "name"], ["what", "are", "you"])
 ID_RESPONSES = (["I", "am", "oh", "jee", ",", "a", "desktop", "robot", "friend"], ["my", "name", "is", "oh", "jee"], ["I", "am", "oh", "jee"], ["hello", "I'm", "oh", "jee"], ["I'm", "just", "the", "cutest", "robot", "you,'ll", "ever", "see"])
 
@@ -174,6 +177,9 @@ def friends2Prompts(_):
 def friends3Prompts(_):
     return FRIENDS_3_PROMPTS
 
+def friends4Prompts(_):
+    return FRIENDS_4_PROMPTS
+
 def caninePrompts(_):
     return CANINE_PROMPTS
 
@@ -227,6 +233,9 @@ def friends2Responses(_):
 
 def friends3Responses(_):
     return FRIENDS_3_RESPONSES
+
+def friends4Responses(_):
+    return FRIENDS_4_RESPONSES
 
 def canineResponses(_):
     return CANINE_RESPONSES
@@ -301,10 +310,10 @@ def getPerson(entities):
     salience = 0
     person = ""
     for entity in entities:
-        if entity.entity_type == language_v1.Entity.Type.PERSON:
-          if entity.salience > salience:
-            salience = entity.salience
-            person = entity.name
+        if entity['entity_type'] == language_v1.Entity.Type.PERSON:
+          if entity['salience'] > salience:
+            salience = entity['salience']
+            person = entity['name']
     return [person]
 
 def getResponse(phrase, entities):
@@ -329,6 +338,7 @@ PROMPTS_RESPONSES = [
   (friends1Prompts, friends1Responses, None, True),
   (friends2Prompts, friends2Responses, None, True),
   (friends3Prompts, friends3Responses, None, True),
+  (friends4Prompts, friends4Responses, None, True),
   (idPrompts, idResponses, None, False),
   (introPrompts, introResponses, None, False), # This should follow specific intros
   (greetings, greetings, inKindSuffixes, True), 

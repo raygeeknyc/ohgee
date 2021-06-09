@@ -17,6 +17,9 @@ import io
 import os
 import sys
 
+TEST_SUSPEND_SECS = 2.0
+TEST_RESUME_SECS = 3.0
+
 # Setup audio and cloud speech
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
@@ -53,24 +56,25 @@ class SpeechRecognizer(multiprocessing.Process):
         self._stop_capturing = False
         self._stop_recognizing = False
         self._audio_buffer = IterableQueue()
-
-    def resumeListening(self):
-        logging.debug("resumeListening")
-        self._suspend_listening.clear()
-        self.resumeRecognizing()
+        self._mic_stream = None
 
     def suspendListening(self):
-        logging.debug("suspendListening")
+        logging.debug("TRACE suspendListening")
         self._suspend_listening.set()
         self.suspendRecognizing()
 
-    def resumeRecognizing(self):
-        logging.debug("resumeRecognizing")
-        self._suspend_recognizing.clear()
+    def resumeListening(self):
+        logging.debug("TRACE resumeListening")
+        self._suspend_listening.clear()
+        self.resumeRecognizing()
 
     def suspendRecognizing(self):
-        logging.debug("suspendRecognizing")
+        logging.debug("TRACE suspendRecognizing")
         self._suspend_recognizing.set()
+
+    def resumeRecognizing(self):
+        logging.debug("TRACE resumeRecognizing")
+        self._suspend_recognizing.clear()
 
     def stop(self):
         logging.debug("***background received shutdown")
@@ -112,7 +116,7 @@ class SpeechRecognizer(multiprocessing.Process):
         logging.debug("setting stop_recognizing")
         self._stop_recognizing = True
 
-    def trainSilence(self, mic_stream):
+    def trainSilence(self):
         logging.debug("Training silence")
         self._silence_threshold = 0
         silence_min = 9999
@@ -121,7 +125,7 @@ class SpeechRecognizer(multiprocessing.Process):
             pass
         for sample in range(SILENCE_TRAINING_SAMPLES):
             try:
-                data = mic_stream.read(FRAMES_PER_BUFFER)
+                data = self._mic_stream.read(FRAMES_PER_BUFFER)
                 volume = max(array.array('h', data))
                 logging.debug("sample {}".format(volume))
                 if volume < 0:
@@ -136,24 +140,39 @@ class SpeechRecognizer(multiprocessing.Process):
         logging.info("Trained silence volume {} min was {} pause samples {} unpause_samples {}".format(self._silence_threshold, silence_min, PAUSE_LENGTH_IN_SAMPLES, UNPAUSE_LENGTH_IN_SAMPLES))
 
     def captureSound(self):
-        logging.debug("starting capturing")
-        mic_stream = self._audio.open(format=FORMAT, channels=CHANNELS,
+        logging.debug("Starting capturing")
+        self._mic_stream = self._audio.open(format=FORMAT, channels=CHANNELS,
             rate=RATE, input=True,
             frames_per_buffer=FRAMES_PER_BUFFER)
 
-        self.trainSilence(mic_stream)
+        self.trainSilence()
         consecutive_silent_samples = PAUSE_LENGTH_IN_SAMPLES + 1
         consecutive_noisy_samples = 0
         samples = 0
         paused_for_silence = True
  
         temp_audio_buffer = deque()
+
+        is_suspended = self._suspend_listening.is_set()
+        was_suspended = None
+
         while not self._stop_capturing:
-            if self._suspend_listening.is_set():
-                continue
+            if was_suspended is None:
+                was_suspended = not is_suspended
+            else:
+                was_suspended = is_suspended
+            is_suspended = self._suspend_listening.is_set()
+            if was_suspended != is_suspended:
+                logging.debug("TRACE: capture suspended: %s", str(is_suspended))
+ 
             try:
                 samples += 1
-                data = mic_stream.read(FRAMES_PER_BUFFER)
+            
+                logging.debug("TRACE reading audio")
+                data = self._mic_stream.read(FRAMES_PER_BUFFER)
+                if self._suspend_listening.is_set():
+                    logging.debug("TRACE audio bypass")
+                    continue
                 volume = max(array.array('h', data))
                 logging.debug("Volume max {}".format(volume))
                 if volume > self._silence_threshold:
@@ -169,26 +188,25 @@ class SpeechRecognizer(multiprocessing.Process):
                     paused_for_silence = True
                 if paused_for_silence:
                     if consecutive_noisy_samples == UNPAUSE_LENGTH_IN_SAMPLES: 
-                        logging.debug("Resuming audio streaming with %d chunks" % len(temp_audio_buffer))
+                        logging.debug("TRACE resuming audio streaming with %d chunks" % len(temp_audio_buffer))
                         paused_for_silence = False
                         (self._audio_buffer.put(buffered_data) for buffered_data in temp_audio_buffer)
                         self.resumeRecognizing()
                     elif consecutive_noisy_samples == 0:
                         logging.debug("Clearing resumption buffer")
                         temp_audio_buffer.clear()
-                    else:
+                    elif not self._suspend_listening.is_set():
                         logging.debug("Buffering possible resumption")
                         temp_audio_buffer.append(data)
                
-                if not paused_for_silence:
-                    logging.debug("chunk")
+                if not paused_for_silence and not self._suspend_listening.is_set():
+                    logging.debug("TRACE streaming chunk")
                     self._audio_buffer.put(data)
             except IOError:
                 logging.exception("IOError capturing audio")
         logging.debug("ending sound capture")
         # stop Recording
-        mic_stream.stop_stream()
-        mic_stream.close()
+        self._mic_stream.close()
         self._audio.terminate()
         logging.debug("stopped capturing")
 
@@ -219,7 +237,7 @@ class SpeechRecognizer(multiprocessing.Process):
                     if not result.alternatives:
                         continue
                     alternative = result.alternatives[0]
-                    logging.info("speech: {}".format(alternative.transcript))
+                    logging.info("TRACE speech: {}".format(alternative.transcript))
                     logging.debug("final: {}".format(result.is_final))
                     logging.debug("confidence: {}".format(alternative.confidence))
                     self._transcript.send(alternative.transcript)
@@ -248,6 +266,13 @@ def main(unused):
     recognition_worker.start()
     unused, _ = transcript
     unused.close()
+
+    
+    for _ in range(2):
+        time.sleep(TEST_RESUME_SECS)
+        recognition_worker.suspendListening()
+        time.sleep(TEST_SUSPEND_SECS)
+        recognition_worker.resumeListening()
 
 if __name__ == '__main__':
     print('running standalone recognizer')
