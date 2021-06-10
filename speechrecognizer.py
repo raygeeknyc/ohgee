@@ -52,6 +52,7 @@ class SpeechRecognizer(multiprocessing.Process):
         self._exit = multiprocessing.Event()
         self._suspend_listening = multiprocessing.Event()
         self._suspend_recognizing = multiprocessing.Event()
+        self.is_ready = multiprocessing.Event()
         self._transcript, _ = transcript
         self._stop_capturing = False
         self._stop_recognizing = False
@@ -94,7 +95,7 @@ class SpeechRecognizer(multiprocessing.Process):
             logging.debug("recognizer process active")
             self._recognizer.start()
             self._suspend_listening.clear()
-            self._suspend_recognizing.clear()
+            self.is_ready.clear()
             self._capturer.start()
             self._exit.wait()
         except Exception:
@@ -137,6 +138,7 @@ class SpeechRecognizer(multiprocessing.Process):
                 logging.exception("Training mic read raised exception")
         self._silence_threshold /= silence_samples
         self._silence_threshold -= abs(self._silence_threshold - silence_min)/4
+        self.is_ready.set()
         logging.info("Trained silence volume {} min was {} pause samples {} unpause_samples {}".format(self._silence_threshold, silence_min, PAUSE_LENGTH_IN_SAMPLES, UNPAUSE_LENGTH_IN_SAMPLES))
 
     def captureSound(self):

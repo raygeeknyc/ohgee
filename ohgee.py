@@ -483,9 +483,6 @@ if __name__ == '__main__':
         searcher = threading.Thread(target = searchForObjects, args=(search_queue, image_queue,))
         searcher.start()
 
-        displayer = threading.Thread(target = maintainDisplay, args=(root, image_queue,))
-        displayer.start()
-
         speech_queue = queue.Queue()
         speaker = threading.Thread(target = speak, args=(speech_queue,))
         speaker.start()
@@ -493,10 +490,15 @@ if __name__ == '__main__':
         listener = threading.Thread(target = receiveLanguageResults, args=(nl_results, search_queue,))
         listener.start()
 
-        #TODO(raymond) Wait for the speechrecognizer to indicate that it is trained before this
-        #speech_queue.put(INITIAL_WAKEUP_GREETING)
+        logging.debug("waiting for speech recognizer")
+        recognition_worker.is_ready.wait()
+        logging.debug("speech recognizer is ready")
+        speech_queue.put(INITIAL_WAKEUP_GREETING)
 
-        logging.debug("Waiting")
+        #TODO(raymond) Be aware that there's a race condition between maintainDisplay and mainloop
+        displayer = threading.Thread(target = maintainDisplay, args=(root, image_queue,))
+        displayer.start()
+
         root.mainloop()
     except Exception as e:
         logging.error("Error in main: {}".format(e))
