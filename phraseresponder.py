@@ -40,7 +40,7 @@ FRIENDS_3_RESPONSES = (["ola", "Daniela"],["nice", "to", "meet", "you", "Daniela
 FRIENDS_4_PROMPTS = (["I'm", "Raymond"], ["I", "am", "Raymond"], ["this", "is", "Raymond"])
 FRIENDS_4_RESPONSES = (["You", "are", "the", "kirk"], ["I", "love", "you", "raymond", "because", "you", "just", "get", "smarter", "every", "day"], ["Raymond", "is", "a", "robots", "best", "friend"])
 
-FRIENDS_5_PROMPTS = (["I'm", "Auggie"], ["I", "am", "Auggie"], ["this", "is", "Auggie"])
+FRIENDS_5_PROMPTS = (["I'm", "Oggy"], ["I", "am", "Oggy"], ["this", "is", "Oggy"])
 FRIENDS_5_RESPONSES = (["You", "are", "a", "genius"], ["Raymond", "always", "says", "how", "great", "you", "are", "Auggie"], ["Our", "names", "are", "almost", "the", "same"])
 
 ID_PROMPTS = (["who", "are", "you"], ["what", "is", "your", "name"], ["what", "are", "you"])
