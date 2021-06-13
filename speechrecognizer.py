@@ -147,7 +147,7 @@ class SpeechRecognizer(multiprocessing.Process):
             except Exception:
                 logging.exception("Training mic read raised exception")
         self._silence_threshold /= silence_samples
-        self._silence_threshold -= abs(self._silence_threshold - silence_min)/4
+        self._silence_threshold = silence_min+(self._silence_threshold - silence_min)**0.5
         self._training.clear()
         self._trained_at = time.time()
         self.resumeListening()
