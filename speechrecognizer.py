@@ -244,13 +244,6 @@ class SpeechRecognizer(multiprocessing.Process):
                     continue
                 requests = (speech.StreamingRecognizeRequest(audio_content=sound_chunk) for sound_chunk in self._audio_buffer)
             
-                if self._streamed_at:
-                    if time.time() - self._streamed_at > MAX_CONTINUOUS_STREAM_DUR_SECS:
-                        logging.debug("TRACE maximum continuous sound was reached.")
-                    logging.debug("Retraining silence threshold.")
-                    self.is_ready.clear()
-                    self.trainSilence()
-                    self.is_ready.set()
                 self._streamed_at = time.time()
                 logging.debug('created requests generator')
                 responses = self._speech_client.streaming_recognize(streaming_config, requests)
@@ -269,6 +262,13 @@ class SpeechRecognizer(multiprocessing.Process):
                         break
                     consecutive_recognition_errors = 0
             except Exception as e:
+                if self._streamed_at:
+                    if time.time() - self._streamed_at > MAX_CONTINUOUS_STREAM_DUR_SECS:
+                        logging.debug("TRACE maximum continuous sound was reached.")
+                    logging.debug("Retraining silence threshold.")
+                    self.is_ready.clear()
+                    self.trainSilence()
+                    self.is_ready.set()
                 logging.exception("error recognizing speech")
                 consecutive_recognition_errors += 1
                 if consecutive_recognition_errors > MAX_CONSECUTIVE_ERRORS:

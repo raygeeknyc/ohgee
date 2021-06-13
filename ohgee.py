@@ -4,8 +4,8 @@ VERSION_ID = ", , version Forty"
 import logging
 
 # reorder as appropriate
-_DEBUG = logging.DEBUG
 _DEBUG = logging.INFO
+_DEBUG = logging.DEBUG
 _DEBUG = logging.WARNING
 
 import tkinter
