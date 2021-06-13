@@ -18,7 +18,7 @@ DISPLAY_RESOLUTION = (640,480)
 def isSmallContent(url):
     header = requests.head(url, allow_redirects=True).headers
     content_type = header.get('content-type')
-    if content is not None and 'text' in content_type.lower() or 'html' in content_type.lower():
+    if content_type is not None and 'text' in content_type.lower() or 'html' in content_type.lower():
         logging.debug("content-type: {}".format(content_type))
         return False
     content_length = int(header.get('content-length') or MAXIMUM_CONTENT_SIZE+1)
