@@ -35,6 +35,8 @@ SAMPLE_RETRY_DELAY_SECS = 0.1
 # This is how many samples to take to find the lowest sound level
 SILENCE_TRAINING_SAMPLES = 10
 MAX_CONSECUTIVE_ERRORS = 3
+# Google cloud speech can only stream 305 secs maxiumum
+MAX_CONTINUOUS_STREAM_DUR_SECS = 180
   
 class IterableQueue(queue.SimpleQueue): 
     _sentinel = object()
@@ -151,12 +153,13 @@ class SpeechRecognizer(multiprocessing.Process):
         consecutive_silent_samples = PAUSE_LENGTH_IN_SAMPLES + 1
         consecutive_noisy_samples = 0
         samples = 0
-        paused_for_silence = True
  
         temp_audio_buffer = deque()
 
         is_suspended = self._suspend_listening.is_set()
         was_suspended = None
+        last_paused_at = 0
+        last_unpaused_at = 0
 
         while not self._stop_capturing:
             if was_suspended is None:
@@ -170,6 +173,12 @@ class SpeechRecognizer(multiprocessing.Process):
             try:
                 samples += 1
             
+                if not paused_at and (time.now() - paused_at) > MAX_CONTINUOUS_STREAM_DUR_SECS:
+                    logging.debug("TRACE maximum continuous sound reached. Retraining silence threshold")
+                    self.is_ready.clear()
+                    self.suspendListening()
+                    self.trainSilence()
+                    self.resumeListening()
                 logging.debug("TRACE reading audio")
                 data = self._mic_stream.read(FRAMES_PER_BUFFER)
                 if self._suspend_listening.is_set():
@@ -184,14 +193,16 @@ class SpeechRecognizer(multiprocessing.Process):
                     consecutive_silent_samples += 1
                     consecutive_noisy_samples = 0
                 
-                if not paused_for_silence and consecutive_silent_samples == PAUSE_LENGTH_IN_SAMPLES:
+                if not paused_at and consecutive_silent_samples == PAUSE_LENGTH_IN_SAMPLES:
                     logging.debug("Pausing audio streaming")
                     self.suspendRecognizing()
-                    paused_for_silence = True
-                if paused_for_silence:
+                    paused_at = time.now()
+                    unpaused_at = 0
+                if paused_at:
                     if consecutive_noisy_samples == UNPAUSE_LENGTH_IN_SAMPLES: 
                         logging.debug("TRACE resuming audio streaming with %d chunks" % len(temp_audio_buffer))
-                        paused_for_silence = False
+                        unpaused_at = time.now()
+                        paused_at = 0
                         (self._audio_buffer.put(buffered_data) for buffered_data in temp_audio_buffer)
                         self.resumeRecognizing()
                     elif consecutive_noisy_samples == 0:
@@ -201,7 +212,7 @@ class SpeechRecognizer(multiprocessing.Process):
                         logging.debug("Buffering possible resumption")
                         temp_audio_buffer.append(data)
                
-                if not paused_for_silence and not self._suspend_listening.is_set():
+                if not paused_at and not self._suspend_listening.is_set():
                     logging.debug("TRACE streaming chunk")
                     self._audio_buffer.put(data)
             except IOError:
