@@ -171,6 +171,7 @@ class SpeechRecognizer(multiprocessing.Process):
         was_suspended = None
         paused = False
         self.is_ready.set()
+        unpaused_at = 0
 
         while not self._stop_capturing:
             if was_suspended is None:
