@@ -245,7 +245,7 @@ class SpeechRecognizer(multiprocessing.Process):
                 if self._suspend_recognizing.is_set():
                     consecutive_continuous_stream_errors = 0
                     continue
-                while self._audio_buffer.empty()
+                while self._audio_buffer.empty():
                     pass
                 requests = (speech.StreamingRecognizeRequest(audio_content=sound_chunk) for sound_chunk in self._audio_buffer)
             
