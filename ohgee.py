@@ -5,8 +5,8 @@ import logging
 
 # reorder as appropriate
 _DEBUG = logging.INFO
-_DEBUG = logging.DEBUG
 _DEBUG = logging.WARNING
+_DEBUG = logging.DEBUG
 
 import tkinter
 import PIL

@@ -34,9 +34,9 @@ SAMPLE_RETRY_DELAY_SECS = 0.1
 
 # This is how many samples to take to find the lowest sound level
 SILENCE_TRAINING_SAMPLES = 10
-MAX_CONSECUTIVE_ERRORS = 3
-# Google cloud speech can only stream 305 secs maxiumum, after 4 mins we recalibrate silence threshold
-MAX_CONTINUOUS_STREAM_DUR_SECS = 240
+MAX_CONSECUTIVE_CONTINUOUS_STREAM_ERRORS = 3
+# Google cloud speech can only stream 305 secs maxiumum, after 5 mins we recalibrate silence threshold
+MAX_CONTINUOUS_STREAM_DUR_SECS = 304
   
 class IterableQueue(queue.SimpleQueue): 
     _sentinel = object()
@@ -198,13 +198,15 @@ class SpeechRecognizer(multiprocessing.Process):
                     consecutive_noisy_samples = 0
                 
                 if not paused and consecutive_silent_samples == PAUSE_LENGTH_IN_SAMPLES:
-                    logging.debug("Pausing audio streaming")
+                    logging.debug("Pausing audio streaming after %f secs", time.time()-unpaused_at)
                     self.suspendRecognizing()
                     paused = True
+                    paused_at = time.time()
                 if paused:
                     if consecutive_noisy_samples == UNPAUSE_LENGTH_IN_SAMPLES: 
-                        logging.debug("TRACE resuming audio streaming with %d chunks" % len(temp_audio_buffer))
+                        logging.debug("TRACE resuming audio streaming with %d chunks after %f secs", len(temp_audio_buffer), time.time()-paused_at)
                         paused = False
+                        unpaused_at = time.time()
                         (self._audio_buffer.put(buffered_data) for buffered_data in temp_audio_buffer)
                         self.resumeRecognizing()
                     elif consecutive_noisy_samples == 0:
@@ -237,11 +239,14 @@ class SpeechRecognizer(multiprocessing.Process):
             interim_results=False)
 
         logging.debug("Starting recognizing")
-        consecutive_recognition_errors = 0
+        consecutive_continuous_stream_errors = 0
         while not self._stop_recognizing:
             try:
                 if self._suspend_recognizing.is_set():
+                    consecutive_continuous_stream_errors = 0
                     continue
+                while self._audio_buffer.empty()
+                    pass
                 requests = (speech.StreamingRecognizeRequest(audio_content=sound_chunk) for sound_chunk in self._audio_buffer)
             
                 self._streamed_at = time.time()
@@ -260,19 +265,21 @@ class SpeechRecognizer(multiprocessing.Process):
                     self._transcript.send(alternative.transcript)
                     if self._stop_recognizing:
                         break
-                    consecutive_recognition_errors = 0
             except Exception as e:
+                logging.debug("Streaming for %s", str(time.time() - self._streamed_at))
                 if self._streamed_at:
                     if time.time() - self._streamed_at > MAX_CONTINUOUS_STREAM_DUR_SECS:
                         logging.debug("TRACE maximum continuous sound was reached.")
-                    logging.debug("Retraining silence threshold.")
-                    self.is_ready.clear()
-                    self.trainSilence()
-                    self.is_ready.set()
+                        consecutive_continuous_stream_errors += 1
+                        logging.debug("Retraining silence threshold.")
+                        self.is_ready.clear()
+                        self.trainSilence()
+                        self.is_ready.set()
+                    else:
+                        consecutive_continuous_stream_errors = 0
                 logging.exception("error recognizing speech")
-                consecutive_recognition_errors += 1
-                if consecutive_recognition_errors > MAX_CONSECUTIVE_ERRORS:
-                    logging.error("Maximum consecutive errors exceeded, exiting")
+                if consecutive_continuous_stream_errors > MAX_CONSECUTIVE_CONTINUOUS_STREAM_ERRORS:
+                    logging.error("Maximum consecutive continuous stream errors exceeded, exiting")
                     raise e
                 continue
         logging.debug("stopped recognizing")
