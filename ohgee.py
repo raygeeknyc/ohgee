@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-VERSION_ID = ", , version Forty one"
+VERSION_ID = ", , version Forty two"
 import logging
 
 # reorder as appropriate
@@ -49,12 +49,13 @@ LABEL_RESPONSE_DELAY_SECS = 60.0 * 10
 INITIAL_WAKEUP_GREETING = ["I'm", "awake", VERSION_ID]
 
 servoPin = 18
-ARM_RELAXED_POSITION = 16.0
-ARM_DOWN_POSITION = 12.0
-ARM_UP_POSITION = 18.0
-ARM_WAVE_LOWER_SECS = 0.5
-ARM_WAVE_RAISE_SECS = 2
+ARM_RELAXED_POSITION = 9.0
+ARM_DOWN_POSITION = 6.0
+ARM_UP_POSITION = 11.0
+ARM_WAVE_LOWER_SECS = 2
+ARM_WAVE_RAISE_SECS = 1
 ARM_WAVE_DELAY_SECS = 1
+_ARM_SERVO_CATCHUP_SECS = 0.1
 MIN_FACE_WAVE_DELAY_SECS = 10
 
 GREETING_INTERVAL_SECS = 5
@@ -135,12 +136,16 @@ def speak(speech_queue):
     logging.debug("Speaker stopping")
 
 def waveArm():
-    raiseArm()
-    time.sleep(ARM_WAVE_RAISE_SECS)
     lowerArm()
+    time.sleep(_ARM_SERVO_CATCHUP_SECS)
+    arm.ChangeDutyCycle(0)
     time.sleep(ARM_WAVE_LOWER_SECS)
+    raiseArm()
+    time.sleep(_ARM_SERVO_CATCHUP_SECS)
+    arm.ChangeDutyCycle(0)
+    time.sleep(ARM_WAVE_RAISE_SECS)
     relaxArm()
-    time.sleep(0.5)
+    time.sleep(_ARM_SERVO_CATCHUP_SECS)
     arm.ChangeDutyCycle(0)
 
 def wave():
