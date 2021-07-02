@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-VERSION_ID = ", , version Forty two"
+VERSION_ID = ", , version Forty three"
 import logging
 
 # reorder as appropriate
@@ -46,7 +46,7 @@ IMAGE_STICKY_DISPLAY_SECS = 3
 IMAGE_MIN_DISPLAY_SECS = 0.2
 LABEL_RESPONSE_DELAY_SECS = 60.0 * 10
 
-INITIAL_WAKEUP_GREETING = ["I'm", "awake", VERSION_ID]
+INITIAL_WAKEUP_GREETING = ["I'm", "awake",  "and",  "ready", VERSION_ID]
 
 servoPin = 18
 ARM_RELAXED_POSITION = 9.0
