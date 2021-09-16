@@ -10,4 +10,3 @@
 #  export GOOGLE_APPLICATION_CREDENTIALS=${credentials_file}
 #  export GOOGLE_CLOUD_PROJECT=ohgee-176600
 #fi
-exit 0
