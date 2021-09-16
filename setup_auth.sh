@@ -8,5 +8,4 @@
 #  gcloud auth application-default login
 #else
 #  export GOOGLE_APPLICATION_CREDENTIALS=${credentials_file}
-#  export GOOGLE_CLOUD_PROJECT=ohgee-176600
-#fi
+export GOOGLE_CLOUD_PROJECT=vision-ml-experiments
