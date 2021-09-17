@@ -47,7 +47,7 @@ MOTION_DETECT_SAMPLE = 1.0/20  # so... 5%? (Kudos to Sarah Cooper)
 POLL_SECS = 0.1
 
 # This is the rate at which to send frames to the vision service
-ANALYSIS_RATE_FPS = 1
+ANALYSIS_RATE_FPS = .67
 _ANALYSIS_DELAY_SECS = 1.0/ANALYSIS_RATE_FPS
 
 COLOR_MEH = (0, 0, 127)
