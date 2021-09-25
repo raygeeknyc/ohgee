@@ -20,7 +20,7 @@ The analyzed images are examined for faces - if any faces are found, Ohgee elide
 If a face is "close enough" Ohgee greets the person and bid them farewell when they depart.
 
 Click on the image to see a quick demo...
-[![demo](images/sorry.jpg)](https://youtu.be/PBYmpuFzArQ "Ohgee demo")
+[![demo](images/sorry.jpg){:height="720px"}](https://youtu.be/PBYmpuFzArQ "Ohgee demo")
 
 
 But wait... there's more!
