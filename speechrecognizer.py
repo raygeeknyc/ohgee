@@ -59,7 +59,7 @@ class SpeechRecognizer(multiprocessing.Process):
         self._transcript, _ = transcript
         self._stop_capturing = False
         self._stop_recognizing = False
-        self._audio_buffer = IterableQueue()
+        self._audio_buffer = None
         self._mic_stream = None
         self.is_ready.clear()
         self._trained_at = 0
@@ -100,6 +100,7 @@ class SpeechRecognizer(multiprocessing.Process):
         self._initLogging()
         try:
             logging.debug("recognizer process active")
+            self._audio_buffer = IterableQueue()
             self._audio = pyaudio.PyAudio()
             self._capturer = threading.Thread(target=self.captureSound)
             self._recognizer = threading.Thread(target=self.recognizeSpeech)
@@ -242,6 +243,7 @@ class SpeechRecognizer(multiprocessing.Process):
         logging.debug("Starting recognizing")
         consecutive_continuous_stream_errors = 0
         while not self._stop_recognizing:
+            logging.debug("Recognizing")
             try:
                 if self._suspend_recognizing.is_set():
                     consecutive_continuous_stream_errors = 0
@@ -253,6 +255,7 @@ class SpeechRecognizer(multiprocessing.Process):
                 self._streamed_at = time.time()
                 logging.debug('created requests generator')
                 responses = self._speech_client.streaming_recognize(streaming_config, requests)
+                consecutive_continuous_stream_errors = 0
                 for response in responses:
                     if not response.results:
                         continue
@@ -267,18 +270,14 @@ class SpeechRecognizer(multiprocessing.Process):
                     if self._stop_recognizing:
                         break
             except Exception as e:
-                logging.debug("Streaming for %s", str(time.time() - self._streamed_at))
-                if self._streamed_at:
-                    if time.time() - self._streamed_at > MAX_CONTINUOUS_STREAM_DUR_SECS:
-                        logging.debug("TRACE maximum continuous sound was reached.")
-                        consecutive_continuous_stream_errors += 1
-                        logging.debug("Retraining silence threshold.")
-                        self.is_ready.clear()
-                        self.trainSilence()
-                        self.is_ready.set()
-                    else:
-                        consecutive_continuous_stream_errors = 0
-                logging.exception("error recognizing speech")
+                logging.exception("error recognizing speech. Streaming for %s", str(time.time() - self._streamed_at))
+                consecutive_continuous_stream_errors += 1
+                if self._streamed_at and (time.time() - self._streamed_at > MAX_CONTINUOUS_STREAM_DUR_SECS):
+                    logging.debug("TRACE maximum continuous sound was reached.")
+                    logging.debug("Retraining silence threshold.")
+                    self.is_ready.clear()
+                    self.trainSilence()
+                    self.is_ready.set()
                 if consecutive_continuous_stream_errors > MAX_CONSECUTIVE_CONTINUOUS_STREAM_ERRORS:
                     logging.error("Maximum consecutive continuous stream errors exceeded, exiting")
                     raise e
@@ -300,11 +299,18 @@ def main(unused):
     unused.close()
 
     
+    logging.debug("Waiting for speech recognizer to be ready")
+    recognition_worker.is_ready.wait()
     for _ in range(2):
+        print("listening for %d seconds" % TEST_RESUME_SECS)
         time.sleep(TEST_RESUME_SECS)
+        print("pausing for %d seconds" % TEST_SUSPEND_SECS)
         recognition_worker.suspendListening()
         time.sleep(TEST_SUSPEND_SECS)
         recognition_worker.resumeListening()
+
+    recognition_worker.stop()
+    recognition_worker.join()
 
 if __name__ == '__main__':
     print('running standalone recognizer')
