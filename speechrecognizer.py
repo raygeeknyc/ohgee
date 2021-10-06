@@ -243,17 +243,17 @@ class SpeechRecognizer(multiprocessing.Process):
         logging.debug("Starting recognizing")
         consecutive_continuous_stream_errors = 0
         while not self._stop_recognizing:
-            logging.debug("Recognizing")
+            logging.info("Recognizing")
             try:
                 if self._suspend_recognizing.is_set():
                     consecutive_continuous_stream_errors = 0
                     continue
                 while self._audio_buffer.empty():
                     pass
+                logging.info('creating speech service requests')
                 requests = (speech.StreamingRecognizeRequest(audio_content=sound_chunk) for sound_chunk in self._audio_buffer)
             
                 self._streamed_at = time.time()
-                logging.debug('created requests generator')
                 responses = self._speech_client.streaming_recognize(streaming_config, requests)
                 consecutive_continuous_stream_errors = 0
                 for response in responses:
