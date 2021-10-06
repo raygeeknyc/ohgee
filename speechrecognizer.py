@@ -34,7 +34,8 @@ SAMPLE_RETRY_DELAY_SECS = 0.1
 
 # This is how many samples to take to find the lowest sound level
 SILENCE_TRAINING_SAMPLES = 10
-MAX_CONSECUTIVE_CONTINUOUS_STREAM_ERRORS = 3
+CONSECUTIVE_CONTINUOUS_STREAM_ERRORS_RETRAIN_THRESHOLD = 3
+MAX_CONSECUTIVE_CONTINUOUS_STREAM_ERRORS = 5
 # Google cloud speech can only stream 305 secs maxiumum, after 5 mins we recalibrate silence threshold
 MAX_CONTINUOUS_STREAM_DUR_SECS = 304
   
@@ -250,7 +251,7 @@ class SpeechRecognizer(multiprocessing.Process):
                     continue
                 while self._audio_buffer.empty():
                     pass
-                logging.info('creating speech service requests')
+                logging.info('Creating speech service requests')
                 requests = (speech.StreamingRecognizeRequest(audio_content=sound_chunk) for sound_chunk in self._audio_buffer)
             
                 self._streamed_at = time.time()
@@ -272,17 +273,15 @@ class SpeechRecognizer(multiprocessing.Process):
             except Exception as e:
                 logging.exception("error recognizing speech. Streaming for %s", str(time.time() - self._streamed_at))
                 consecutive_continuous_stream_errors += 1
-                if self._streamed_at and (time.time() - self._streamed_at > MAX_CONTINUOUS_STREAM_DUR_SECS):
-                    logging.debug("TRACE maximum continuous sound was reached.")
+                if (self._streamed_at and (time.time() - self._streamed_at > MAX_CONTINUOUS_STREAM_DUR_SECS)) and (consecutive_continuous_stream_errors == CONSECUTIVE_CONTINUOUS_STREAM_ERRORS_RETRAIN_THRESHOLD):
+                    logging.debug("TRACE sound level retraining threshold was reached.")
                     logging.debug("Retraining silence threshold.")
                     self.is_ready.clear()
                     self.trainSilence()
                     self.is_ready.set()
                 if consecutive_continuous_stream_errors > MAX_CONSECUTIVE_CONTINUOUS_STREAM_ERRORS:
-                    logging.error("Maximum consecutive continuous stream errors exceeded, exiting")
+                    logging.error("Maximum consecutive listening errors was exceeded, exiting recognizer.")
                     raise e
-                continue
-        logging.debug("stopped recognizing")
 
 def main(unused):
     log_stream = sys.stderr
