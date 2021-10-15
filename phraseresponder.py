@@ -388,7 +388,20 @@ PROMPTS_RESPONSES = [
   (otherProducts, productRecs, None, False)]
 
 def substituteWildcards(chosenResponse, wildcards):
-    return chosenResponse
+    if not wildcards:
+        return chosenResponse
+    finalResponse=[]
+    for token in chosenResponse:
+        if re.match('\?.*\?',token):
+            try:
+                substituted_token = wildcards[token.upper()]
+                logging.info("wildcards: '%s'", str(wildcards))
+                finalResponse.append(substituted_token)
+            except KeyError:
+                finalResponse.append(token.replace("?",""))
+        else:
+            finalResponse.append(token)
+    return finalResponse
 
 def phraseMatch(phrase, entities, candidate_phrase_generator):
     candidate_phrases = eval('candidate_phrase_generator(entities)')
