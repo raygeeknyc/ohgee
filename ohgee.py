@@ -174,7 +174,7 @@ def receiveLanguageResults(nl_results, search_queue):
                 showBadMood(sentiment)
             else:
                 showMehMood(sentiment)
-            response = phraseresponder.getResponse(text, entities)
+            response = phraseresponder.getResponse(text.strip(), entities)
             if response:
                 logging.debug("Phrase matched")
                 comeback, wave_flag = response

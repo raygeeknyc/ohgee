@@ -30,22 +30,16 @@ NEWS_1_PROMPTS = (["president" ,"trump"], ["donald", "trump"])
 NEWS_1_RESPONSES = (["Trump", "is", "a", "chump"], ["donald", "chump"], ["dump", "trump"])
 
 FOOD_PROMPTS = (["I", "love", "to", "eat", "?foodname?"], ["?foodname?", "is", "delicious"])
-FOOD_RESPONSES = (["I", "hope", "that", "you", "have", "some", "?foodname?", "soon"], ["?foodname?", "is", "great"])
+FOOD_RESPONSES = (["I", "hope", "that", "you", "have", "some", "?foodname?", "soon"], ["?foodname?", "is", "great"], ["yum", "yum", "?foodname?"])
 
-FRIENDS_1_PROMPTS = (["I'm", "diana"], ["I", "am", "diana"], ["this", "is", "diana"])
-FRIENDS_1_RESPONSES = (["I'm", "so", "glad", "to", "meet", "you", "diana"], ["I've", "heard", "so", "much", "about", "you", "diana"], ["Raymond", "says", "such", "good", "things", "about", "you", "diana"])
+FRIENDS_1_PROMPTS = (["I'm", "Raymond"], ["I", "am", "Raymond"], ["this", "is", "Raymond"])
+FRIENDS_1_RESPONSES = (["You", "are", "the", "kirk"], ["I", "love", "you", "raymond", "because", "you", "just", "get", "smarter", "every", "day"], ["Raymond", "is", "a", "robots", "best", "friend"])
 
-FRIENDS_2_PROMPTS = (["I'm", "Nicole"], ["I", "am", "Nicole"], ["this", "is", "Nicole"], ["It's Nicole"])
-FRIENDS_2_RESPONSES = (["" ,"Nicole!"], ["New", "York", "misses", "you", "Nicole"], ["I", "thought", "you", "are", "Judy", "Jetson"], ["I'm", "so", "happy", "to", "see", "you", "Nicole"])
+FRIENDS_2_PROMPTS = (["I'm", "Oggy"], ["I", "am", "Oggy"], ["this", "is", "Oggy"])
+FRIENDS_2_RESPONSES = (["You", "are", "a", "genius"], ["Raymond", "always", "says", "how", "great", "you", "are", "Auggie"], ["Our", "names", "are", "almost", "the", "same"])
 
-FRIENDS_3_PROMPTS = (["I'm", "Daniela"], ["I", "am", "Daniela"], ["this", "is", "Daniela"])
-FRIENDS_3_RESPONSES = (["ola", "Daniela"],["nice", "to", "meet", "you", "Daniela"])
-
-FRIENDS_4_PROMPTS = (["I'm", "Raymond"], ["I", "am", "Raymond"], ["this", "is", "Raymond"])
-FRIENDS_4_RESPONSES = (["You", "are", "the", "kirk"], ["I", "love", "you", "raymond", "because", "you", "just", "get", "smarter", "every", "day"], ["Raymond", "is", "a", "robots", "best", "friend"])
-
-FRIENDS_5_PROMPTS = (["I'm", "Oggy"], ["I", "am", "Oggy"], ["this", "is", "Oggy"])
-FRIENDS_5_RESPONSES = (["You", "are", "a", "genius"], ["Raymond", "always", "says", "how", "great", "you", "are", "Auggie"], ["Our", "names", "are", "almost", "the", "same"])
+FRIENDS_3_PROMPTS = (["I'm", "?personname?"], ["I", "am", "?personname?"], ["this", "is", "?personname?"])
+FRIENDS_3_RESPONSES = (["I'm", "so", "glad", "to", "meet", "you", "?personname?"], ["I've", "heard", "so", "much", "about", "you", "?personname?"], ["Raymond", "says", "such", "good", "things", "about", "you", "?personname?"])
 
 ID_PROMPTS = (["who", "are", "you"], ["what", "is", "your", "name"], ["what", "are", "you"])
 ID_RESPONSES = (["I", "am", "oh", "jee", ",", "a", "desktop", "robot", "friend"], ["my", "name", "is", "oh", "jee"], ["I", "am", "oh", "jee"], ["hello", "I'm", "oh", "jee"], ["I'm", "just", "the", "cutest", "robot", "you,'ll", "ever", "see"])
@@ -187,12 +181,6 @@ def friends2Prompts(_):
 def friends3Prompts(_):
     return FRIENDS_3_PROMPTS
 
-def friends4Prompts(_):
-    return FRIENDS_4_PROMPTS
-
-def friends5Prompts(_):
-    return FRIENDS_5_PROMPTS
-
 def caninePrompts(_):
     return CANINE_PROMPTS
 
@@ -249,12 +237,6 @@ def friends2Responses(_):
 
 def friends3Responses(_):
     return FRIENDS_3_RESPONSES
-
-def friends4Responses(_):
-    return FRIENDS_4_RESPONSES
-
-def friends5Responses(_):
-    return FRIENDS_5_RESPONSES
 
 def canineResponses(_):
     return CANINE_RESPONSES
@@ -336,9 +318,10 @@ def getPerson(entities):
     return [person]
 
 def getResponse(phrase, entities):
-    logging.debug("Looking to match phrase {}".format(phrase))
+    logging.debug("Looking to match phrase '%s'" % phrase)
     for prompt_generator, response_generator, suffix_generator, wave_flag in PROMPTS_RESPONSES:
         matchedPhrase, wildcards = phraseMatch(phrase, entities, prompt_generator)
+        logging.debug("'%s', '%s', '%s'" % (phrase, matchedPhrase, wildcards))
         if matchedPhrase:
             responses = eval('response_generator(entities)')
             if suffix_generator:
@@ -361,8 +344,6 @@ PROMPTS_RESPONSES = [
   (friends1Prompts, friends1Responses, None, True),
   (friends2Prompts, friends2Responses, None, True),
   (friends3Prompts, friends3Responses, None, True),
-  (friends4Prompts, friends4Responses, None, True),
-  (friends5Prompts, friends5Responses, None, True),
   (idPrompts, idResponses, None, False),
   (introPrompts, introResponses, None, False), # This should follow specific intros
   (greetings, greetings, inKindSuffixes, True), 
