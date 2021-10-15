@@ -32,8 +32,8 @@ NEWS_1_RESPONSES = (["Trump", "is", "a", "chump"], ["donald", "chump"], ["dump",
 FOOD_PROMPTS = (["I", "love", "to", "eat", "?foodname?"], ["?foodname?", "is", "delicious"])
 FOOD_RESPONSES = (["I", "hope", "that", "you", "have", "some", "?foodname?", "soon"], ["?foodname?", "is", "great"], ["yumm", "yumm", "?foodname?"])
 
-GREAT_STUFF_PROMPTS = ("?greatthing?", "is", "the", "best", "%type?"])
-GREAT_STUFF_RESPONSES = (["I'm", "glad", "that", "?greatthing?", "is", "such", "great", "?type?"])
+GREAT_STUFF_PROMPTS = (["?greatthing?", "is", "the", "best", "?type?"], ["?greatthing?", "is", "my", "favorite", "?type?"])
+GREAT_STUFF_RESPONSES = (["I'm", "glad", "that", "?greatthing?", "is", "such", "great", "?type?"], ["you", "really", "know", "your", "?type?"])
 
 FRIENDS_1_PROMPTS = (["I'm", "Raymond"], ["I", "am", "Raymond"], ["this", "is", "Raymond"])
 FRIENDS_1_RESPONSES = (["You", "are", "the", "kirk"], ["I", "love", "you", "raymond", "because", "you", "just", "get", "smarter", "every", "day"], ["Raymond", "is", "a", "robots", "best", "friend"])
@@ -337,9 +337,9 @@ def getResponse(phrase, entities):
                 suffixes = eval('suffix_generator(entities)')
             else:
                 suffixes = None
+            logging.debug("responses '%s', '%s'" % (responses, suffixes))
             chosenResponse = randomPhraseFrom(responses)+randomPhraseFrom(suffixes)
-            if wildcards:
-                chosenResponse = substituteWildcards(chosenResponse, wildcards)
+            chosenResponse = substituteWildcards(chosenResponse, wildcards)
             return (chosenResponse, wave_flag)
     return None
 
@@ -400,7 +400,7 @@ def phraseMatch(phrase, entities, candidate_phrase_generator):
     for candidate_phrase in candidate_phrases:
         logging.debug("Matching with {}".format(candidate_phrase))
         matched_phrase, wildcard_values = phraseInKnownCandidatePhrase(phrase, candidate_phrase)
-        logging.debug("'%s' matched '%s, %s'", phrase, str(matched_phrase), str(wildcard_values))
+        logging.debug("'%s' matched '%s, %s'" % (phrase, str(matched_phrase), str(wildcard_values)))
         if matched_phrase:
             return (matched_phrase, wildcard_values)
     return ([], None)
