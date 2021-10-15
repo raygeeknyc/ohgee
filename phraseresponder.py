@@ -30,7 +30,7 @@ NEWS_1_PROMPTS = (["president" ,"trump"], ["donald", "trump"])
 NEWS_1_RESPONSES = (["Trump", "is", "a", "chump"], ["donald", "chump"], ["dump", "trump"])
 
 FOOD_PROMPTS = (["I", "love", "to", "eat", "?foodname?"], ["?foodname?", "is", "delicious"])
-FOOD_RESPONSES = (["I", "hope", "that", "you", "have", "some", "?foodname?", "soon"], ["?foodname?", "is", "great"], ["yum", "yum", "?foodname?"])
+FOOD_RESPONSES = (["I", "hope", "that", "you", "have", "some", "?foodname?", "soon"], ["?foodname?", "is", "great"], ["yumm", "yumm", "?foodname?"])
 
 FRIENDS_1_PROMPTS = (["I'm", "Raymond"], ["I", "am", "Raymond"], ["this", "is", "Raymond"])
 FRIENDS_1_RESPONSES = (["You", "are", "the", "kirk"], ["I", "love", "you", "raymond", "because", "you", "just", "get", "smarter", "every", "day"], ["Raymond", "is", "a", "robots", "best", "friend"])
