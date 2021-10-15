@@ -6,6 +6,7 @@ _DEBUG=logging.INFO
 _DEBUG=logging.DEBUG
 
 import os
+import re
 from random import randint
 from datetime import datetime
 from google.cloud import language_v1
@@ -27,6 +28,9 @@ POP_4_RESPONSES = (["hey", "I'm", "talking", "about", "shaft"], ["hey", "I'm", "
 
 NEWS_1_PROMPTS = (["president" ,"trump"], ["donald", "trump"])
 NEWS_1_RESPONSES = (["Trump", "is", "a", "chump"], ["donald", "chump"], ["dump", "trump"])
+
+FOOD_PROMPTS = (["I", "love", "to", "eat", "?foodname?"], ["?foodname?", "is", "delicious"])
+FOOD_RESPONSES = (["I", "hope", "that", "you", "have", "some", "?foodname?", "soon"], ["?foodname?", "is", "great"])
 
 FRIENDS_1_PROMPTS = (["I'm", "diana"], ["I", "am", "diana"], ["this", "is", "diana"])
 FRIENDS_1_RESPONSES = (["I'm", "so", "glad", "to", "meet", "you", "diana"], ["I've", "heard", "so", "much", "about", "you", "diana"], ["Raymond", "says", "such", "good", "things", "about", "you", "diana"])
@@ -171,6 +175,9 @@ def pop4Prompts(_):
 def news1Prompts(_):
     return NEWS_1_PROMPTS
 
+def foodPrompts(_):
+    return FOOD_PROMPTS
+
 def friends1Prompts(_):
     return FRIENDS_1_PROMPTS
 
@@ -227,6 +234,9 @@ def pop4Responses(_):
 
 def news1Responses(_):
     return NEWS_1_RESPONSES
+
+def foodResponses(_):
+    return FOOD_RESPONSES
 
 def girlsCountResponses(_):
     return GIRLS_COUNT_RESPONSES
@@ -367,6 +377,7 @@ PROMPTS_RESPONSES = [
   (pop3Prompts, pop3Responses, None, True),
   (pop4Prompts, pop4Responses, None, False),
   (news1Prompts, news1Responses, None, False),
+  (foodPrompts, foodResponses, None, False),
   (girlsCountPrompts, girlsCountResponses, None, False),
   (banal1Prompts, banal1Responses, None, False),
   (banal2Prompts, banal2Responses, None, False),
@@ -377,25 +388,32 @@ def phraseMatch(phrase, entities, candidate_phrase_generator):
     logging.debug("Candidate phrases: {}".format(candidate_phrases))
     for candidate_phrase in candidate_phrases:
         logging.debug("Matching with {}".format(candidate_phrase))
-        matched_phrase = phraseInTokens(phrase, candidate_phrase)
+        matched_phrase, wildcard_values = phraseInKnownCandidatePhrase(phrase, candidate_phrase)
+        logging.debug("'%s' matched '%s, %s'", phrase, str(matched_phrase), str(wildcard_values))
         if matched_phrase:
-            return matched_phrase
+            return (matched_phrase, wildcard_values)
     return []
 
-def phraseInTokens(phrase, candidate_phrase):
-    if not phrase or not candidate_phrase:
+def phraseInKnownCandidatePhrase(phrase_being_matched, candidate_phrase):
+    if not phrase_being_matched or not candidate_phrase:
         return []
-    w = candidate_phrase[0]
+    known_word = candidate_phrase[0]
     matched = True
-    words = phrase.split(" ")
-    for i in range(len(words)-len(candidate_phrase)+1):
-        if words[i].upper() == w.upper():
+    wildcard_values = {}
+    words_being_matched = phrase_being_matched.split(" ")
+    for i in range(len(words_being_matched)-len(candidate_phrase)+1):
+        if words_being_matched[i].upper() == known_word.upper() or re.match('\?.*\?',known_word):
+            if re.match('\?.*\?',known_word):
+                wildcard_values[known_word.upper()] = words_being_matched[i]
             for j in range(1,len(candidate_phrase)):
-                if words[i+j].upper() != candidate_phrase[j].upper():
+                if words_being_matched[i+j].upper() != candidate_phrase[j].upper() and not re.match('\?.*\?',candidate_phrase[j]):
                     matched = False
+                else:
+                    if re.match('\?.*\?',candidate_phrase[j]):
+                        wildcard_values[candidate_phrase[j].upper()] = words_being_matched[i+j]
             if matched:
-                return words[i:i+len(candidate_phrase)]
-    return []
+                return (words_being_matched[i:i+len(candidate_phrase)], wildcard_values)
+    return ([], None)
 
 def getFarewell():
     return randomPhraseFrom(FAREWELLS+timeFarewells(None))
@@ -413,7 +431,7 @@ if __name__ == '__main__':
     logging.getLogger('').setLevel(_DEBUG)
     print(getGreeting())
     while True:
-        phrase = raw_input("Enter a phrase to match: ")
+        phrase = input("Enter a phrase to match: ")
         if not phrase:
             break
         print(getResponse(phrase, None))
