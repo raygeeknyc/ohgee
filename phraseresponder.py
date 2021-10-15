@@ -36,7 +36,7 @@ ELIZA_7_PROMPTS = (["I'm", "glad", "that", "?happiness?"], ["I", "am", "glad", "
 ELIZA_7_RESPONSES = (["Why", "does", "?happiness?", "make", "you", "glad?"], ["Is", "?happiness?", "very", "important", "for", "happiness?"])
 
 ELIZA_8_PROMPTS = (["I'm", "glad"], ["I'm", "happy"], ["I", "am", "glad"], ["I", "am", "happy"])
-ELIZA_8_RESPONSES = (["How", "have", "I", "helped", "you", "to", "be", "glad?"], ["What", "makes", "you", "happy", "just", "?now?"], ["Can", "you", "explain", "why", "you", "are", "suddenly", "happy?"])
+ELIZA_8_RESPONSES = (["How", "have", "I", "helped", "you", "to", "be", "glad?"], ["What", "makes", "you", "happy", "just", "now"], ["Can", "you", "explain", "why", "you", "are", "suddenly", "happy?"])
 
 ELIZA_9_PROMPTS = (["?first?", "is", "like", "?second?"], ["?first?", "reminds", "me", "of", "?second?"], ["?first?", "are", "like", "?second?"])
 ELIZA_9_RESPONSES = (["In", "what", "way", "is", "?first?", "like", "?second?"], ["What", "resemblence", "do", "you", "see", "between", "?second?", "and", "?first?"], ["Could", "there", "really", "be", "some", "connection", "between", "them?"])
