@@ -14,6 +14,36 @@ from google.cloud import language_v1
 REBOOT_PROMPTS = (["og", "please", "reboot"], ["oh", "please", "reboot"], ["o", "please", "reboot"])
 REBOOT_RESPONSES = (["rebooting"], ["I'm", "rebooting"],  ["Okay", "", "I'm", "on", "it"])
 
+ELIZA_1_PROMPTS = (["I", "remember", "?memory?"], ["I'm", "thinking", "about", "?memory?"])
+ELIZA_1_RESPONSES = (["Do", "you", "often", "think", "about", "?memory?"], ["Does", "thinking", "of", "?memory?", "bring", "anything", "else", "to", "mind?"], ["what", "else", "do", "you", "remember?"], ["Why", "do", "you", "recall", "?memory?", "right", "now?"], ["What", "in", "the", "present", "situation", "reminds", "you", "of", "?memory?"], ["What", "is", "the", "connection", "between", "me", "and", "?memory?"])
+
+ELIZA_2_PROMPTS = (["I", "want", "?desire?"], ["I", "wish", "I", "had", "?desire?"])
+ELIZA_2_RESPONSES = (["What", "would", "it", "mean", "if", "you", "got", "?desire?"], ["Why", "do", "you", "want", "?memory?"], ["Suppose", "you", "got", "?desire?", "soon"])
+
+ELIZA_3_PROMPTS = (["?preface?", "if", "?perhaps?"], ["?preface", "only", "if", "?perhaps?"])
+ELIZA_3_RESPONSES = (["Do", "you", "really", "think", "it,'s", "likely", "that", "?perhaps?"], ["Do", "you", "wish", "that", "?perhaps?"], ["What", "do", "you", "think", "about", "?perhaps?"], ["Really", ",", "if", "?perhaps?"])
+
+ELIZA_4_PROMPTS = (["I", "dreamt", "?dream?"], ["I", "dream", "about", "?dream?"])
+ELIZA_4_RESPONSES = (["How", "do", "you", "feel", "about", "?dream?", "in", "reality?"], ["Would", "you", "really", "want", "?dream?", "to", "be", "true?"])
+
+ELIZA_5_PROMPTS = (["I'm", "sad", "about", "?sadness?"], ["I", "am", "sad", "about", "?sadness?"], ["?sadness?", "makes", "me", "sad"], ["?sadness?", "makes", "me", "unhappy"], ["?sadness?", "is", "sad"])
+ELIZA_5_RESPONSES = (["I", "am", "sorry", "to", "hear", "you", "are", "depressed"], ["I'm", "sure", "it's", "not", "pleasant", "to", "be", "sad"])
+
+ELIZA_6_PROMPTS = (["I'm", "sad"], ["I'm", "unhappy"], ["I", "am", "sad"], ["I", "am", "unhappy"])
+ELIZA_6_RESPONSES = (["I", "am", "sorry", "to", "hear", "you", "are", "depressed"], ["I'm", "sure", "it's", "not", "pleasant", "to", "be", "sad"])
+
+ELIZA_7_PROMPTS = (["I'm", "glad", "that", "?happiness?"], ["I", "am", "glad", "that", "?happiness?"], ["?happiness?", "makes", "me", "happy"], ["?happiness?", "makes", "me", "glad"])
+ELIZA_7_RESPONSES = (["Why", "does", "?happiness?", "make", "you", "glad?"], ["Is", "?happiness?", "very", "important", "for", "happiness?"])
+
+ELIZA_8_PROMPTS = (["I'm", "glad"], ["I'm", "happy"], ["I", "am", "glad"], ["I", "am", "happy"])
+ELIZA_8_RESPONSES = (["How", "have", "I", "helped", "you", "to", "be", "glad?"], ["What", "makes", "you", "happy", "just", "?now?"], ["Can", "you", "explain", "why", "you", "are", "suddenly", "happy?"])
+
+ELIZA_9_PROMPTS = (["?first?", "is", "like", "?second?"], ["?first?", "reminds", "me", "of", "?second?"], ["?first?", "are", "like", "?second?"])
+ELIZA_9_RESPONSES = (["In", "what", "way", "is", "?first?", "like", "?second?"], ["What", "resemblence", "do", "you", "see", "between", "?second?", "and", "?first?"], ["Could", "there", "really", "be", "some", "connection", "between", "them?"])
+
+ELIZA_10_PROMPTS = (["?they?", "are", "?what?"], ["?they?", "is", "?what?"])
+ELIZA_10_RESPONSES = (["Do", "you", "think", "that", "about", "?they?"], ["Possibly", "they", "are", "?what?"], ["Did", "you", "think", "that", "they", "might", "not", "be", "?what?"])
+
 POP_1_PROMPTS = (["who", "is", "the", "man"], ["who", "would", "risk", "his", "neck"], ["his", "neck", "for", "his", "brother", "man"], ["the", "cat", "that", "won't", "cop", "out", "when"], ["danger", "all", "about"] )
 POP_1_RESPONSES = (["SHAFT"], ["that's", "shaft"], ["john", "shaft"])
 
@@ -157,6 +187,36 @@ def sadnesses(_):
 def rebootPrompts(_):
     return REBOOT_PROMPTS
 
+def eliza1Prompts(_):
+    return ELIZA_1_PROMPTS
+
+def eliza2Prompts(_):
+    return ELIZA_2_PROMPTS
+
+def eliza3Prompts(_):
+    return ELIZA_3_PROMPTS
+
+def eliza4Prompts(_):
+    return ELIZA_4_PROMPTS
+
+def eliza5Prompts(_):
+    return ELIZA_5_PROMPTS
+
+def eliza6Prompts(_):
+    return ELIZA_6_PROMPTS
+
+def eliza7Prompts(_):
+    return ELIZA_7_PROMPTS
+
+def eliza8Prompts(_):
+    return ELIZA_8_PROMPTS
+
+def eliza9Prompts(_):
+    return ELIZA_9_PROMPTS
+
+def eliza10Prompts(_):
+    return ELIZA_10_PROMPTS
+
 def pop1Prompts(_):
     return POP_1_PROMPTS
 
@@ -213,6 +273,36 @@ def banal2Prompts(_):
 
 def rebootResponses(_):
     return REBOOT_RESPONSES
+
+def eliza1Responses(_):
+    return ELIZA_1_RESPONSES
+
+def eliza2Responses(_):
+    return ELIZA_2_RESPONSES
+
+def eliza3Responses(_):
+    return ELIZA_3_RESPONSES
+
+def eliza4Responses(_):
+    return ELIZA_4_RESPONSES
+
+def eliza5Responses(_):
+    return ELIZA_5_RESPONSES
+
+def eliza6Responses(_):
+    return ELIZA_6_RESPONSES
+
+def eliza7Responses(_):
+    return ELIZA_7_RESPONSES
+
+def eliza8Responses(_):
+    return ELIZA_8_RESPONSES
+
+def eliza9Responses(_):
+    return ELIZA_9_RESPONSES
+
+def eliza10Responses(_):
+    return ELIZA_10_RESPONSES
 
 def pop1Responses(_):
     return POP_1_RESPONSES
@@ -345,6 +435,16 @@ def getResponse(phrase, entities):
 
 PROMPTS_RESPONSES = [
   (rebootPrompts, rebootResponses, None, True),
+  (eliza1Prompts, eliza1Responses, None, False),
+  (eliza2Prompts, eliza2Responses, None, False),
+  (eliza3Prompts, eliza3Responses, None, False),
+  (eliza4Prompts, eliza4Responses, None, False),
+  (eliza5Prompts, eliza5Responses, None, False),
+  (eliza6Prompts, eliza6Responses, None, False),
+  (eliza7Prompts, eliza7Responses, None, False),
+  (eliza8Prompts, eliza8Responses, None, False),
+  (eliza9Prompts, eliza9Responses, None, False),
+  (eliza10Prompts, eliza10Responses, None, False),
   (smugPrompts, smugResponses, None, False),
   (felinePrompts, felineResponses, None, True),
   (caninePrompts, canineResponses, None, True),
