@@ -32,6 +32,9 @@ NEWS_1_RESPONSES = (["Trump", "is", "a", "chump"], ["donald", "chump"], ["dump",
 FOOD_PROMPTS = (["I", "love", "to", "eat", "?foodname?"], ["?foodname?", "is", "delicious"])
 FOOD_RESPONSES = (["I", "hope", "that", "you", "have", "some", "?foodname?", "soon"], ["?foodname?", "is", "great"], ["yumm", "yumm", "?foodname?"])
 
+GREAT_STUFF_PROMPTS = ("?greatthing?", "is", "the", "best", "%type?"])
+GREAT_STUFF_RESPONSES = (["I'm", "glad", "that", "?greatthing?", "is", "such", "great", "?type?"])
+
 FRIENDS_1_PROMPTS = (["I'm", "Raymond"], ["I", "am", "Raymond"], ["this", "is", "Raymond"])
 FRIENDS_1_RESPONSES = (["You", "are", "the", "kirk"], ["I", "love", "you", "raymond", "because", "you", "just", "get", "smarter", "every", "day"], ["Raymond", "is", "a", "robots", "best", "friend"])
 
@@ -172,6 +175,9 @@ def news1Prompts(_):
 def foodPrompts(_):
     return FOOD_PROMPTS
 
+def greatStuffPrompts(_):
+    return GREAT_STUFF_PROMPTS
+
 def friends1Prompts(_):
     return FRIENDS_1_PROMPTS
 
@@ -225,6 +231,9 @@ def news1Responses(_):
 
 def foodResponses(_):
     return FOOD_RESPONSES
+
+def greatStuffResponses(_):
+    return GREAT_STUFF_RESPONSES
 
 def girlsCountResponses(_):
     return GIRLS_COUNT_RESPONSES
@@ -363,6 +372,7 @@ PROMPTS_RESPONSES = [
   (pop4Prompts, pop4Responses, None, False),
   (news1Prompts, news1Responses, None, False),
   (foodPrompts, foodResponses, None, False),
+  (greatStuffPrompts, greatStuffResponses, None, False),
   (girlsCountPrompts, girlsCountResponses, None, False),
   (banal1Prompts, banal1Responses, None, False),
   (banal2Prompts, banal2Responses, None, False),
