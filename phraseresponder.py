@@ -338,13 +338,17 @@ def getPerson(entities):
 def getResponse(phrase, entities):
     logging.debug("Looking to match phrase {}".format(phrase))
     for prompt_generator, response_generator, suffix_generator, wave_flag in PROMPTS_RESPONSES:
-        if phraseMatch(phrase, entities, prompt_generator):
+        matchedPhrase, wildcards = phraseMatch(phrase, entities, prompt_generator)
+        if matchedPhrase:
             responses = eval('response_generator(entities)')
             if suffix_generator:
                 suffixes = eval('suffix_generator(entities)')
             else:
                 suffixes = None
-            return (randomPhraseFrom(responses)+randomPhraseFrom(suffixes), wave_flag)
+            chosenResponse = randomPhraseFrom(responses)+randomPhraseFrom(suffixes)
+            if wildcards:
+                chosenResponse = substituteWildcards(chosenResponse, wildcards)
+            return (chosenResponse, wave_flag)
     return None
 
 PROMPTS_RESPONSES = [
@@ -383,6 +387,9 @@ PROMPTS_RESPONSES = [
   (banal2Prompts, banal2Responses, None, False),
   (otherProducts, productRecs, None, False)]
 
+def substituteWildcards(chosenResponse, wildcards):
+    return chosenResponse
+
 def phraseMatch(phrase, entities, candidate_phrase_generator):
     candidate_phrases = eval('candidate_phrase_generator(entities)')
     logging.debug("Candidate phrases: {}".format(candidate_phrases))
@@ -392,11 +399,11 @@ def phraseMatch(phrase, entities, candidate_phrase_generator):
         logging.debug("'%s' matched '%s, %s'", phrase, str(matched_phrase), str(wildcard_values))
         if matched_phrase:
             return (matched_phrase, wildcard_values)
-    return []
+    return ([], None)
 
 def phraseInKnownCandidatePhrase(phrase_being_matched, candidate_phrase):
     if not phrase_being_matched or not candidate_phrase:
-        return []
+        return ([], None)
     known_word = candidate_phrase[0]
     matched = True
     wildcard_values = {}
