@@ -26,13 +26,13 @@ ELIZA_3_RESPONSES = (["Do", "you", "really", "think", "it,'s", "likely", "that",
 ELIZA_4_PROMPTS = (["I", "dreamt", "?dream?"], ["I", "dream", "about", "?dream?"])
 ELIZA_4_RESPONSES = (["How", "do", "you", "feel", "about", "?dream?", "in", "reality"], ["Would", "you", "really", "want", "?dream?", "to", "be", "true"])
 
-ELIZA_5_PROMPTS = (["I'm", "sad", "about", "?sadness?"], ["I", "am", "sad", "about", "?sadness?"], ["?sadness?", "makes", "me", "sad"], ["?sadness?", "makes", "me", "unhappy"], ["?sadness?", "is", "sad"])
+ELIZA_5_PROMPTS = (["I'm", "sad", "about", "?sadness?"], ["I", "am", "sad", "about", "?sadness?"], ["?sadness?", "makes", "me", "sad"], ["?sadness?", "makes", "me", "unhappy"], ["?sadness?", "is", "sad"], ["?sadness?", "make", "me", "sad"], ["?sadness?", "makes", "me", "unhappy"])
 ELIZA_5_RESPONSES = (["I", "am", "sorry", "to", "hear", "you", "are", "depressed"], ["I'm", "sure", "it's", "not", "pleasant", "to", "be", "sad"])
 
 ELIZA_6_PROMPTS = (["I'm", "sad"], ["I'm", "unhappy"], ["I", "am", "sad"], ["I", "am", "unhappy"])
 ELIZA_6_RESPONSES = (["I", "am", "sorry", "to", "hear", "you", "are", "depressed"], ["I'm", "sure", "it's", "not", "pleasant", "to", "be", "sad"])
 
-ELIZA_7_PROMPTS = (["I'm", "glad", "that", "?happiness?"], ["I", "am", "glad", "that", "?happiness?"], ["?happiness?", "makes", "me", "happy"], ["?happiness?", "makes", "me", "glad"], ["I'm", "happy", "about", "?happiness?"])
+ELIZA_7_PROMPTS = (["I'm", "glad", "that", "?happiness?"], ["I", "am", "glad", "that", "?happiness?"], ["?happiness?", "makes", "me", "happy"], ["?happiness?", "makes", "me", "glad"], ["I'm", "happy", "about", "?happiness?"], ["?happiness?", "make", "me", "happy"], ["?happiness?", "make", "me", "glad"])
 ELIZA_7_RESPONSES = (["Why", "does", "?happiness?", "make", "you", "glad"], ["Is", "?happiness?", "very", "important", "for", "happiness"], ["Why", "does", "?happiness?", "make", "you", "happy"])
 
 ELIZA_8_PROMPTS = (["I'm", "glad"], ["I'm", "happy"], ["I", "am", "glad"], ["I", "am", "happy"])
@@ -59,7 +59,7 @@ POP_4_RESPONSES = (["hey", "I'm", "talking", "about", "shaft"], ["hey", "I'm", "
 NEWS_1_PROMPTS = (["president" ,"trump"], ["donald", "trump"])
 NEWS_1_RESPONSES = (["Trump", "is", "a", "chump"], ["donald", "chump"], ["dump", "trump"])
 
-FOOD_PROMPTS = (["I", "love", "to", "eat", "?foodname?"], ["?foodname?", "tastes", "great"])
+FOOD_PROMPTS = (["I", "love", "to", "eat", "?foodname?"], ["?foodname?", "tastes", "great"], ["?foodname?", "is", "delicious"])
 FOOD_RESPONSES = (["I", "hope", "that", "you", "have", "some", "?foodname?", "soon"], ["?foodname?", "is", "great"], ["yumm", "yumm", "?foodname?"])
 
 GREAT_STUFF_PROMPTS = (["?greatthing?", "is", "the", "best", "?type?"], ["?greatthing?", "is", "my", "favorite", "?type?"])
@@ -442,12 +442,6 @@ PROMPTS_RESPONSES = [
   (pop2Prompts, pop2Responses, None, True),
   (pop3Prompts, pop3Responses, None, True),
   (pop4Prompts, pop4Responses, None, False),
-  (friends1Prompts, friends1Responses, None, True),
-  (friends2Prompts, friends2Responses, None, True),
-  (friends3Prompts, friends3Responses, None, True),
-  (idPrompts, idResponses, None, False),
-  (introPrompts, introResponses, None, False), # This should follow specific intros
-  (greetings, greetings, inKindSuffixes, True), 
   (fixedGreetings, greetings, inKindSuffixes, True),
   (farewells, farewells, inKindSuffixes, True),
   (affections, affectionResponses, inKindSuffixes, False),
@@ -474,6 +468,12 @@ PROMPTS_RESPONSES = [
   (eliza8Prompts, eliza8Responses, None, False),
   (eliza9Prompts, eliza9Responses, None, False),
   (eliza10Prompts, eliza10Responses, None, False),
+  (friends1Prompts, friends1Responses, None, True),
+  (friends2Prompts, friends2Responses, None, True),
+  (friends3Prompts, friends3Responses, None, True),
+  (idPrompts, idResponses, None, False),
+  (introPrompts, introResponses, None, False), # This should follow specific intros
+  (greetings, greetings, inKindSuffixes, True), 
   (banal1Prompts, banal1Responses, None, False),
   (banal2Prompts, banal2Responses, None, False),
   (otherProducts, productRecs, None, False)]
