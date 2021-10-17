@@ -508,22 +508,17 @@ def phraseMatch(phrase, entities, candidate_phrase_generator):
 def phraseInKnownCandidatePhrase(phrase_being_matched, candidate_phrase):
     if not phrase_being_matched or not candidate_phrase:
         return ([], None)
-    known_word = candidate_phrase[0]
-    matched = True
-    wildcard_values = {}
-    words_being_matched = phrase_being_matched.split(" ")
-    for i in range(len(words_being_matched)-len(candidate_phrase)+1):
-        if words_being_matched[i].upper() == known_word.upper() or re.match('\?.*\?',known_word):
-            if re.match('\?.*\?',known_word):
-                wildcard_values[known_word.upper()] = words_being_matched[i]
-            for j in range(1,len(candidate_phrase)):
-                if words_being_matched[i+j].upper() != candidate_phrase[j].upper() and not re.match('\?.*\?',candidate_phrase[j]):
-                    matched = False
-                else:
-                    if re.match('\?.*\?',candidate_phrase[j]):
-                        wildcard_values[candidate_phrase[j].upper()] = words_being_matched[i+j]
-            if matched:
-                return (words_being_matched[i:i+len(candidate_phrase)], wildcard_values)
+    for phrase_position in range(len(candidate_phrase) - len(phrase_being_matched,)):
+        wildcards = {}
+        can_match = True
+        for candidate_position in range(len(candidate_phrase)):
+            if re.match('\?.*\?', candidate_phrase[candidate_position]):
+                wildcards[candidate_phrase[candidate_position]] = phrase_being_matched[phrase_position + candidate_position]
+            elif candidate_phrase[candidate_position].upper() != phrase_being_matched[phrase_position + candidate_position].upper():
+                can_match = False
+                break
+        if can_match:
+            return (candidate_phrase, wildcards)
     return ([], None)
 
 def getFarewell():
