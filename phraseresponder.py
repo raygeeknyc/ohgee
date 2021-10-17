@@ -32,7 +32,7 @@ ELIZA_5_RESPONSES = (["I", "am", "sorry", "to", "hear", "you", "are", "depressed
 ELIZA_6_PROMPTS = (["I'm", "sad"], ["I'm", "unhappy"], ["I", "am", "sad"], ["I", "am", "unhappy"])
 ELIZA_6_RESPONSES = (["I", "am", "sorry", "to", "hear", "you", "are", "depressed"], ["I'm", "sure", "it's", "not", "pleasant", "to", "be", "sad"])
 
-ELIZA_7_PROMPTS = (["I'm", "glad", "that", "?happiness?"], ["I", "am", "glad", "that", "?happiness?"], ["?happiness?", "makes", "me", "happy"], ["?happiness?", "makes", "me", "glad"])
+ELIZA_7_PROMPTS = (["I'm", "glad", "that", "?happiness?"], ["I", "am", "glad", "that", "?happiness?"], ["?happiness?", "makes", "me", "happy"], ["?happiness?", "makes", "me", "glad"], ["I'm", "happy", "about", "?happiness?"])
 ELIZA_7_RESPONSES = (["Why", "does", "?happiness?", "make", "you", "glad?"], ["Is", "?happiness?", "very", "important", "for", "happiness?"])
 
 ELIZA_8_PROMPTS = (["I'm", "glad"], ["I'm", "happy"], ["I", "am", "glad"], ["I", "am", "happy"])
