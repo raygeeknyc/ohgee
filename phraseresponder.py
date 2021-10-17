@@ -15,7 +15,7 @@ REBOOT_PROMPTS = (["og", "please", "reboot"], ["oh", "please", "reboot"], ["o", 
 REBOOT_RESPONSES = (["rebooting"], ["I'm", "rebooting"],  ["Okay", "", "I'm", "on", "it"])
 
 ELIZA_1_PROMPTS = (["I", "remember", "?memory?"], ["I'm", "thinking", "about", "?memory?"])
-ELIZA_1_RESPONSES = (["Do", "you", "often", "think", "about", "?memory?"], ["Does", "thinking", "of", "?memory?", "bring", "anything", "else", "to", "mind?"], ["what", "else", "do", "you", "remember?"], ["Why", "do", "you", "recall", "?memory?", "right", "now?"], ["What", "in", "the", "present", "situation", "reminds", "you", "of", "?memory?"], ["What", "is", "the", "connection", "between", "me", "and", "?memory?"])
+ELIZA_1_RESPONSES = (["Do", "you", "often", "think", "about", "?memory?"], ["Does", "thinking", "of", "?memory?", "bring", "anything", "else", "to", "mind"], ["what", "else", "do", "you", "remember"], ["Why", "do", "you", "recall", "?memory?", "right", "now"], ["What", "in", "the", "present", "situation", "reminds", "you", "of", "?memory?"], ["What", "is", "the", "connection", "between", "me", "and", "?memory?"])
 
 ELIZA_2_PROMPTS = (["I", "want", "?desire?"], ["I", "wish", "I", "had", "?desire?"])
 ELIZA_2_RESPONSES = (["What", "would", "it", "mean", "if", "you", "got", "?desire?"], ["Why", "do", "you", "want", "?memory?"], ["Suppose", "you", "got", "?desire?", "soon"])
@@ -24,7 +24,7 @@ ELIZA_3_PROMPTS = (["?preface?", "if", "?perhaps?"], ["?preface", "only", "if", 
 ELIZA_3_RESPONSES = (["Do", "you", "really", "think", "it,'s", "likely", "that", "?perhaps?"], ["Do", "you", "wish", "that", "?perhaps?"], ["What", "do", "you", "think", "about", "?perhaps?"], ["Really", ",", "if", "?perhaps?"])
 
 ELIZA_4_PROMPTS = (["I", "dreamt", "?dream?"], ["I", "dream", "about", "?dream?"])
-ELIZA_4_RESPONSES = (["How", "do", "you", "feel", "about", "?dream?", "in", "reality?"], ["Would", "you", "really", "want", "?dream?", "to", "be", "true?"])
+ELIZA_4_RESPONSES = (["How", "do", "you", "feel", "about", "?dream?", "in", "reality"], ["Would", "you", "really", "want", "?dream?", "to", "be", "true"])
 
 ELIZA_5_PROMPTS = (["I'm", "sad", "about", "?sadness?"], ["I", "am", "sad", "about", "?sadness?"], ["?sadness?", "makes", "me", "sad"], ["?sadness?", "makes", "me", "unhappy"], ["?sadness?", "is", "sad"])
 ELIZA_5_RESPONSES = (["I", "am", "sorry", "to", "hear", "you", "are", "depressed"], ["I'm", "sure", "it's", "not", "pleasant", "to", "be", "sad"])
@@ -33,13 +33,13 @@ ELIZA_6_PROMPTS = (["I'm", "sad"], ["I'm", "unhappy"], ["I", "am", "sad"], ["I",
 ELIZA_6_RESPONSES = (["I", "am", "sorry", "to", "hear", "you", "are", "depressed"], ["I'm", "sure", "it's", "not", "pleasant", "to", "be", "sad"])
 
 ELIZA_7_PROMPTS = (["I'm", "glad", "that", "?happiness?"], ["I", "am", "glad", "that", "?happiness?"], ["?happiness?", "makes", "me", "happy"], ["?happiness?", "makes", "me", "glad"], ["I'm", "happy", "about", "?happiness?"])
-ELIZA_7_RESPONSES = (["Why", "does", "?happiness?", "make", "you", "glad?"], ["Is", "?happiness?", "very", "important", "for", "?happiness?"])
+ELIZA_7_RESPONSES = (["Why", "does", "?happiness?", "make", "you", "glad"], ["Is", "?happiness?", "very", "important", "for", "happiness"], ["Why", "does", "?happiness?", "make", "you", "happy"])
 
 ELIZA_8_PROMPTS = (["I'm", "glad"], ["I'm", "happy"], ["I", "am", "glad"], ["I", "am", "happy"])
-ELIZA_8_RESPONSES = (["How", "have", "I", "helped", "you", "to", "be", "glad?"], ["What", "makes", "you", "happy", "just", "now"], ["Can", "you", "explain", "why", "you", "are", "suddenly", "happy?"])
+ELIZA_8_RESPONSES = (["How", "have", "I", "helped", "you", "to", "be", "glad"], ["What", "makes", "you", "happy", "just", "now"], ["Can", "you", "explain", "why", "you", "are", "suddenly", "happy"])
 
 ELIZA_9_PROMPTS = (["?first?", "is", "like", "?second?"], ["?first?", "reminds", "me", "of", "?second?"], ["?first?", "are", "like", "?second?"])
-ELIZA_9_RESPONSES = (["In", "what", "way", "is", "?first?", "like", "?second?"], ["What", "resemblence", "do", "you", "see", "between", "?second?", "and", "?first?"], ["Could", "there", "really", "be", "some", "connection", "between", "them?"])
+ELIZA_9_RESPONSES = (["In", "what", "way", "is", "?first?", "like", "?second?"], ["What", "resemblence", "do", "you", "see", "between", "?second?", "and", "?first?"], ["Could", "there", "really", "be", "some", "connection", "between", "them"])
 
 ELIZA_10_PROMPTS = (["?they?", "are", "?what?"], ["?they?", "is", "?what?"])
 ELIZA_10_RESPONSES = (["Do", "you", "think", "that", "about", "?they?"], ["Possibly", "?they?", "are", "?what?"], ["Did", "you", "think", "that", "?they?", "might", "not", "be", "?what?"])
@@ -59,7 +59,7 @@ POP_4_RESPONSES = (["hey", "I'm", "talking", "about", "shaft"], ["hey", "I'm", "
 NEWS_1_PROMPTS = (["president" ,"trump"], ["donald", "trump"])
 NEWS_1_RESPONSES = (["Trump", "is", "a", "chump"], ["donald", "chump"], ["dump", "trump"])
 
-FOOD_PROMPTS = (["I", "love", "to", "eat", "?foodname?"], ["?foodname?", "is", "delicious"])
+FOOD_PROMPTS = (["I", "love", "to", "eat", "?foodname?"], ["?foodname?", "tastes", "great"])
 FOOD_RESPONSES = (["I", "hope", "that", "you", "have", "some", "?foodname?", "soon"], ["?foodname?", "is", "great"], ["yumm", "yumm", "?foodname?"])
 
 GREAT_STUFF_PROMPTS = (["?greatthing?", "is", "the", "best", "?type?"], ["?greatthing?", "is", "my", "favorite", "?type?"])
@@ -435,21 +435,13 @@ def getResponse(phrase, entities):
 
 PROMPTS_RESPONSES = [
   (rebootPrompts, rebootResponses, None, True),
-  (eliza1Prompts, eliza1Responses, None, False),
-  (eliza2Prompts, eliza2Responses, None, False),
-  (eliza3Prompts, eliza3Responses, None, False),
-  (eliza4Prompts, eliza4Responses, None, False),
-  (eliza5Prompts, eliza5Responses, None, False),
-  (eliza6Prompts, eliza6Responses, None, False),
-  (eliza7Prompts, eliza7Responses, None, False),
-  (eliza8Prompts, eliza8Responses, None, False),
-  (eliza9Prompts, eliza9Responses, None, False),
-  (eliza10Prompts, eliza10Responses, None, False),
   (smugPrompts, smugResponses, None, False),
   (felinePrompts, felineResponses, None, True),
   (caninePrompts, canineResponses, None, True),
   (pop1Prompts, pop1Responses, None, False),
   (pop2Prompts, pop2Responses, None, True),
+  (pop3Prompts, pop3Responses, None, True),
+  (pop4Prompts, pop4Responses, None, False),
   (friends1Prompts, friends1Responses, None, True),
   (friends2Prompts, friends2Responses, None, True),
   (friends3Prompts, friends3Responses, None, True),
@@ -468,12 +460,20 @@ PROMPTS_RESPONSES = [
   (hates, sadnesses, None, False),
   (timePrompts, timeResponses, None, False),
   (datePrompts, dateResponses, None, False),
-  (pop3Prompts, pop3Responses, None, True),
-  (pop4Prompts, pop4Responses, None, False),
   (news1Prompts, news1Responses, None, False),
   (foodPrompts, foodResponses, None, False),
   (greatStuffPrompts, greatStuffResponses, None, False),
   (girlsCountPrompts, girlsCountResponses, None, False),
+  (eliza1Prompts, eliza1Responses, None, False),
+  (eliza2Prompts, eliza2Responses, None, False),
+  (eliza3Prompts, eliza3Responses, None, False),
+  (eliza4Prompts, eliza4Responses, None, False),
+  (eliza5Prompts, eliza5Responses, None, False),
+  (eliza6Prompts, eliza6Responses, None, False),
+  (eliza7Prompts, eliza7Responses, None, False),
+  (eliza8Prompts, eliza8Responses, None, False),
+  (eliza9Prompts, eliza9Responses, None, False),
+  (eliza10Prompts, eliza10Responses, None, False),
   (banal1Prompts, banal1Responses, None, False),
   (banal2Prompts, banal2Responses, None, False),
   (otherProducts, productRecs, None, False)]
@@ -509,7 +509,7 @@ def phraseMatch(phrase, entities, candidate_phrase_generator):
 def phraseInKnownCandidatePhrase(phrase_being_matched, candidate_phrase):
     if not phrase_being_matched or not candidate_phrase:
         return ([], None)
-    phrase_words = phrase.strip().split(' ')
+    phrase_words = phrase_being_matched.strip().split(' ')
     logging.debug("phrase '%s' - candidate '%s': %d", str(phrase_words), str(candidate_phrase), (len(phrase_words) - len(candidate_phrase) + 1))
     for phrase_position in range(len(phrase_words) - len(candidate_phrase) + 1):
         wildcards = {}
