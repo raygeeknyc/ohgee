@@ -33,7 +33,7 @@ ELIZA_6_PROMPTS = (["I'm", "sad"], ["I'm", "unhappy"], ["I", "am", "sad"], ["I",
 ELIZA_6_RESPONSES = (["I", "am", "sorry", "to", "hear", "you", "are", "depressed"], ["I'm", "sure", "it's", "not", "pleasant", "to", "be", "sad"])
 
 ELIZA_7_PROMPTS = (["I'm", "glad", "that", "?happiness?"], ["I", "am", "glad", "that", "?happiness?"], ["?happiness?", "makes", "me", "happy"], ["?happiness?", "makes", "me", "glad"], ["I'm", "happy", "about", "?happiness?"])
-ELIZA_7_RESPONSES = (["Why", "does", "?happiness?", "make", "you", "glad?"], ["Is", "?happiness?", "very", "important", "for", "happiness?"])
+ELIZA_7_RESPONSES = (["Why", "does", "?happiness?", "make", "you", "glad?"], ["Is", "?happiness?", "very", "important", "for", "?happiness?"])
 
 ELIZA_8_PROMPTS = (["I'm", "glad"], ["I'm", "happy"], ["I", "am", "glad"], ["I", "am", "happy"])
 ELIZA_8_RESPONSES = (["How", "have", "I", "helped", "you", "to", "be", "glad?"], ["What", "makes", "you", "happy", "just", "now"], ["Can", "you", "explain", "why", "you", "are", "suddenly", "happy?"])
@@ -42,7 +42,7 @@ ELIZA_9_PROMPTS = (["?first?", "is", "like", "?second?"], ["?first?", "reminds",
 ELIZA_9_RESPONSES = (["In", "what", "way", "is", "?first?", "like", "?second?"], ["What", "resemblence", "do", "you", "see", "between", "?second?", "and", "?first?"], ["Could", "there", "really", "be", "some", "connection", "between", "them?"])
 
 ELIZA_10_PROMPTS = (["?they?", "are", "?what?"], ["?they?", "is", "?what?"])
-ELIZA_10_RESPONSES = (["Do", "you", "think", "that", "about", "?they?"], ["Possibly", "they", "are", "?what?"], ["Did", "you", "think", "that", "they", "might", "not", "be", "?what?"])
+ELIZA_10_RESPONSES = (["Do", "you", "think", "that", "about", "?they?"], ["Possibly", "?they?", "are", "?what?"], ["Did", "you", "think", "that", "?they?", "might", "not", "be", "?what?"])
 
 POP_1_PROMPTS = (["who", "is", "the", "man"], ["who", "would", "risk", "his", "neck"], ["his", "neck", "for", "his", "brother", "man"], ["the", "cat", "that", "won't", "cop", "out", "when"], ["danger", "all", "about"] )
 POP_1_RESPONSES = (["SHAFT"], ["that's", "shaft"], ["john", "shaft"])
@@ -485,10 +485,11 @@ def substituteWildcards(chosenResponse, wildcards):
     for token in chosenResponse:
         if re.match('\?.*\?',token):
             try:
-                substituted_token = wildcards[token.upper()]
-                logging.info("wildcards: '%s'", str(wildcards))
+                logging.info("token: '%s', wildcards: '%s'", token, str(wildcards))
+                substituted_token = wildcards[token]
                 finalResponse.append(substituted_token)
             except KeyError:
+                logging.debug("token: '%s'", token)
                 finalResponse.append(token.replace("?",""))
         else:
             finalResponse.append(token)
@@ -500,21 +501,24 @@ def phraseMatch(phrase, entities, candidate_phrase_generator):
     for candidate_phrase in candidate_phrases:
         logging.debug("Matching with {}".format(candidate_phrase))
         matched_phrase, wildcard_values = phraseInKnownCandidatePhrase(phrase, candidate_phrase)
-        logging.debug("'%s' matched '%s, %s'" % (phrase, str(matched_phrase), str(wildcard_values)))
         if matched_phrase:
+            logging.debug("'%s' matched '%s, %s'" % (phrase, str(matched_phrase), str(wildcard_values)))
             return (matched_phrase, wildcard_values)
     return ([], None)
 
 def phraseInKnownCandidatePhrase(phrase_being_matched, candidate_phrase):
     if not phrase_being_matched or not candidate_phrase:
         return ([], None)
-    for phrase_position in range(len(candidate_phrase) - len(phrase_being_matched,)):
+    phrase_words = phrase.strip().split(' ')
+    logging.debug("phrase '%s' - candidate '%s': %d", str(phrase_words), str(candidate_phrase), (len(phrase_words) - len(candidate_phrase) + 1))
+    for phrase_position in range(len(phrase_words) - len(candidate_phrase) + 1):
         wildcards = {}
         can_match = True
         for candidate_position in range(len(candidate_phrase)):
             if re.match('\?.*\?', candidate_phrase[candidate_position]):
-                wildcards[candidate_phrase[candidate_position]] = phrase_being_matched[phrase_position + candidate_position]
-            elif candidate_phrase[candidate_position].upper() != phrase_being_matched[phrase_position + candidate_position].upper():
+                wildcards[candidate_phrase[candidate_position]] = phrase_words[phrase_position + candidate_position]
+                logging.debug("[%s]='%s'", candidate_phrase[candidate_position], phrase_words[phrase_position + candidate_position])
+            elif candidate_phrase[candidate_position].upper() != phrase_words[phrase_position + candidate_position].upper():
                 can_match = False
                 break
         if can_match:
