@@ -44,7 +44,7 @@ ELIZA_9_RESPONSES = (["In", "what", "way", "is", "?first?", "like", "?second?"],
 ELIZA_10_PROMPTS = (["?they?", "are", "?what?"], ["?they?", "is", "?what?"])
 ELIZA_10_RESPONSES = (["Do", "you", "think", "that", "about", "?they?"], ["Possibly", "?they?", "are", "?what?"], ["Did", "you", "think", "that", "?they?", "might", "not", "be", "?what?"])
 
-ELIZA_11_PROMPTS = (["I", "love", "to", "?act?", "with", "?object?"], ["I", "love", "to", "?act?", "?object?"], ["I", "love", "to", "?act?", "to",  "?object?"])
+ELIZA_11_PROMPTS = (["I", "love", "to", "?act?", "with", "?object?"], ["I", "love", "to", "?act?", "to", "?object?"], ["I", "love", "to", "?act?", "?object?"])
 ELIZA_11_RESPONSES = (["Do", "you", "think", "?object?", "also", "likes", "to", "?act?"], ["I'm", "glad", "that", "you", "enjoy", "?object?", "so", "much"], ["Is", "it", "always", "important", "to", "?act?", "or", "only", "with", "?object?"])
 
 POP_1_PROMPTS = (["who", "is", "the", "man"], ["who", "would", "risk", "his", "neck"], ["his", "neck", "for", "his", "brother", "man"], ["the", "cat", "that", "won't", "cop", "out", "when"], ["danger", "all", "about"] )
