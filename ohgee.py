@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-VERSION_ID = ", , version Fifty one"
+VERSION_ID = ", , version Fifty two"
 import logging
 
 # reorder as appropriate
