@@ -48,7 +48,7 @@ ELIZA_11_PROMPTS = (["I", "love", "to", "?act?", "with", "?object?"], ["I", "lov
 ELIZA_11_RESPONSES = (["Do", "you", "think", "?object?", "also", "likes", "to", "?act?"], ["I'm", "glad", "that", "you", "enjoy", "?object?", "so", "much"], ["Is", "it", "always", "important", "to", "?act?", "or", "only", "with", "?object?"])
 
 ELIZA_12_PROMPTS = (["I", "remember", "?memory?"], ["?_?", "think", "about", "?memory?"])
-ELIZA_12_RESPONSES = (["Do", "you", "often", "think", "of", ?memory?"], ["Does", "thinking", "of", "?memory?", "bring", "anything", "else", "to", "mind"], ["Why", "do", "you", "recall", "?memory?",  "right", "now"])
+ELIZA_12_RESPONSES = (["Do", "you", "often", "think", "of", "?memory?"], ["Does", "thinking", "of", "?memory?", "bring", "anything", "else", "to", "mind"], ["Why", "do", "you", "recall", "?memory?",  "right", "now"])
 
 POP_1_PROMPTS = (["who", "is", "the", "man"], ["who", "would", "risk", "his", "neck"], ["his", "neck", "for", "his", "brother", "man"], ["the", "cat", "that", "won't", "cop", "out", "when"], ["danger", "all", "about"] )
 POP_1_RESPONSES = (["SHAFT"], ["that's", "shaft"], ["john", "shaft"])
