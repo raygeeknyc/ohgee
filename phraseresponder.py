@@ -47,6 +47,9 @@ ELIZA_10_RESPONSES = (["Do", "you", "think", "that", "about", "?they?"], ["Possi
 ELIZA_11_PROMPTS = (["I", "love", "to", "?act?", "with", "?object?"], ["I", "love", "to", "?act?", "to", "?object?"], ["I", "love", "to", "?act?", "?object?"])
 ELIZA_11_RESPONSES = (["Do", "you", "think", "?object?", "also", "likes", "to", "?act?"], ["I'm", "glad", "that", "you", "enjoy", "?object?", "so", "much"], ["Is", "it", "always", "important", "to", "?act?", "or", "only", "with", "?object?"])
 
+ELIZA_12_PROMPTS = (["I", "remember", "?memory?"], ["?_?", "think", "about", "?memory?"])
+ELIZA_12_RESPONSES = (["Do", "you", "often", "think", "of", ?memory?"], ["Does", "thinking", "of" "?memory?", "bring", "anything", "else", "to", "mind"], ["Why", "do", "you", "recall", "?memory?",  "right", "now"])
+
 POP_1_PROMPTS = (["who", "is", "the", "man"], ["who", "would", "risk", "his", "neck"], ["his", "neck", "for", "his", "brother", "man"], ["the", "cat", "that", "won't", "cop", "out", "when"], ["danger", "all", "about"] )
 POP_1_RESPONSES = (["SHAFT"], ["that's", "shaft"], ["john", "shaft"])
 
@@ -223,6 +226,9 @@ def eliza10Prompts(_):
 def eliza11Prompts(_):
     return ELIZA_11_PROMPTS
 
+def eliza12Prompts(_):
+    return ELIZA_12_PROMPTS
+
 def pop1Prompts(_):
     return POP_1_PROMPTS
 
@@ -312,6 +318,9 @@ def eliza10Responses(_):
 
 def eliza11Responses(_):
     return ELIZA_11_RESPONSES
+
+def eliza12Responses(_):
+    return ELIZA_12_RESPONSES
 
 def pop1Responses(_):
     return POP_1_RESPONSES
@@ -478,6 +487,7 @@ PROMPTS_RESPONSES = [
   (eliza9Prompts, eliza9Responses, None, False),
   (eliza10Prompts, eliza10Responses, None, False),
   (eliza11Prompts, eliza11Responses, None, False),
+  (eliza12Prompts, eliza12Responses, None, False),
   (friends1Prompts, friends1Responses, None, True),
   (friends2Prompts, friends2Responses, None, True),
   (friends3Prompts, friends3Responses, None, True),
