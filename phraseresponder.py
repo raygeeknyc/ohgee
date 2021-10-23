@@ -50,6 +50,36 @@ ELIZA_11_RESPONSES = (["Do", "you", "think", "?object?", "also", "likes", "to", 
 ELIZA_12_PROMPTS = (["I", "remember", "?memory?"], ["?_?", "think", "about", "?memory?"])
 ELIZA_12_RESPONSES = (["Do", "you", "often", "think", "of", "?memory?"], ["Does", "thinking", "of", "?memory?", "bring", "anything", "else", "to", "mind"], ["Why", "do", "you", "recall", "?memory?",  "right", "now"])
 
+ELIZA_13_PROMPTS = (["I'm", "sorry", "about", "?regret?"], ["I", "regret", "?regret?"], ["I", "am", "sorry", "for", "?regret?"], ["I", "am", "sorry", "about", "?regret?"])
+ELIZA_13_RESPONSES = (["Do", "you", "think", "about", "?regret?", "a", "lot", "of", "the", "time"], ["What", "other", "feelings",  "do", "you", "have", "about", "?regret?"])
+
+ELIZA_14_PROMPTS = (["I", "am", "sorry"], ["I'm", "sorry"])
+ELIZA_14_RESPONSES = (["There's", "no", "need", "to", "apologize"], ["Apologies", "are", "not", "necessary"])
+
+ELIZA_15_PROMPTS = (["?feeling?", "my", "mother"], ["?feeling?", "my", "mom"])
+ELIZA_15_RESPONSES = (["Who", "else", "in", "your", "family", "do", "you", "?feeling?"], ["Tell", "me", "more", "about", "your", "family"])
+
+ELIZA_16_PROMPTS = (["?feeling?", "my", "father"], ["?feeling?", "my", "dad"])
+ELIZA_16_RESPONSES = (["Your", "father?"], ["Does", "he", "influence", "you", "strongly?"], ["What", "else", "comes", "to", "mind", "when", "you", "think", "of", "your", "father?"])
+
+ELIZA_17_PROMPTS = (["I", "was", "being", "?me?"], ["I", "was", "?me?"], ["I", "have", "been", "?me?"])
+ELIZA_17_RESPONSES = (["Were", "you", "really?"], ["Perhaps", "I", "already", "knew", "you", "were", "?me?"], ["Why", "do", "you", "tell", "me", "you", "were", "?me?", "now?"])
+
+ELIZA_18_PROMPTS = (["Are", "you", "being", "?you?"], ["Are", "you", "?you?"])
+ELIZA_18_RESPONSES = (["Why", "are", "you", "interested", "in", "whether", "I", "am", "?y", "or", "not?"], ["Would", "you", "prefer", "if", "I", "weren't", "?you?"], ["Perhaps", "I", "am", "?y", "in", "your", "fantasies"])
+
+ELIZA_19_PROMPTS = (["You", "are", "being", "?you?"], ["You", "are", "?you?"])
+ELIZA_19_RESPONSES = (["What", "makes", "you", "think", "I", "am", "?you?"], ["Are", "you", "certain", "that", "I", "am", "being", "?you?"])
+
+ELIZA_20_PROMPTS = (["Why", "don't", "you", "?act?"], ["You", "should", "?act?"])
+ELIZA_20_RESPONSES = (["Should", "you", "?act?", "yourself?"], ["Do", "you", "believe", "I", "don't", "?act?"], ["Perhaps", "I", "will", "?act?", "in", "good", "time"])
+
+ELIZA_21_PROMPTS = (["Everyone", "?acts?"], ["Everybody", "?acts?"])
+ELIZA_21_RESPONSES = (["Surely", "not", "everyone"], ["Can", "you", "think", "of", "anyone", "in", "particular?"], ["Who", "for", "example?"], ["You", "are", "thinking", "of", "a", "special", "person"], ["Do", "you", "think", "that", "it's", "important", "to", "?acts?"])
+
+ELIZA_22_PROMPTS = (["?x?", "always", "?y?"], ["?x?", "?y?", "every", "time"])
+ELIZA_22_RESPONSES = (["What", "incident", "are", "you", "thinking", "of?"], ["Can", "you", "think", "of", "a", "specific", "example?"], ["Really", "always"])
+
 POP_1_PROMPTS = (["who", "is", "the", "man"], ["who", "would", "risk", "his", "neck"], ["his", "neck", "for", "his", "brother", "man"], ["the", "cat", "that", "won't", "cop", "out", "when"], ["danger", "all", "about"] )
 POP_1_RESPONSES = (["SHAFT"], ["that's", "shaft"], ["john", "shaft"])
 
@@ -229,6 +259,36 @@ def eliza11Prompts(_):
 def eliza12Prompts(_):
     return ELIZA_12_PROMPTS
 
+def eliza13Prompts(_):
+    return ELIZA_13_PROMPTS
+
+def eliza14Prompts(_):
+    return ELIZA_14_PROMPTS
+
+def eliza15Prompts(_):
+    return ELIZA_15_PROMPTS
+
+def eliza16Prompts(_):
+    return ELIZA_16_PROMPTS
+
+def eliza17Prompts(_):
+    return ELIZA_17_PROMPTS
+
+def eliza18Prompts(_):
+    return ELIZA_18_PROMPTS
+
+def eliza19Prompts(_):
+    return ELIZA_19_PROMPTS
+
+def eliza20Prompts(_):
+    return ELIZA_20_PROMPTS
+
+def eliza21Prompts(_):
+    return ELIZA_21_PROMPTS
+
+def eliza22Prompts(_):
+    return ELIZA_22_PROMPTS
+
 def pop1Prompts(_):
     return POP_1_PROMPTS
 
@@ -321,6 +381,36 @@ def eliza11Responses(_):
 
 def eliza12Responses(_):
     return ELIZA_12_RESPONSES
+
+def eliza13Responses(_):
+    return ELIZA_13_RESPONSES
+
+def eliza14Responses(_):
+    return ELIZA_14_RESPONSES
+
+def eliza15Responses(_):
+    return ELIZA_15_RESPONSES
+
+def eliza16Responses(_):
+    return ELIZA_16_RESPONSES
+
+def eliza17Responses(_):
+    return ELIZA_17_RESPONSES
+
+def eliza18Responses(_):
+    return ELIZA_18_RESPONSES
+
+def eliza19Responses(_):
+    return ELIZA_19_RESPONSES
+
+def eliza20Responses(_):
+    return ELIZA_20_RESPONSES
+
+def eliza21Responses(_):
+    return ELIZA_21_RESPONSES
+
+def eliza22Responses(_):
+    return ELIZA_22_RESPONSES
 
 def pop1Responses(_):
     return POP_1_RESPONSES
@@ -488,6 +578,16 @@ PROMPTS_RESPONSES = [
   (eliza10Prompts, eliza10Responses, None, False),
   (eliza11Prompts, eliza11Responses, None, False),
   (eliza12Prompts, eliza12Responses, None, False),
+  (eliza13Prompts, eliza13Responses, None, False),
+  (eliza14Prompts, eliza14Responses, None, False),
+  (eliza15Prompts, eliza15Responses, None, False),
+  (eliza16Prompts, eliza16Responses, None, False),
+  (eliza17Prompts, eliza17Responses, None, False),
+  (eliza18Prompts, eliza18Responses, None, False),
+  (eliza19Prompts, eliza19Responses, None, False),
+  (eliza20Prompts, eliza20Responses, None, False),
+  (eliza21Prompts, eliza21Responses, None, False),
+  (eliza22Prompts, eliza22Responses, None, False),
   (friends1Prompts, friends1Responses, None, True),
   (friends2Prompts, friends2Responses, None, True),
   (friends3Prompts, friends3Responses, None, True),
