@@ -19,12 +19,12 @@ fi
 /sbin/swapoff -a
 
 set clobber
-/bin/mkdir -p /boot/files
-/usr/bin/touch /boot/files/networks_list.txt
-/usr/bin/python /home/pi/Documents/workspace/ohgee/generate_wpa_conf.py  /boot/files/networks_list.txt /etc/wpa_supplicant/wpa_supplicant.conf
+/bin/mkdir -p /boot/network_files
+/usr/bin/touch /boot/network_files/networks_list.txt
+/usr/bin/python /home/pi/Documents/workspace/ohgee/generate_wpa_conf.py  /boot/network_files/networks_list.txt /etc/wpa_supplicant/wpa_supplicant.conf
 
 /usr/bin/touch /var/log/ohgee.out
-/bin/mv /var/log/ohgee.out /boot/files/last-ohgee.out
+/bin/mv /var/log/ohgee.out /boot/network_files/last-ohgee.out
 
 /usr/bin/touch /var/log/ohgee.out
 /bin/chmod 777 /var/log/ohgee.out
