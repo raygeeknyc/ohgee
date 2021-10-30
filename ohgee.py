@@ -359,7 +359,6 @@ def maintainDisplay(root_window, image_queue):
     display_off = False
     canvas = tkinter.Canvas(root_window, width=root_window.winfo_screenwidth(), height=root_window.winfo_screenheight())
     canvas.pack()
-    logged = False
     image = None
     tk_image = None
     skipped_images = 0
@@ -407,13 +406,10 @@ def maintainDisplay(root_window, image_queue):
                 logging.debug("displayed image %s" % id(image))
                 time.sleep(image_display_min_secs)
         except Exception:
-            if not logged:
-                logging.exception("error displaying")
-                logged = True
-                continue
+            logging.exception("error displaying")
         finally:
             expireMood()
-    logging.debug("Stopping image display")
+    logging.info("Stopping image display")
     root_window.quit()
     
 if __name__ == '__main__':
