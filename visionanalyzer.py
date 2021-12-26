@@ -273,12 +273,14 @@ class ImageAnalyzer(multiprocessing.Process):
     def analyzeVision(self):
         self._vision_client = vision.ImageAnnotatorClient()
         skipped_images = 0
+        frame = None
         while not self._stop_analyzing:
-            frame = None
             try:
+                logging.debug("popping frame")
                 frame = self._frames.get(block=False)
                 skipped_images += 1
             except queue.Empty:
+                logging.debug("frame queue empty")
                 if not frame:
                     logging.debug("Empty image queue, waiting")
                     skipped_images = 0
@@ -287,6 +289,7 @@ class ImageAnalyzer(multiprocessing.Process):
                     skipped_images -= 1
                     logging.debug("Trailing frame read, skipped {} frames".format(skipped_images))
                     try:
+                        logging.debug("Analyzing frame")
                         results = self._analyzeFrame(frame)
                         buffer = io.BytesIO()
                         results[0].save(buffer, format="JPEG")
@@ -298,6 +301,9 @@ class ImageAnalyzer(multiprocessing.Process):
                         logging.exception("error reading image")
                     finally:
                         frame = None
+            except Exception as e:
+                logging.exception("Exception getting next frame")
+                continue
         self._vision_queue.close()
         logging.debug("Exiting vision analyze thread")
 
@@ -342,12 +348,16 @@ class ImageAnalyzer(multiprocessing.Process):
         logging.info("Trained motion detection {}".format(self._motion_threshold))
         while not self._stop_capturing:
             try:
+                logging.debug("Capturing frame")
                 self.getNextFrame()
+                logging.debug("Captured frame")
                 if self.imageDifferenceOverThreshold(self._motion_threshold):
                     logging.debug("Motion detected")
                     self._frames.put(self._current_frame)
                     self._prev_frame = self._current_frame
                     self.getNextFrame()
+                else:
+                    logging.debug("No motion detected")
             except Exception as e:
                 logging.error("Error in analysis: {}".format(e))
         logging.debug("Exiting vision capture thread")
