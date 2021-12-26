@@ -273,8 +273,8 @@ class ImageAnalyzer(multiprocessing.Process):
     def analyzeVision(self):
         self._vision_client = vision.ImageAnnotatorClient()
         skipped_images = 0
-        frame = None
         while not self._stop_analyzing:
+            frame = None
             try:
                 frame = self._frames.get(block=False)
                 skipped_images += 1
