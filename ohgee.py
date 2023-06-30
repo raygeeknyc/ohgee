@@ -446,7 +446,7 @@ if __name__ == '__main__':
     led.setColor(rgbled.OFF)
 
     logging.debug('setting up servo')
-    GPIO.SetMode(GPIO.BCM)
+    GPIO.setmode(GPIO.BCM)
     GPIO.setup(servoPin, GPIO.OUT)
     arm = GPIO.PWM(servoPin, 50)
     arm.start(0)
