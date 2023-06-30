@@ -24,7 +24,6 @@ COLOR_CYCLE_SECS = 0.5
 
 class RgbLed:
     GPIO.setmode(GPIO.BCM)
-    GPIO.setwarnings(False)
 
     def __init__(self, redPin, greenPin, bluePin, powerPin=None):
 
