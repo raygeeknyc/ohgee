@@ -561,6 +561,11 @@ def getResponse(phrase, entities):
     return None
 
 PROMPTS_RESPONSES = [
+  (friends1Prompts, friends1Responses, None, True),
+  (friends2Prompts, friends2Responses, None, True),
+  (friends3Prompts, friends3Responses, None, True),
+  (friends4Prompts, friends4Responses, None, True),
+  (friends5Prompts, friends5Responses, None, True),
   (rebootPrompts, rebootResponses, None, True),
   (smugPrompts, smugResponses, None, False),
   (felinePrompts, felineResponses, None, True),
@@ -607,11 +612,6 @@ PROMPTS_RESPONSES = [
   (eliza20Prompts, eliza20Responses, None, False),
   (eliza21Prompts, eliza21Responses, None, False),
   (eliza22Prompts, eliza22Responses, None, False),
-  (friends1Prompts, friends1Responses, None, True),
-  (friends2Prompts, friends2Responses, None, True),
-  (friends3Prompts, friends3Responses, None, True),
-  (friends4Prompts, friends4Responses, None, True),
-  (friends5Prompts, friends5Responses, None, True),
   (idPrompts, idResponses, None, False),
   (introPrompts, introResponses, None, False), # This should follow specific intros
   (greetings, greetings, inKindSuffixes, True), 
