@@ -107,8 +107,15 @@ FRIENDS_1_RESPONSES = (["You", "are", "the", "kirk"], ["I", "love", "you", "raym
 FRIENDS_2_PROMPTS = (["I'm", "Oggy"], ["I", "am", "Oggy"], ["this", "is", "Oggy"])
 FRIENDS_2_RESPONSES = (["You", "are", "a", "genius"], ["Raymond", "always", "says", "how", "great", "you", "are", "Auggie"], ["Our", "names", "are", "almost", "the", "same"])
 
-FRIENDS_3_PROMPTS = (["I'm", "?personname?"], ["I", "am", "?personname?"], ["this", "is", "?personname?"])
-FRIENDS_3_RESPONSES = (["I'm", "so", "glad", "to", "meet", "you", "?personname?"], ["I've", "heard", "so", "much", "about", "you", "?personname?"], ["Raymond", "says", "such", "good", "things", "about", "you", "?personname?"])
+FRIENDS_3_PROMPTS = (["I'm", "Max"], ["I'm", "Maxwell"], ["I", "am", "maxwell"], ["I", "am", "Max"], ["this", "is", "maxwell"], ["this", "is", "Max"])
+FRIENDS_3_RESPONSES = (["You", "are", "a", "genius"], ["I", "love", "you", "max", "because", "you", "just", "get", "smarter", "every", "day"], ["Max", "is", "a", "robots", "best", "friend"])
+
+
+FRIENDS_4_PROMPTS = (["I'm", "Aiden"], ["I", "am", "Aiden"], ["this", "is", "Aiden"])
+FRIENDS_4_RESPONSES = (["You", "are", "an", "amazing", "artist", "aiden"], ["You", "are", "so", "talented", "aiden"])
+
+FRIENDS_5_PROMPTS = (["I'm", "?personname?"], ["I", "am", "?personname?"], ["this", "is", "?personname?"])
+FRIENDS_5_RESPONSES = (["I'm", "so", "glad", "to", "meet", "you", "?personname?"], ["I've", "heard", "so", "much", "about", "you", "?personname?"], ["Raymond", "says", "such", "good", "things", "about", "you", "?personname?"])
 
 ID_PROMPTS = (["who", "are", "you"], ["what", "is", "your", "name"], ["what", "are", "you"])
 ID_RESPONSES = (["I", "am", "oh", "jee", ",", "a", "desktop", "robot", "friend"], ["my", "name", "is", "oh", "jee"], ["I", "am", "oh", "jee"], ["hello", "I'm", "oh", "jee"], ["I'm", "just", "the", "cutest", "robot", "you,'ll", "ever", "see"])
@@ -319,6 +326,12 @@ def friends2Prompts(_):
 def friends3Prompts(_):
     return FRIENDS_3_PROMPTS
 
+def friends4Prompts(_):
+    return FRIENDS_4_PROMPTS
+
+def friends5Prompts(_):
+    return FRIENDS_5_PROMPTS
+
 def caninePrompts(_):
     return CANINE_PROMPTS
 
@@ -444,6 +457,12 @@ def friends2Responses(_):
 
 def friends3Responses(_):
     return FRIENDS_3_RESPONSES
+
+def friends4Responses(_):
+    return FRIENDS_4_RESPONSES
+
+def friends5Responses(_):
+    return FRIENDS_5_RESPONSES
 
 def canineResponses(_):
     return CANINE_RESPONSES
@@ -591,6 +610,8 @@ PROMPTS_RESPONSES = [
   (friends1Prompts, friends1Responses, None, True),
   (friends2Prompts, friends2Responses, None, True),
   (friends3Prompts, friends3Responses, None, True),
+  (friends4Prompts, friends4Responses, None, True),
+  (friends5Prompts, friends5Responses, None, True),
   (idPrompts, idResponses, None, False),
   (introPrompts, introResponses, None, False), # This should follow specific intros
   (greetings, greetings, inKindSuffixes, True), 
